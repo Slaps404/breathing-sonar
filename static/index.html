@@ -33,6 +33,7 @@
   .feed div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .feed .bd { color:#8fb4ff; } .feed .recalled { color:var(--red); font-weight:600; } .feed .closer_look { color:var(--amber); } .feed .cleared { color:var(--green); } .feed .error { color:#ff7b72; } .feed .done { color:var(--fg); font-weight:600; }
   #map { height:320px; border-radius:10px; border:1px solid var(--border); margin-bottom:14px; background:#0b0f14; }
+  .dark-tiles { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9); }
   .leaflet-popup-content { font:13px system-ui; } .leaflet-container { background:#0b0f14; }
   .stats { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
   .stats .chip b { margin-left:4px; }
@@ -54,6 +55,11 @@
   .links { font-size:13px; margin-top:8px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
   a { color:var(--blue); text-decoration:none; } a:hover { text-decoration:underline; }
   .linkbtn { background:none; border:1px solid var(--border); color:var(--fg); border-radius:6px; padding:3px 10px; cursor:pointer; font:inherit; font-size:12px; }
+  .group { background:var(--card); border:1px solid var(--border); border-left:4px solid var(--amber); border-radius:10px; padding:14px; margin-bottom:12px; }
+  .group.recalled { border-left-color:var(--red); }
+  .group .strip { display:flex; gap:6px; overflow-x:auto; margin:10px 0 6px; }
+  .group .strip img { width:76px; height:76px; object-fit:cover; border-radius:6px; flex:none; }
+  .group .gt { font-size:16px; font-weight:600; }
   .empty { color:var(--muted); text-align:center; padding:30px; }
   .note { color:var(--muted); font-size:12px; margin-top:18px; }
   .modal { position:fixed; inset:0; background:#000a; display:none; align-items:center; justify-content:center; z-index:9; }
@@ -108,7 +114,7 @@
     <button class="chip" data-f="recalled"><span class="v-recalled">●</span> Recalled <b id="c-recalled">0</b></button>
     <button class="chip" data-f="closer_look"><span class="v-closer_look">●</span> Needs a closer look <b id="c-closer_look">0</b></button>
     <button class="chip" data-f="cleared"><span class="v-cleared">●</span> Cleared <b id="c-cleared">0</b></button>
-    <span class="meta" id="sweepinfo" style="margin-left:auto"></span>
+    <span style="margin-left:auto" class="meta">showing</span><select id="sweeppick"></select>
   </div>
 
   <div id="list"><div class="empty">Loading…</div></div>
@@ -129,6 +135,7 @@ const $ = id => document.getElementById(id);
 const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const img = u => u ? '/api/img?u=' + encodeURIComponent(u) : '';
 const BADGE = { recalled: 'MATCHES A RECALL', closer_look: 'NEEDS A CLOSER LOOK', cleared: 'CLEARED', no_match: 'NO MATCH', error: 'ERROR' };
+const openGroups = new Set();
 let filter = 'all', results = [], lastT = -1, polling = null, sweepId = null, cfg = null, report = null;
 
 async function init() {
@@ -146,7 +153,14 @@ async function init() {
 async function loadResults() {
   const r = await (await fetch('/api/results' + (sweepId ? '?sweep_id=' + sweepId : ''))).json();
   results = r.results; sweepId = sweepId || r.sweep_id;
-  $('sweepinfo').textContent = r.sweep_id ? 'sweep ' + r.sweep_id : '';
+  const sw = await (await fetch('/api/sweeps')).json();
+  const cur = sw.find(x => x.sweep_id === r.sweep_id);
+  if (cur && cur.stats && !polling_on) { try { const st = JSON.parse(cur.stats); st.running = false; st.events = []; showStatus(st); } catch {} }
+  $('sweeppick').innerHTML = sw.filter(x => x.n > 0).map(x => {
+    let q = []; try { q = JSON.parse(x.queries); } catch {}
+    const label = Array.isArray(q) ? q.slice(0, 3).join(', ') + (q.length > 3 ? ` +${q.length - 3}` : '') : 'rejudge';
+    return `<option value="${x.sweep_id}" ${x.sweep_id === r.sweep_id ? 'selected' : ''}>${x.started.slice(5, 16).replace('T', ' ')} · ${esc(label)} · ${x.n}</option>`;
+  }).join('');
   render();
 }
 
@@ -182,7 +196,7 @@ function drawMap(shown) {
   if (!window.L) { $('map').style.display = 'none'; return; }
   if (!map) {
     map = L.map('map', { zoomControl: true, attributionControl: true }).setView([32.8, -117.1], 9);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 18 }).addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 18, className: 'dark-tiles' }).addTo(map);
     layer = L.layerGroup().addTo(map);
   }
   layer.clearLayers();
@@ -202,10 +216,30 @@ function render() {
   $('c-all').textContent = results.length;
   ['recalled', 'closer_look', 'cleared'].forEach(v => $('c-' + v).textContent = n(v));
   const shown = results.filter(x => filter === 'all' || x.verdict === filter);
-  $('list').innerHTML = shown.length ? shown.map(card).join('') : '<div class="empty">No matches yet.</div>';
+  // collapse 4+ listings that match the same recall with the same verdict into one group card
+  const groups = {};
+  shown.forEach(x => { const k = x.verdict + ':' + ((x.recall || {}).id || x.listing_id); (groups[k] = groups[k] || []).push(x); });
+  const done = new Set(); let html = '';
+  shown.forEach(x => {
+    const k = x.verdict + ':' + ((x.recall || {}).id || x.listing_id);
+    if (done.has(k)) return; done.add(k);
+    const g = groups[k];
+    if (g.length < 4 || openGroups.has(k)) { html += g.map(card).join(''); return; }
+    const r = x.recall || {};
+    const prices = g.map(y => parseFloat(y.price)).filter(p => !isNaN(p));
+    const cities = [...new Set(g.map(y => (y.city || '').replace(', CA', '')))];
+    html += `<div class="group ${x.verdict}"><div class="top"><div><div class="gt">${g.length} listings ${x.verdict === 'recalled' ? 'match' : 'may match'}: ${esc(r.title || '')}</div>
+      <div class="meta">$${Math.min(...prices)}-$${Math.max(...prices)} · ${esc(cities.slice(0, 6).join(', '))}${cities.length > 6 ? ' and more' : ''} · recall ${esc(r.date || '')} · remedy: ${esc(r.remedy_type || '')}</div></div>
+      <span class="badge v-${x.verdict}">${BADGE[x.verdict]}</span></div>
+      <div class="why">${esc(x.reason)}</div>
+      <div class="strip">${g.map(y => `<img src="${img(y.photo)}" title="${esc(y.title)} $${esc(y.price)}" loading="lazy">`).join('')}</div>
+      <div class="links">${r.url ? `<a href="${r.url}" target="_blank">Open recall record ↗</a>` : ''}<button class="linkbtn" onclick="openGroups.add('${k}'); render()">Show all ${g.length}</button></div></div>`;
+  });
+  $('list').innerHTML = html || '<div class="empty">No matches yet.</div>';
   drawMap(shown);
 }
 
+$('sweeppick').onchange = e => { sweepId = e.target.value; openGroups.clear(); loadResults(); };
 $('filters').onclick = e => {
   const b = e.target.closest('[data-f]'); if (!b) return;
   filter = b.dataset.f; document.querySelectorAll('#filters [data-f]').forEach(c => c.classList.toggle('on', c === b)); render();
@@ -237,13 +271,14 @@ function showStatus(s) {
   $('go').disabled = !!s.running; $('go').textContent = s.running ? 'Sweeping…' : 'Sweep';
 }
 
+let polling_on = false;
 function startPolling() {
-  clearInterval(polling); let tick = 0;
+  clearInterval(polling); let tick = 0; polling_on = true;
   polling = setInterval(async () => {
     const s = await (await fetch('/api/status?since=' + lastT)).json();
     showStatus(s);
     if (++tick % 3 === 0 || !s.running) { sweepId = s.sweep_id; await loadResults(); }
-    if (!s.running) clearInterval(polling);
+    if (!s.running) { clearInterval(polling); polling_on = false; }
   }, 1000);
 }
 

@@ -73,7 +73,7 @@ def status(since: float = -1):
 
 @app.get("/api/sweeps")
 def sweeps():
-    rows = con.execute("""SELECT s.sweep_id, s.started, s.finished, s.queries,
+    rows = con.execute("""SELECT s.sweep_id, s.started, s.finished, s.queries, s.stats,
                           (SELECT count(*) FROM verdicts v WHERE v.sweep_id = s.sweep_id) AS n
                           FROM sweeps s ORDER BY s.started DESC LIMIT 30""").fetchall()
     return [dict(r) for r in rows]
