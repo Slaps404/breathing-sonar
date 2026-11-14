@@ -115,7 +115,8 @@ def model_shortcut(listing: dict, ident: dict | None, cands: list[dict]) -> dict
         rec = c["recall"]
         status, lm, rm = model_check(listing, ident, rec)
         if status == "listed" and (match.brand_is_recaller((ident or {}).get("brand") or "", rec)
-                                   or any(match.brand_is_recaller(w, rec) for w in brand.split()[:3])):
+                                   or any(match.brand_is_recaller(w, rec) for w in brand.split()[:3]
+                                          if not re.search(r"\d", w) and len(w) >= 3)):
             hit = [m for m in lm if m.replace("-", "") in {x.replace("-", "") for x in rm}]
             out = {"verdict": "recalled", "recall_id": rec["recall_id"], "confidence": 0.95, "photo_index": 0,
                    "reason": f"Model {', '.join(hit)} is readable in the listing and is on this recall's model list.",

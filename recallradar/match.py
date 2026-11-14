@@ -277,8 +277,8 @@ def brand_shortlist(con, title: str, ident: dict, body: str = "", k: int = 3) ->
 def brand_is_recaller(brand: str, rec: dict) -> bool:
     """True if the brand is named in the recall's headline (the company or brand doing the recall)."""
     b = _norm_brand(brand)
-    if b in GENERIC_BRANDS or len(b) < 3:
-        return False
+    if b in GENERIC_BRANDS or len(b) < 3 or re.search(r"\d", b):
+        return False   # a token with digits is a model number, not a brand
     head = _norm_brand(re.split(r"\bDue to\b", rec["title"])[0])
     return re.search(r"\b" + re.escape(b) + r"\b", head) is not None
 
