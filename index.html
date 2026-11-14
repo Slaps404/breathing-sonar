@@ -1,0 +1,333 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ultrasound breathing test</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #0b0f14; color: #e6edf3; margin: 24px; max-width: 1200px; }
+  button { font-size: 16px; padding: 8px 18px; margin-right: 8px; cursor: pointer; }
+  input[type=text] { font-size: 14px; width: 220px; }
+  canvas { background: #111823; border: 1px solid #263445; display: block; margin: 12px 0; width: 100%; }
+  .stat { display: inline-block; margin-right: 32px; font-size: 18px; color: #9fb0c2; }
+  .stat b { font-size: 34px; color: #e6edf3; }
+  #alert { display: none; background: #b42318; padding: 14px; font-size: 26px; margin: 12px 0; }
+  table { border-collapse: collapse; margin-top: 6px; }
+  td, th { padding: 4px 14px; text-align: left; border-bottom: 1px solid #263445; }
+  .good { color: #3fb950; } .bad { color: #f85149; } .meh { color: #d29922; }
+  .hint { color: #9fb0c2; font-size: 14px; }
+</style>
+</head>
+<body>
+<h2>Ultrasound breathing test</h2>
+<p class="hint">
+  Built-in speaker and mic only (no headphones, no Bluetooth). Sit 30-80 cm from the laptop, chest facing the screen, stay still.
+  On macOS set Control Center &gt; Mic Mode to <b>Standard</b> (Voice Isolation filters out the ultrasound).
+</p>
+<div>
+  <button id="start">Start</button>
+  <button id="stop" disabled>Stop</button>
+  <label>Tones (Hz) <input id="freqs" type="text" value="18500,19500,20500"></label>
+  <label>Volume <input id="vol" type="range" min="0" max="1" step="0.05" value="0.7"></label>
+</div>
+
+<div id="alert">No breathing detected. Are you okay?</div>
+
+<div style="margin-top:14px">
+  <span class="stat">Breathing rate <b id="bpm">--</b> /min</span>
+  <span class="stat">Signal quality <b id="quality">--</b></span>
+  <span class="stat">Best tone <b id="tone">--</b></span>
+</div>
+
+<canvas id="wave" width="1200" height="280"></canvas>
+
+<h3>Tone check</h3>
+<p class="hint">SNR = how much louder the reflected tone is than background noise at a nearby silent frequency.
+Under ~20 dB means your speaker or mic can't handle that frequency. Quality = share of the motion signal that looks like breathing (0.1-0.7 Hz).</p>
+<table id="toneTable"></table>
+
+<script>
+// ---------- Audio thread: plays the tones and demodulates the mic ----------
+// For each tone we multiply the mic signal by cos and sin of that tone (I/Q demodulation)
+// and average over DEC samples. The result is a slow-moving 2D vector per tone whose
+// angle shifts when something (your chest) moves the reflection path.
+const WORKLET = `
+class Sonar extends AudioWorkletProcessor {
+  constructor(opts) {
+    super();
+    const p = opts.processorOptions;
+    this.freqs = p.freqs;          // all demod frequencies (tones + noise references)
+    this.emit = p.emit;            // which of them are actually played
+    this.dec = p.dec;
+    this.amp = p.amp;
+    this.gain = 0;
+    this.n = 0;
+    const K = this.freqs.length;
+    this.w = this.freqs.map(f => 2 * Math.PI * f / sampleRate);
+    this.ph = new Float64Array(K);
+    this.I = new Float64Array(K);
+    this.Q = new Float64Array(K);
+    this.nEmit = this.emit.filter(Boolean).length;
+    this.port.onmessage = e => { if (e.data.amp !== undefined) this.amp = e.data.amp; };
+  }
+  process(inputs, outputs) {
+    const inp = inputs[0] && inputs[0][0];
+    const out = outputs[0];
+    const N = out[0].length;
+    const K = this.freqs.length;
+    for (let s = 0; s < N; s++) {
+      this.gain += (this.amp - this.gain) * 0.0005; // fade in/out to avoid clicks
+      const x = inp ? inp[s] : 0;
+      let y = 0;
+      for (let k = 0; k < K; k++) {
+        const c = Math.cos(this.ph[k]), sn = Math.sin(this.ph[k]);
+        if (this.emit[k]) y += c;
+        this.I[k] += x * c;
+        this.Q[k] -= x * sn;
+        this.ph[k] += this.w[k];
+        if (this.ph[k] > 2 * Math.PI) this.ph[k] -= 2 * Math.PI;
+      }
+      y *= this.gain / this.nEmit;
+      for (let ch = 0; ch < out.length; ch++) out[ch][s] = y;
+      if (++this.n === this.dec) {
+        this.n = 0;
+        this.port.postMessage({
+          I: Array.from(this.I, v => v / this.dec),
+          Q: Array.from(this.Q, v => v / this.dec),
+        });
+        this.I.fill(0);
+        this.Q.fill(0);
+      }
+    }
+    return true;
+  }
+}
+registerProcessor('sonar', Sonar);
+`;
+
+// ---------- Main thread: signal processing + UI ----------
+const RATE = 100;            // demodulated samples per second
+const HIST = 30 * RATE;      // keep 30 s of history
+const WIN = 20 * RATE;       // analyze last 20 s
+const $ = id => document.getElementById(id);
+
+let ctx, node, stream, timer;
+let tones = [];              // per-tone state
+let alerting = false, holdStart = null, savedBase = 0;
+let display = [];            // waveform currently drawn
+let rec = null;              // full-run recording, downloaded on Stop
+
+function makeState(f, emitted) {
+  return { f, emitted, mI: null, mQ: null, mag: 0, ri: [], rq: [], v: [1, 0], proj: [], quality: 0, bpm: null };
+}
+
+async function start() {
+  const freqs = $('freqs').value.split(',').map(s => parseFloat(s.trim())).filter(Boolean);
+  // A silent reference frequency halfway between tones measures background noise.
+  const all = [], emit = [];
+  freqs.forEach(f => { all.push(f); emit.push(true); });
+  freqs.forEach(f => { all.push(f + 500); emit.push(false); });
+
+  stream = await navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 }
+  });
+  ctx = new AudioContext({ sampleRate: 48000, latencyHint: 'interactive' });
+  const url = URL.createObjectURL(new Blob([WORKLET], { type: 'application/javascript' }));
+  await ctx.audioWorklet.addModule(url);
+
+  node = new AudioWorkletNode(ctx, 'sonar', {
+    numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
+    processorOptions: { freqs: all, emit, dec: Math.round(ctx.sampleRate / RATE), amp: parseFloat($('vol').value) }
+  });
+  ctx.createMediaStreamSource(stream).connect(node);
+  node.connect(ctx.destination);
+
+  tones = all.map((f, k) => makeState(f, emit[k]));
+  rec = { started: new Date().toISOString(), rate: RATE, freqs: all, emit, I: all.map(() => []), Q: all.map(() => []), snaps: [] };
+  node.port.onmessage = e => ingest(e.data);
+  timer = setInterval(analyze, 200);
+  $('start').disabled = true; $('stop').disabled = false;
+}
+
+function stop() {
+  clearInterval(timer);
+  if (node) node.disconnect();
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  if (ctx) ctx.close();
+  if (rec && rec.I[0].length) { // save the run so it can be analyzed offline
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(rec)], { type: 'application/json' }));
+    a.download = 'sonar-run-' + rec.started.replace(/[:.]/g, '-') + '.json';
+    a.click();
+    rec = null;
+  }
+  $('start').disabled = false; $('stop').disabled = true;
+}
+
+// Remove the static part of each I/Q vector (direct speaker->mic sound, walls, desk).
+// What's left is the part that changes: reflections from moving things, like a chest.
+function ingest({ I, Q }) {
+  if (rec) I.forEach((v, k) => { rec.I[k].push(+v.toExponential(5)); rec.Q[k].push(+Q[k].toExponential(5)); });
+  const a = 1 / (RATE * 8); // ~8 s average = "static" baseline
+  tones.forEach((s, k) => {
+    if (s.mI === null) { s.mI = I[k]; s.mQ = Q[k]; }
+    s.mI += a * (I[k] - s.mI);
+    s.mQ += a * (Q[k] - s.mQ);
+    s.mag += 0.01 * (Math.hypot(I[k], Q[k]) - s.mag);
+    s.ri.push(I[k] - s.mI);
+    s.rq.push(Q[k] - s.mQ);
+    if (s.ri.length > HIST) { s.ri.shift(); s.rq.shift(); }
+  });
+}
+
+function movingAvg(x, n) {
+  const out = new Array(x.length);
+  let sum = 0;
+  for (let i = 0; i < x.length; i++) {
+    sum += x[i];
+    if (i >= n) sum -= x[i - n];
+    out[i] = sum / Math.min(i + 1, n);
+  }
+  return out;
+}
+
+function detrend(x) {
+  const n = x.length, mx = (n - 1) / 2;
+  let my = 0; for (const v of x) my += v; my /= n;
+  let num = 0, den = 0;
+  for (let i = 0; i < n; i++) { num += (i - mx) * (x[i] - my); den += (i - mx) ** 2; }
+  const b = num / den;
+  return x.map((v, i) => v - my - b * (i - mx));
+}
+
+function std(x) {
+  if (!x.length) return 0;
+  let m = 0; for (const v of x) m += v; m /= x.length;
+  let s = 0; for (const v of x) s += (v - m) ** 2;
+  return Math.sqrt(s / x.length);
+}
+
+// Find the strongest repeating rhythm between 0.1 and 0.7 Hz (6-42 breaths/min).
+function breathingSpectrum(x) {
+  let best = 0, bestF = 0, band = 0;
+  for (let f = 0.1; f <= 0.7; f += 0.01) {
+    let re = 0, im = 0;
+    const w = 2 * Math.PI * f / RATE;
+    for (let i = 0; i < x.length; i++) { re += x[i] * Math.cos(w * i); im -= x[i] * Math.sin(w * i); }
+    const p = (re * re + im * im) / x.length;
+    band += p;
+    if (p > best) { best = p; bestF = f; }
+  }
+  return { bestF, best, band };
+}
+
+function analyze() {
+  for (const s of tones) {
+    if (!s.emitted || s.ri.length < 8 * RATE) continue;
+    const n = Math.min(s.ri.length, WIN);
+    const xs = s.ri.slice(-n), ys = s.rq.slice(-n);
+
+    // The moving reflection traces a curve in the I/Q plane. PCA finds the direction
+    // it moves along most; projecting onto it turns 2D motion into one waveform.
+    let mx = 0, my = 0;
+    for (let i = 0; i < n; i++) { mx += xs[i]; my += ys[i]; }
+    mx /= n; my /= n;
+    let cxx = 0, cxy = 0, cyy = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = xs[i] - mx, dy = ys[i] - my;
+      cxx += dx * dx; cxy += dx * dy; cyy += dy * dy;
+    }
+    const th = 0.5 * Math.atan2(2 * cxy, cxx - cyy);
+    let v = [Math.cos(th), Math.sin(th)];
+    if (v[0] * s.v[0] + v[1] * s.v[1] < 0) v = [-v[0], -v[1]]; // keep sign stable
+    s.v = v;
+
+    let proj = xs.map((x, i) => (x - mx) * v[0] + (ys[i] - my) * v[1]);
+    proj = detrend(movingAvg(proj, 25)); // smooth out jitter faster than ~4 Hz
+    s.proj = proj;
+
+    const total = proj.reduce((a, b) => a + b * b, 0);
+    const spec = breathingSpectrum(proj);
+    s.quality = total > 0 ? Math.min(1, spec.band / total) : 0;
+    s.bpm = spec.bestF * 60;
+  }
+
+  const emitted = tones.filter(s => s.emitted && s.proj.length);
+  if (!emitted.length) { renderTable(); return; }
+  const best = emitted.reduce((a, b) => (b.quality > a.quality ? b : a));
+  display = best.proj;
+
+  $('tone').textContent = (best.f / 1000).toFixed(1) + 'k';
+  $('quality').textContent = best.quality.toFixed(2);
+  $('quality').className = best.quality > 0.5 ? 'good' : best.quality > 0.25 ? 'meh' : 'bad';
+  $('bpm').textContent = best.quality > 0.25 && best.proj.length >= 15 * RATE ? best.bpm.toFixed(0) : '--';
+
+  detectApnea(best);
+  if (rec) rec.snaps.push({ t: rec.I[0].length / RATE, tone: best.f, bpm: best.bpm, quality: best.quality, alerting,
+    mag: tones.map(s => s.mag) });
+  renderTable();
+  draw();
+}
+
+// Breath-hold / apnea check: compare the last 5 s of motion to the whole 20 s window.
+// If recent motion drops below 25% of normal for 4+ seconds, raise the alert.
+// Once raised, it stays until breathing returns to at least half the saved baseline.
+function detectApnea(best) {
+  const p = best.proj;
+  if (p.length < 15 * RATE) return;
+  const recent = std(p.slice(-5 * RATE));
+  const whole = std(p);
+  const now = performance.now();
+  if (!alerting) {
+    if (best.quality > 0.2 && recent < 0.25 * whole) {
+      holdStart ??= now;
+      if (now - holdStart > 4000) {
+        alerting = true;
+        savedBase = whole;
+        $('alert').style.display = 'block';
+        speechSynthesis.speak(new SpeechSynthesisUtterance("Are you okay? I can't detect your breathing."));
+      }
+    } else holdStart = null;
+  } else if (recent > 0.5 * savedBase) {
+    alerting = false;
+    holdStart = null;
+    $('alert').style.display = 'none';
+  }
+}
+
+function renderTable() {
+  const rows = tones.filter(s => s.emitted).map(s => {
+    const noise = tones.find(t => !t.emitted && t.f === s.f + 500);
+    const snr = noise && noise.mag > 0 ? 20 * Math.log10(s.mag / noise.mag) : 0;
+    const cls = snr > 30 ? 'good' : snr > 20 ? 'meh' : 'bad';
+    return `<tr><td>${s.f} Hz</td><td class="${cls}">${snr.toFixed(0)} dB</td><td>${s.quality.toFixed(2)}</td></tr>`;
+  });
+  $('toneTable').innerHTML = '<tr><th>Tone</th><th>SNR</th><th>Quality</th></tr>' + rows.join('');
+}
+
+function draw() {
+  const c = $('wave'), g = c.getContext('2d');
+  g.clearRect(0, 0, c.width, c.height);
+  g.strokeStyle = '#263445';
+  g.beginPath(); g.moveTo(0, c.height / 2); g.lineTo(c.width, c.height / 2); g.stroke();
+  if (display.length < 2) return;
+  const peak = Math.max(...display.map(Math.abs)) || 1;
+  g.strokeStyle = alerting ? '#f85149' : '#58a6ff';
+  g.lineWidth = 2;
+  g.beginPath();
+  display.forEach((v, i) => {
+    const x = (i / (WIN - 1)) * c.width;
+    const y = c.height / 2 - (v / peak) * (c.height * 0.42);
+    i ? g.lineTo(x, y) : g.moveTo(x, y);
+  });
+  g.stroke();
+  g.fillStyle = '#9fb0c2';
+  g.font = '13px system-ui';
+  g.fillText('last 20 s', 8, 18);
+}
+
+$('start').onclick = () => start().catch(e => alert('Could not start: ' + e.message));
+$('stop').onclick = stop;
+$('vol').oninput = e => node && node.port.postMessage({ amp: parseFloat(e.target.value) });
+</script>
+</body>
+</html>
