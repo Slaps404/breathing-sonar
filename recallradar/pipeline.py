@@ -21,7 +21,7 @@ def model_check(listing: dict, ident: dict | None, rec: dict) -> tuple[str, list
     """Deterministic model-number check. Returns (status, listing_models, recalled_models).
     status: 'listed' | 'not_listed' | 'unknown' | 'all_models'."""
     text = listing["title"] + " " + (listing.get("description") or "") + " " + " ".join((ident or {}).get("model_numbers") or [])
-    lm = [m for m in extract_models(text) if not m.isdigit() or len(m) >= 5]
+    lm = match.listing_model_numbers(text)
     rm = rec["models"].split()
     norm = lambda m: m.replace("-", "").replace(".", "")
     if any(norm(m) in {norm(x) for x in rm} for m in lm):
@@ -71,6 +71,13 @@ async def judge_listing(con, http, listing: dict, ident: dict | None) -> dict:
     out = await vision.judge(http, listing, cands)
     out["stage"] = "vision"
     out["candidates"] = [c["recall"]["recall_id"] for c in cands]
+    top = cands[0]
+    if (out["verdict"] == "no_match" and top["rule"] and top["ev"]["brand_hit"] and top["ev"]["product_hit"]
+            and model_check(listing, ident, top["recall"])[0] == "unknown" and top["recall"]["models"]):
+        # Rule: same brand + same product type, recall covers only some models, none readable -> closer look
+        out.update(verdict="closer_look", recall_id=top["recall"]["recall_id"],
+                   reason=f"Same brand and product type as this recall, which covers only certain models; "
+                          f"no model number is visible. Photo check said: {out['reason']}")
     rec = next((c["recall"] for c in cands if c["recall"]["recall_id"] == out.get("recall_id")), None)
     if out["verdict"] != "no_match" and not rec:
         rec = cands[0]["recall"]; out["recall_id"] = rec["recall_id"]

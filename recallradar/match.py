@@ -82,6 +82,23 @@ def bigrams(ws: list[str]) -> set[str]:
     return {f"{a} {b}" for a, b in zip(ws, ws[1:])}
 
 
+_product_nouns: set = set()
+
+
+def product_nouns(con) -> set:
+    """Words that name product TYPES (bassinet, sleeper, rail...): they appear after 'Recalls' in 5+ recall titles.
+    These are not brand evidence even if rare overall."""
+    if not _product_nouns:
+        from collections import Counter
+        cnt = Counter()
+        for (t,) in con.execute("SELECT title FROM recalls"):
+            m = re.search(r"\bRecall(?:s|ed)?\b(.*?)(\bDue\b|$)", t)
+            if m:
+                cnt.update({stem(w) for w in words(m.group(1))})
+        _product_nouns.update(w for w, n in cnt.items() if n >= 5)
+    return _product_nouns
+
+
 _phrase_df: dict = {}
 
 
@@ -105,10 +122,12 @@ def evidence(con, title: str, body: str, rec: dict) -> dict:
     t_raw = re.findall(r"[a-z0-9]+", title.lower())
     tw = [w for w in dict.fromkeys(words(title)) if not w.isdigit()]
     # brand: a rare title word, or a rare title phrase, that appears in the recall
-    brand_hit = [w for w in tw if (w in rw or stem(w) in rw) and idf(con, w) > 4.0]
+    pn = product_nouns(con)
+    brand_hit = [w for w in tw if (w in rw or stem(w) in rw) and idf(con, w) > 4.0 and stem(w) not in pn]
     tbig = [p for p in dict.fromkeys(bigrams(t_raw)) if not set(p.split()) & STOP and not any(x.isdigit() for x in p.split())]
     phrases = [p for p in tbig if p in rbig or " ".join(stem(x) for x in p.split()) in rbig]
-    brand_hit += [p for p in phrases if phrase_idf(con, p) > 4.5 and not any(x in brand_hit for x in p.split())]
+    brand_hit += [p for p in phrases if phrase_idf(con, p) > 4.5 and not any(x in brand_hit for x in p.split())
+                  and not all(stem(x) in pn for x in p.split())]
 
     a_raw = re.findall(r"[a-z0-9]+", (title + " " + body).lower())
     aw = set(words(title + " " + body))
@@ -120,9 +139,9 @@ def evidence(con, title: str, body: str, rec: dict) -> dict:
                 and not any(x.isdigit() for x in p.split()) and phrase_idf(con, p) > 3.5]
 
     rec_models = {m.replace("-", "") for m in rec["models"].split()}
-    listing_models = extract_models(title + " " + body)
+    listing_models = listing_model_numbers(title + " " + body)
     model_hit = [m for m in listing_models if m.replace("-", "") in rec_models and not m.isdigit()]
-    other_models = [m for m in extract_models(title) if m not in model_hit and not m.isdigit()]
+    other_models = [m for m in listing_model_numbers(title) if m not in model_hit and not m.isdigit()]
     all_models = bool(re.search(r"\ball (models|styles)\b", rec["description"] + " " + rec["products"] + " " + rec["title"], re.I))
     score = (2 * sum(idf(con, w) for w in brand_hit if " " not in w)
              + sum(phrase_idf(con, p) for p in phrases) + 0.5 * sum(phrase_idf(con, p) for p in body_phr)
@@ -150,6 +169,22 @@ def rule_verdict(rec: dict, ev: dict) -> tuple[str, str] | None:
     if repair:
         return "closer_look", why + "; the remedy is a repair, so check whether it was done."
     return "closer_look", why + ", but no model number is visible. Check the label."
+
+
+def listing_model_numbers(text: str) -> list[str]:
+    """Model numbers in seller text. Stricter than for recall text: sellers write zip codes, sizes ('NEWBORN-3')
+    and brand names with digits ('4moms'). Keep tokens with a digit and at most 3 letters in a row; pure numbers
+    only when the seller says 'model' or 'style' right before them."""
+    out = []
+    for m in extract_models(text):
+        if m.isdigit():
+            if re.search(r"(model|style|item|mod)\s*(#|no\.?|number)?\s*:?\s*" + m, text, re.I):
+                out.append(m)
+            continue
+        if re.search(r"[A-Z]{4,}", m):
+            continue
+        out.append(m)
+    return out
 
 
 def text_stage(con, title: str, body: str = "", k: int = 3) -> list[dict]:

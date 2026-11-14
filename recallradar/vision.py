@@ -16,7 +16,7 @@ from .config import CACHE, gemini_key
 from .offerup import fetch_image
 
 ID_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash"]
-JUDGE_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash-lite"]
+JUDGE_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash"]  # 3.6 first once billing is on
 
 _client = None
 
@@ -107,6 +107,7 @@ Verdicts:
 - closer_look: likely the same brand and product, but you cannot confirm the model (recall covers only some models and none is readable), OR the recall's remedy is a repair/firmware/part fix so this unit may already be fixed.
 - cleared: same brand/type, but the listing shows a model or version the recall does NOT include.
 - no_match: different product or brand.
+Judge only the main item for sale. Ignore objects in the background of the photo.
 Be strict: a look-alike of a generic shape (e.g. any bassinet) is not a match without a brand, name or design cue that the recall describes.
 Quote evidence exactly. Neutral wording: say "matches a recalled product", never accuse the seller."""
 
@@ -140,5 +141,5 @@ async def judge(http: httpx.AsyncClient, listing: dict, cands: list[dict]) -> di
         if ri:
             parts += [f"Photo of recalled product (recall id={rec['recall_id']}):", _img(ri)]
     parts.append(JUDGE_RULES)
-    key = "judge3:" + listing["listing_id"] + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands) + ":" + str(len(photos))
+    key = "judge4:" + listing["listing_id"] + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands) + ":" + str(len(photos))
     return await _generate(JUDGE_MODELS, parts, JUDGE_SCHEMA, cache_key=key)
