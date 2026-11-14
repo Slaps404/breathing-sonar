@@ -25,7 +25,7 @@ CATEGORIES = {
 }
 
 STATE: dict = {"running": False}
-LIMITS = {"search": 4, "identify": 10, "unlock": 20, "judge": 4}
+LIMITS = {"search": 6, "identify": 20, "unlock": 20, "judge": 8}
 
 
 def _new_state(sweep_id, queries):
