@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0e1116">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Collector">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Sonar Collector</title>
+<style>
+  :root { --bg:#0e1116; --panel:#171c24; --line:#2a323d; --text:#e6e9ee; --dim:#8b95a3; --go:#4cc38a; --warn:#e5a13a; --bad:#e5534b; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom));
+    background:var(--bg); color:var(--text); font:16px/1.4 -apple-system,system-ui,sans-serif; }
+  h1 { font-size:18px; margin:0 0 12px; }
+  .row { display:flex; gap:10px; align-items:center; margin:10px 0; }
+  .row label { color:var(--dim); font-size:14px; min-width:64px; }
+  input[type=text] { flex:1; min-width:0; padding:10px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel); color:var(--text); font-size:16px; }
+  input[type=range] { flex:1; }
+  button { font:inherit; color:var(--text); background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:16px 8px; touch-action:manipulation; }
+  button:disabled { opacity:.35; }
+  #go { width:100%; font-size:20px; font-weight:600; background:var(--go); color:#06120c; border:0; }
+  #go.rec { background:var(--bad); color:#fff; }
+  #stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:12px 0; }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:8px 10px; }
+  .stat b { display:block; font-size:22px; font-variant-numeric:tabular-nums; }
+  .stat span { color:var(--dim); font-size:12px; }
+  #labels { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
+  #labels button { font-size:18px; padding:22px 8px; }
+  #labels button.on { background:#1f3b2e; border-color:var(--go); color:var(--go); font-weight:600; }
+  #msg { min-height:22px; color:var(--dim); font-size:14px; margin:8px 0; word-break:break-word; }
+  #msg.bad { color:var(--bad); } #msg.ok { color:var(--go); }
+  #log { color:var(--dim); font-size:13px; font-variant-numeric:tabular-nums; white-space:pre-wrap; }
+  .hint { color:var(--dim); font-size:13px; }
+  a { color:var(--go); }
+</style>
+</head>
+<body>
+<h1>Sonar Collector</h1>
+
+<div class="row"><label for="note">Setup</label>
+  <input id="note" type="text" placeholder="e.g. 40 cm, phone on desk, sitting" autocomplete="off"></div>
+<div class="row"><label for="vol">Volume</label>
+  <input id="vol" type="range" min="0" max="1" step="0.05" value="0.7"></div>
+
+<button id="go">Start recording</button>
+
+<div id="stats">
+  <div class="stat"><b id="time">0:00</b><span>recorded</span></div>
+  <div class="stat"><b id="snr">--</b><span>probe SNR (dB)</span></div>
+  <div class="stat"><b id="peak">--</b><span>mic peak (%)</span></div>
+</div>
+<div id="msg"></div>
+
+<div id="labels"></div>
+<p class="hint">Tap a label when you START doing it. It stays active until you tap another.
+Probe SNR under ~15 dB means the phone is not hearing its own 18-20 kHz signal: raise the volume or media volume.</p>
+<div id="log"></div>
+
+<script src="../dsp.js"></script>
+<script>
+const LABELS = ['normal', 'slow', 'hold', 'moving', 'empty room', 'other'];
+const MAX_SEC = 15 * 60;            // auto-stop so a forgotten take does not fill phone memory
+const $ = id => document.getElementById(id);
+
+let ctx, node, stream, probe, wake, timer;
+let chunks = [], events = [], snrs = [], peak = 0, lastFrame = null, meta = null;
+
+// Label buttons: each tap logs {label, sample} at the sample count recorded so far.
+LABELS.forEach(name => {
+  const b = document.createElement('button');
+  b.textContent = name; b.disabled = true;
+  b.onclick = () => {
+    const sample = chunks.length * probe.P;
+    events.push({ label: name, sample, t: +(sample / ctx.sampleRate).toFixed(3) });
+    document.querySelectorAll('#labels button').forEach(x => x.classList.toggle('on', x === b));
+    if (navigator.vibrate) navigator.vibrate(30);
+    showLog();
+  };
+  $('labels').appendChild(b);
+});
+
+function say(text, cls = '') { $('msg').textContent = text; $('msg').className = cls; }
+function showLog() { $('log').textContent = events.map(e => `${fmt(e.t)}  ${e.label}`).join('\n'); }
+function fmt(s) { return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); }
+
+async function start() {
+  say('');
+  stream = await navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 }
+  });
+  ctx = new AudioContext({ sampleRate: DSP.SR, latencyHint: 'playback' });
+  await ctx.resume();
+  // Same probe and audio-thread code as the main page, so recordings replay through dsp.js.
+  probe = DSP.makeProbe({ sr: ctx.sampleRate });
+  await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([DSP.PROBE_WORKLET], { type: 'application/javascript' })));
+  node = new AudioWorkletNode(ctx, 'probe', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
+    processorOptions: { signal: probe.sig, amp: +$('vol').value } });
+
+  chunks = []; events = []; snrs = []; peak = 0; lastFrame = null;
+  meta = { started: new Date().toISOString(), sampleRate: ctx.sampleRate, P: probe.P, f0: probe.f0, f1: probe.f1,
+    amp: +$('vol').value, userAgent: navigator.userAgent, trackSettings: stream.getAudioTracks()[0].getSettings() };
+
+  // Each message is one probe period of raw mic samples. Stored as 16-bit to halve memory.
+  node.port.onmessage = e => {
+    const f = e.data, q = new Int16Array(f.length);
+    for (let i = 0; i < f.length; i++) {
+      const v = Math.max(-1, Math.min(1, f[i]));
+      q[i] = v * 32767;
+      if (v > peak) peak = v; else if (-v > peak) peak = -v;
+    }
+    chunks.push(q); lastFrame = f;
+  };
+  ctx.createMediaStreamSource(stream).connect(node);
+  node.connect(ctx.destination);
+
+  try { wake = await navigator.wakeLock.request('screen'); } catch (_) {}
+  timer = setInterval(tick, 500);
+  $('go').textContent = 'Stop and upload'; $('go').classList.add('rec');
+  document.querySelectorAll('#labels button').forEach(b => { b.disabled = false; b.classList.remove('on'); });
+  showLog();
+}
+
+function tick() {
+  const sec = chunks.length * probe.P / ctx.sampleRate;
+  $('time').textContent = fmt(sec);
+  if (lastFrame) {
+    const raw = DSP.cir(probe, lastFrame).snr;
+    const s = Number.isFinite(raw) ? raw : -99; // a fully silent mic gives -Infinity
+    snrs.push(+s.toFixed(1));
+    $('snr').textContent = s.toFixed(0);
+    $('snr').style.color = s < 15 ? 'var(--bad)' : s < 25 ? 'var(--warn)' : 'var(--go)';
+  }
+  $('peak').textContent = (peak * 100).toFixed(0);
+  $('peak').style.color = peak > 0.98 ? 'var(--bad)' : '';
+  if (sec >= MAX_SEC) stop();
+}
+
+function wavBlob(sr) {
+  const n = chunks.length * probe.P, h = new DataView(new ArrayBuffer(44));
+  const str = (o, s) => [...s].forEach((c, i) => h.setUint8(o + i, c.charCodeAt(0)));
+  str(0, 'RIFF'); h.setUint32(4, 36 + n * 2, true); str(8, 'WAVE'); str(12, 'fmt ');
+  h.setUint32(16, 16, true); h.setUint16(20, 1, true); h.setUint16(22, 1, true);
+  h.setUint32(24, sr, true); h.setUint32(28, sr * 2, true); h.setUint16(32, 2, true); h.setUint16(34, 16, true);
+  str(36, 'data'); h.setUint32(40, n * 2, true);
+  return new Blob([h, ...chunks], { type: 'audio/wav' });
+}
+
+async function stop() {
+  clearInterval(timer);
+  const sr = ctx.sampleRate;
+  node.port.onmessage = null; node.disconnect();
+  stream.getTracks().forEach(t => t.stop());
+  await ctx.close();
+  if (wake) { try { await wake.release(); } catch (_) {} wake = null; }
+  $('go').classList.remove('rec'); $('go').disabled = true;
+  document.querySelectorAll('#labels button').forEach(b => b.disabled = true);
+
+  const samples = chunks.length * probe.P;
+  if (!samples) { say('Nothing recorded.', 'bad'); return reset(); }
+  const id = 'take-' + meta.started.replace(/[:.]/g, '-');
+  const sorted = snrs.slice().sort((a, b) => a - b);
+  Object.assign(meta, { id, samples, seconds: +(samples / sr).toFixed(2), note: $('note').value, peak: +peak.toFixed(4),
+    snrMedianDb: sorted.length ? sorted[sorted.length >> 1] : null, labels: events,
+    // Sample n of the WAV lines up with probe[n % P]: speaker and mic share one clock.
+    probe: Array.from(probe.sig, v => +v.toFixed(6)) });
+  const wav = wavBlob(sr), json = new Blob([JSON.stringify(meta)], { type: 'application/json' });
+
+  say(`Uploading ${(wav.size / 1e6).toFixed(1)} MB...`);
+  try {
+    for (const [name, body] of [[id + '.wav', wav], [id + '.json', json]]) {
+      const r = await fetch('/upload/' + name, { method: 'PUT', body });
+      if (!r.ok) throw new Error(name + ' -> HTTP ' + r.status);
+    }
+    say(`Saved ${id} (${fmt(meta.seconds)}, ${events.length} labels, SNR ${meta.snrMedianDb} dB)`, 'ok');
+  } catch (err) {
+    // Upload failed: keep the take by offering it as downloads on the phone.
+    say('Upload failed: ' + err.message + '. Save the files here: ', 'bad');
+    for (const [name, body] of [[id + '.wav', wav], [id + '.json', json]]) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(body); a.download = name; a.textContent = name + ' ';
+      $('msg').appendChild(a);
+    }
+  }
+  reset();
+}
+
+function reset() { chunks = []; $('go').textContent = 'Start recording'; $('go').disabled = false; }
+
+$('go').onclick = () => {
+  if ($('go').classList.contains('rec')) stop();
+  else start().catch(err => { say('Could not start: ' + err.message, 'bad'); });
+};
+$('vol').oninput = () => { if (node) node.port.postMessage({ amp: +$('vol').value }); };
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
