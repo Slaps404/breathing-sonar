@@ -1,4 +1,4 @@
-SONAR BREATHING RECORDER  (Mac only, about 10 minutes)
+SONAR BREATHING RECORDER  (Mac only, 4 to 20 minutes, you choose)
 
 Your laptop plays a very high-pitched sound (most adults can't hear it) and records the echo
 off your chest. We are teaching it to tell breathing from a held breath.
@@ -6,19 +6,22 @@ Only the echo recording is saved. It stays on your laptop until you send it.
 
 1. Right-click "Start Recorder.command" > Open > Open.
    (A normal double-click gets blocked by macOS the first time.)
-2. Type your first name when asked. Click Allow when macOS asks about the microphone.
-3. Set up:
-   - Laptop on a table, speaker volume about half, no headphones or AirPods.
-   - Sit facing the screen. Write down roughly how far your chest is from the screen.
-4. Click the  ◌  icon in the menu bar (top-right of the screen):
-   - Distance: pick the one closest to where you sit.
-   - Start guided take.
+2. Type your first name, then pick how much to help:
+     1. Quick       2 takes, about 4 min   (seated, then an empty chair)
+     2. Helpful     5 takes, about 13 min  (adds close, far, and moving around)
+     3. Extra mile  8 takes, about 20 min  (adds slouched, noisy room, lying down)
+   Click Allow when macOS asks about the microphone.
+3. Laptop on a table, speaker volume about half, no headphones or AirPods.
+4. Click the  ◌  icon in the menu bar (top-right of the screen) > Next take.
+   A box tells you how to sit. Click Start.
 5. Hands off the laptop. A banner at the top tells you what to do:
      BREATHE NORMALLY = just breathe
      HOLD BREATH      = hold until the banner changes (20 s)
-   Keep still the whole time. About 3 minutes. It saves by itself at the end.
-6. If you have time, do 2 more takes at different distances (close ~30 cm, farther ~70 cm).
-   Set the Distance in the menu before each one.
-7. Choose Quit from the  ◌  menu. A zip appears on your Desktop: send it back.
+     MOVE AROUND      = fidget like normal (shift, scratch, look around)
+     STEP AWAY        = leave the room until it says SAVED
+   It saves by itself at the end. Then click  ◌  > Next take again, until it says all done.
+6. Choose Quit from the  ◌  menu. A zip appears on your Desktop: send it back.
 
-If the banner says "audio dropouts: redo", close other apps and do that take again.
+Done early and want to give more? Click  ◌  > How much to help > pick a bigger one.
+The takes you already did count.
+If the banner says "redo", Next take repeats that take (close other apps, unmute, volume up).
