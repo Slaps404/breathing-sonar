@@ -45,10 +45,7 @@ def extract_brands(rec: dict) -> list[str]:
 
 def remedy_type(rec: dict) -> str:
     opts = {o.get("Option", "").lower() for o in rec.get("RemedyOptions") or []}
-    for t in ("refund", "replace", "repair"):
-        if t in opts:
-            return t
-    return next(iter(opts), "") or "other"
+    return ",".join(sorted(o for o in opts if o)) or "other"   # e.g. "refund,repair"
 
 
 def row_from(rec: dict) -> dict:
