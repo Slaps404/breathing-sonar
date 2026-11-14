@@ -36,7 +36,19 @@
   "listing_id": "9dd21465-51a3-3d1f-ae19-281cdb9d2367",
   "expect": "recalled",
   "expect_recall": "Rocking Sleeper",
-  "error": "Unlocker failed for https://offerup.com/item/detail/9dd21465-51a3-3d1f-ae19-281cdb9d2367: status 502, 0 bytes"
+  "title": "\"Automatic Rock N Soothe Sleeper\"",
+  "description": "In very good condition only used about 4 times..",
+  "photos": [
+   "https://images.offerup.com/9MFHM7QFi1BUuxFc_3UKWbnuoSE=/1440x1920/c277/c277773f2751425184bd52c191aedce1.jpg",
+   "https://images.offerup.com/sq8j1_LT_Rh7KI9v_j7QXUmOkW8=/1440x1920/3bf3/3bf36d8ac34740bab8a12b29e7c34124.jpg",
+   "https://images.offerup.com/ZqEdUzJ9Q4db-6EP0FQ6oifdmpI=/1440x1920/6ebe/6ebeea9e66044addbe0b315c07503ca0.jpg",
+   "https://images.offerup.com/779usWchvyUNYEwvGTrNnXnUt_w=/991x1424/439f/439f9110b64d442fa72f16fdaa0892ac.jpg"
+  ],
+  "lat": 32.58299,
+  "lon": -117.12059,
+  "city": "Imperial Beach, CA",
+  "post_date": "2018-11-05T04:27:21.532Z",
+  "from_cache": false
  },
  {
   "listing_id": "5c736bde-0508-3d09-ae63-3a627e480a8e",
