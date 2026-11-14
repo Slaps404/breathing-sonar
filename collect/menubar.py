@@ -3,6 +3,7 @@
 Click the icon, start recording, then pick what you are doing. Each pick is logged
 with the exact sample it happened at. Recordings land in data/.
 """
+import signal
 import subprocess
 
 import rumps
@@ -20,13 +21,18 @@ LABELS = {
 DISTANCES = {"About 20 cm": 20, "About 30 cm": 30, "About 40 cm": 40, "About 50 cm": 50, "About 60 cm": 60,
              "About 80 cm": 80, "About 1 m": 100, "About 1.5 m": 150, "2 m or more": 200}
 
+IDLE = "◌"
+
 
 class SonarApp(rumps.App):
     def __init__(self):
-        super().__init__("Sonar", title="◌ sonar", quit_button=None)
+        # Keep the title tiny: a wide one gets pushed behind the notch and cannot be clicked.
+        super().__init__("Sonar", title=IDLE, quit_button=None)
         # 20-22 kHz at low level: above what most people can hear. 18-20 kHz was audible and unpleasant.
         self.rec = Recorder(amp=0.15, f0=20000, f1=22000)
         self.current = None
+        self.stop_requested = False
+        signal.signal(signal.SIGTERM, lambda *_: setattr(self, "stop_requested", True))
         self.toggle = rumps.MenuItem("Start recording", callback=self.on_toggle)
         self.items = {text: rumps.MenuItem(text, callback=self.on_label) for text in LABELS}
         self.status = rumps.MenuItem("Not recording")
@@ -71,7 +77,7 @@ class SonarApp(rumps.App):
     def save(self):
         meta = self.rec.stop()
         self.toggle.title = "Start recording"
-        self.title = "◌ sonar"
+        self.title = IDLE
         self.current = None
         for item in self.items.values():
             item.state = 0
@@ -79,18 +85,21 @@ class SonarApp(rumps.App):
 
     @rumps.timer(1)
     def tick(self, _):
+        if self.stop_requested:         # `kill <pid>` saves the take instead of losing it
+            self.on_quit(None)
         if not self.rec.running:
             return
         s = int(self.rec.seconds())
         snr = self.rec.snr
-        self.title = f"● {LABELS[self.current]} {s // 60}:{s % 60:02d}"
+        self.title = "●" + LABELS[self.current][0].upper()     # e.g. ●N normal, ●H hold
+        head = f"{LABELS[self.current]} {s // 60}:{s % 60:02d}"
         if snr is None:
-            self.status.title = "Recording..."
+            self.status.title = head
         elif self.rec.peak == 0:
-            self.status.title = "Mic is silent: allow microphone access for this app"
+            self.status.title = head + ", mic is silent: allow microphone access"
         else:
-            warn = "  (LOW: raise volume)" if snr < 15 else ""
-            self.status.title = f"Probe SNR {snr:.0f} dB{warn}, dropouts {self.rec.xruns}"
+            warn = " (LOW: raise volume)" if snr < 15 else ""
+            self.status.title = f"{head}, SNR {snr:.0f} dB{warn}, dropouts {self.rec.xruns}"
 
     def on_open(self, _):
         DATA.mkdir(exist_ok=True)
