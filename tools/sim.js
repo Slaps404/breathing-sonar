@@ -10,4 +10,4 @@ for (const x of res.timeline) if (Math.abs(x.t % 5) < 0.01)
   console.log(`t=${String(x.t).padStart(3)}s bpm=${x.bpm === null ? '--' : x.bpm.toFixed(1)} quality=${x.q.toFixed(2)} alert=${x.alert}` +
     (x.lock !== null ? ` chest@${x.lock}m` : '') + ` snr=${x.snr.toFixed(0)}dB`);
 console.log('alert events:', res.events.map(e => e.join(' ')).join(', ') || 'none');
-console.log('score:', JSON.stringify(score(res, { truth: 15, hold, T })), `(${((Date.now() - t0) / 1000).toFixed(1)} s)`);
+console.log('score:', JSON.stringify(score(res, { scene, hold, T })), `(${((Date.now() - t0) / 1000).toFixed(1)} s)`);

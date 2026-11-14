@@ -15,14 +15,36 @@ function gauss(r) { return Math.sqrt(-2 * Math.log(r() + 1e-12)) * Math.cos(2 * 
 // Breather: chest distance over time. Rate wanders +-8%, small body sway, freezes during a hold.
 function breather({ d, mm, bpm, hold = null, r }) {
   let ph = 0, last = 0, wobble = 0, sway = 0;
-  return t => {
+  const log = []; // [t, phase] every ~0.1 s, to know the true rate later
+  const f = t => {
     const dt = t - last; last = t;
     if (dt > 0) {
       wobble += (-wobble * dt / 10) + gauss(r) * Math.sqrt(dt) * 0.04;
       sway += (-sway * dt / 3) + gauss(r) * Math.sqrt(dt) * 0.0002;
       if (!(hold && t > hold[0] && t < hold[1])) ph += 2 * Math.PI * (bpm / 60) * (1 + wobble) * dt;
+      if (!log.length || t - log[log.length - 1][0] >= 0.1) log.push([t, ph]);
     }
     return d + mm / 1000 * (Math.sin(ph) + 0.2 * Math.sin(2 * ph)) / 1.1 + sway;
+  };
+  // true average rate over [t-win, t] in breaths/min
+  f.rate = (t, win = 20) => {
+    const at = x => { let i = Math.min(log.length - 1, Math.max(0, Math.round(x / 0.1))); while (i > 0 && log[i][0] > x) i--; return log[i][1]; };
+    return (at(t) - at(t - win)) / (2 * Math.PI) / win * 60;
+  };
+  return f;
+}
+// Someone standing still-ish: slow random sway/weight shifts (std `cm`, ~2 s time scale),
+// plus an arm gesture now and then. This motion is slow, so it lands in the breathing band.
+function stander({ d, cm = 2, r }) {
+  let x = 0, last = 0, arm = 0, armT = -99;
+  return t => {
+    const dt = t - last; last = t;
+    if (dt > 0) {
+      x += -x * dt / 2 + gauss(r) * Math.sqrt(dt) * (cm / 100) ;
+      if (r() < dt / 8) armT = t;                       // a gesture every ~8 s
+    }
+    arm = t - armT < 1.5 ? 0.15 * Math.sin(Math.PI * (t - armT) / 1.5) : 0;
+    return { body: d + x, arm: d - 0.1 - arm };
   };
 }
 
@@ -36,10 +58,12 @@ const amp = (a0, d) => a0 * (0.6 / d) ** 2;
 //  bystander {d, mm, bpm}              another seated person breathing
 //  noise  multiplier on the base noise floor, gust bool (wind-like slow swells, x0.3..x5)
 function makeScene(o, seed = 1) {
-  const r = rng(seed);
-  const chest = breather({ ...o.chest, hold: o.hold, r });
-  const by = o.bystander ? breather({ ...o.bystander, r }) : null;
-  const walkers = (o.walkers || []).map((w, i) => ({ speed: 1.3, start: 3 + 4 * i + r() * 3, ...w }));
+  // separate random streams per element, so adding a bystander doesn't change the subject
+  const r = rng(seed), rw = rng(seed * 7 + 1);
+  const chest = breather({ ...o.chest, hold: o.hold, r: rng(seed * 7 + 2) });
+  const by = o.bystander ? breather({ ...o.bystander, r: rng(seed * 7 + 3) }) : null;
+  const st = (o.standers || []).map((s, i) => stander({ ...s, r: rng(seed * 7 + 4 + i) }));
+  const walkers = (o.walkers || []).map((w, i) => ({ speed: 1.3, start: 3 + 4 * i + rw() * 3, ...w }));
   let g = 0, gLast = 0;
   return {
     opts: o,
@@ -48,6 +72,7 @@ function makeScene(o, seed = 1) {
       if (o.walls !== false) out.push({ d: 1.2, a: 0.05 });
       const c = chest(t); out.push({ d: c, a: amp(0.01, c) });
       if (by) { const b = by(t); out.push({ d: b, a: amp(0.01, b) }); }
+      for (const s of st) { const p = s(t); out.push({ d: p.body, a: amp(0.03, p.body) }, { d: p.arm, a: amp(0.005, p.arm) }); }
       for (const w of walkers) {
         const k = Math.floor((t - w.start) / w.every);
         if (k < 0) continue;
@@ -68,7 +93,7 @@ function makeScene(o, seed = 1) {
       g += -g * dt / 1.5 + gauss(r) * Math.sqrt(Math.max(dt, 0)) * 0.9; // slow random swells
       return base * Math.min(5, Math.max(0.3, Math.exp(g)));
     },
-    r,
+    r, truthRate: t => chest.rate(t),
   };
 }
 
@@ -145,10 +170,11 @@ function run(mode, scene, { T = 100, lat = 0.004 } = {}) {
 }
 
 // Score a run. Breathing judged from 25 s (window full) until the hold, and 15 s after it.
-function score(res, { truth, hold, T }) {
+function score(res, { scene, hold, T }) {
   const tl = res.timeline;
-  const breathing = tl.filter(x => x.t >= 25 && (!hold || x.t < hold[0] || x.t > hold[1] + 15));
-  const good = breathing.filter(x => x.bpm !== null && Math.abs(x.bpm - truth) <= 2).length;
+  // judge rate only when the 20 s window holds no breath hold
+  const breathing = tl.filter(x => x.t >= 25 && (!hold || x.t < hold[0] || x.t > hold[1] + 20));
+  const good = breathing.filter(x => x.bpm !== null && Math.abs(x.bpm - scene.truthRate(x.t)) <= 2).length;
   const starts = res.events.filter(e => e[1] === 'start').map(e => e[0]);
   let latency = null, fa = 0;
   for (const s of starts) {

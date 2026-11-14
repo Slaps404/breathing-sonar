@@ -1,0 +1,2691 @@
+{
+ "chest": {
+  "d": 0.45,
+  "mm": 3,
+  "bpm": 15
+ },
+ "hold": [
+  60,
+  80
+ ],
+ "T": 100,
+ "seeds": 5,
+ "results": [
+  {
+   "name": "alone, quiet room",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.005009097411225,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.002341482551174,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.889631857834,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.95035883609888,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.82795601712848,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.949254205559654,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.82597407768591,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.001651653486704,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.88611798111813,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.0030183585704,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.78035142533217,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.71852291670805,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.527956159744704,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.12084698200786,
+   "onChest": null,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.07263130609157,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.95044118359693,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.82829453085219,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.00242403143891,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.89118216018936,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.49234533916259,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     80.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.75027967697065,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     80.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.00337812731983,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.69110498479201,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     79,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.0233048906628,
+   "onChest": null,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.0918015377849,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     80.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.82678961206882,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.94845032761243,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.88909532517632,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.0022836194398,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.54428798803188,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.783629925317264,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.004510556533326,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.71547820125797,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.091993163301375,
+   "onChest": null,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.09052913280662,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.94835247097708,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.82653352254823,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.00041745466126,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     79,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.88799104902749,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     79.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.53142779991903,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.71437950377308,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.79078791582812,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.05572731411164,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.0000727586974,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.10410855523909,
+   "onChest": null,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.949265645804076,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.8282556343927,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.003107203979795,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.889427869043544,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 0.9142857142857143,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.74032632354506,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 0.8571428571428571,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.4735222994191,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     68.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.00655547281788,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 0.9542857142857143,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.0566729272207,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     79.2,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.65318464755599,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 1,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.9929351621099,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     73.4,
+     "end"
+    ],
+    [
+     79.2,
+     "start"
+    ],
+    [
+     79.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.840177160533365,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.55144897876602,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.76351932019126,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.71360566417058,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.092317621519676,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.753344165321835,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.876813326960075,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.11230000420145,
+   "onChest": null,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.783138350486304,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.947594268373656,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.32648684819094,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.05951612657902,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.24709541857779,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.23988991686967,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 56.12868298322944,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.2,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.443322393772206,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.044357235552035,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 56.510634989943604,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     80.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 56.90439334752935,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 56.96077562488453,
+   "onChest": null,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 45.23915910513593,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.2,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 44.840880860335346,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 44.94594078394197,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 1,
+   "breathMin": 0.5833333333333334,
+   "snr": 54.24848622025248,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     79.4,
+     "end"
+    ],
+    [
+     87.6,
+     "start"
+    ],
+    [
+     91.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 56.227644866190445,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 45.3271397771989,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 55.56097725552884,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     80.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 55.33593810990946,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     79.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 45.54731246031117,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.2,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 55.51530469188003,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     79.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 38.366540636104745,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 38.196655312993805,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 52.64096040523783,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 38.35933438954414,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 38.257236343385706,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 49.4506678301196,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 1,
+   "breathMin": 0.5833333333333334,
+   "snr": 50.81374907564769,
+   "onChest": null,
+   "events": [
+    [
+     87,
+     "start"
+    ],
+    [
+     92.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 1,
+   "breathMin": 0.5833333333333334,
+   "snr": 51.19506972408757,
+   "onChest": null,
+   "events": [
+    [
+     92,
+     "start"
+    ],
+    [
+     93,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 51.47895530669345,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 38.41153719179921,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 22.567971186848723,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 29.902921920903914,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.2,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 29.602936080832343,
+   "onChest": 1,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     80.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 27.146710524884035,
+   "onChest": 1,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 25.759564908548857,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.21805856842551,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.153837028939506,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     80.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.89846935962112,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     80.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.835522903834445,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.11909404501753,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     80.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 8.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 13.37634983974301,
+   "onChest": 1,
+   "events": [
+    [
+     68.8,
+     "start"
+    ],
+    [
+     81.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 0.5142857142857142,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 20.424126227291634,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 0.6228571428571429,
+   "latency": 7,
+   "falseAlarms": 1,
+   "breathMin": 0.5833333333333334,
+   "snr": 20.13859898613337,
+   "onChest": 1,
+   "events": [
+    [
+     67,
+     "start"
+    ],
+    [
+     67.4,
+     "end"
+    ],
+    [
+     79.6,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 30.154932450105218,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 0.017142857142857144,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 17.717989694537618,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 37.135309680815396,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     80.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 37.82374115089436,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 34.25987578931251,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     80.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 33.609679578739595,
+   "onChest": null,
+   "events": [
+    [
+     67.8,
+     "start"
+    ],
+    [
+     80.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 0.92,
+   "latency": 12.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 16.35652062051222,
+   "onChest": 1,
+   "events": [
+    [
+     72.2,
+     "start"
+    ],
+    [
+     81.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 0,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 5.312032421425413,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 0.24571428571428572,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 10.404756075521806,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 0.17142857142857143,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 10.23712270954664,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 20.647092872443714,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 0,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 8.195760694561269,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 0.06285714285714286,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 7.082364226035816,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 28.278861582197937,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 27.676575707835216,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 24.794037568533046,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x30",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 24.071367349733688,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 8.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 13.371855665127857,
+   "onChest": 1,
+   "events": [
+    [
+     68.8,
+     "start"
+    ],
+    [
+     81.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 0.4114285714285714,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 20.42283079365191,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "range",
+   "seed": 3,
+   "rateOK": 0.6228571428571429,
+   "latency": 7,
+   "falseAlarms": 1,
+   "breathMin": 0.5833333333333334,
+   "snr": 20.13691421114401,
+   "onChest": 1,
+   "events": [
+    [
+     67,
+     "start"
+    ],
+    [
+     67.2,
+     "end"
+    ],
+    [
+     79.6,
+     "start"
+    ]
+   ]
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 0.022857142857142857,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 17.708565941590653,
+   "onChest": 0,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 10.524127379416042,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 17.800657325919392,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 14.501783061155782,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 0.9942857142857143,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 17.299296199836775,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 0.9142857142857143,
+   "latency": 20.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 16.350770852616424,
+   "onChest": 1,
+   "events": [
+    [
+     80.6,
+     "start"
+    ]
+   ]
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 0.6,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 13.683674478942915,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 20.533952069490024,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 28.18275942932203,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 27.646105717555656,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 24.77160152294621,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "street: walkers only, wind x30",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 24.00593269352219,
+   "onChest": null,
+   "events": []
+  }
+ ]
+}
