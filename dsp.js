@@ -347,11 +347,27 @@ class RangeSonar {
     for (let r = r0; r <= r1; r++) {
       const ch = this.chs[this.tap(r)];
       if (!analyzeChannel(ch)) continue;
-      const s = ch.quality * (ch.center ? ch.center.R : 0);
+      // Is the motion real? Compare slow movement (distance from the average) with
+      // frame-to-frame jitter (noise). Far slices with weak echoes have mm-sized "motion"
+      // that is just noise; near slices have strong echoes but barely move.
+      const n = Math.min(ch.I.length, Math.round(20 * this.rate)), a0 = ch.I.length - n;
+      let mI = 0, mQ = 0;
+      for (let i = a0; i < ch.I.length; i++) { mI += ch.I[i]; mQ += ch.Q[i]; }
+      mI /= n; mQ /= n;
+      let slow = 0, jit = 0;
+      for (let i = a0; i < ch.I.length; i++) {
+        slow += (ch.I[i] - mI) ** 2 + (ch.Q[i] - mQ) ** 2;
+        if (i > a0) jit += ((ch.I[i] - ch.I[i - 1]) ** 2 + (ch.Q[i] - ch.Q[i - 1]) ** 2) / 2;
+      }
+      const motionSnr = Math.sqrt(slow / n) / (Math.sqrt(jit / (n - 1)) || 1e-12);
+      const s = ch.quality * Math.min(std(ch.disp), 20) * Math.min(1, motionSnr / 10);
       this.scores.push([r, s]);
       if (!best || s > best[1]) best = [r, s];
     }
     if (!best) return;
+    // Echoes of the chest that bounce off a desk or wall arrive later, so they look farther
+    // away and move in step with the breathing. The real chest is the nearest strong slice.
+    best = this.scores.find(sc => sc[1] >= 0.5 * best[1]);
     if (this.lock === null) { this.lock = best[0]; return; }
     if (this.manual) return;
     // Only move the lock if the current slice has looked dead for 20 s and we are not in a
