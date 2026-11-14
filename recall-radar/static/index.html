@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RecallRadar</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root { --bg:#0d1117; --card:#161b22; --border:#30363d; --fg:#e6edf3; --muted:#8b949e; --red:#f85149; --amber:#d29922; --green:#3fb950; --blue:#58a6ff; --bd:#3d7eff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; }
+  main { max-width:1100px; margin:0 auto; padding:20px 18px 60px; }
+  h1 { font-size:24px; margin:0; letter-spacing:-.3px; } h1 span { color:var(--red); }
+  .sub { color:var(--muted); margin:4px 0 16px; }
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:14px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .chip { border:1px solid var(--border); border-radius:999px; padding:5px 11px; cursor:pointer; user-select:none; color:var(--muted); background:transparent; font:inherit; }
+  .chip.on { background:#1f6feb33; border-color:var(--blue); color:var(--fg); }
+  .label { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.5px; margin-right:4px; }
+  button.go { margin-left:auto; background:var(--red); color:#fff; border:0; border-radius:8px; padding:10px 22px; font:600 15px system-ui; cursor:pointer; }
+  button.go:disabled { opacity:.5; cursor:default; }
+  .pipe { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:14px; }
+  .stage { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 12px; position:relative; }
+  .stage.active { border-color:var(--blue); box-shadow:0 0 0 1px var(--blue) inset; }
+  .stage.bd { border-color:#3d7eff88; }
+  .stage .n { font-size:24px; font-weight:700; }
+  .stage .t { font-size:12px; color:var(--muted); }
+  .stage .tag { position:absolute; top:8px; right:8px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:#3d7eff33; color:#8fb4ff; }
+  .stage .tag.g { background:#a371f733; color:#d2a8ff; }
+  .bar { height:3px; background:var(--border); border-radius:2px; margin-top:6px; overflow:hidden; } .bar i { display:block; height:100%; background:var(--blue); width:0; transition:width .4s; }
+  .feed { font:12px ui-monospace,Menlo,monospace; color:var(--muted); max-height:120px; overflow:auto; background:#0b0f14; border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-bottom:14px; }
+  .feed div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .feed .bd { color:#8fb4ff; } .feed .recalled { color:var(--red); font-weight:600; } .feed .closer_look { color:var(--amber); } .feed .cleared { color:var(--green); } .feed .error { color:#ff7b72; } .feed .done { color:var(--fg); font-weight:600; }
+  #map { height:320px; border-radius:10px; border:1px solid var(--border); margin-bottom:14px; background:#0b0f14; }
+  .dark-tiles { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9); }
+  .leaflet-popup-content { font:13px system-ui; } .leaflet-container { background:#0b0f14; }
+  .stats { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+  .stats .chip b { margin-left:4px; }
+  .card { display:grid; grid-template-columns:300px 1fr; gap:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px; }
+  .card.recalled { border-left:4px solid var(--red); } .card.closer_look { border-left:4px solid var(--amber); } .card.cleared { border-left:4px solid var(--green); }
+  .pics { display:grid; grid-template-columns:1fr 1fr; gap:6px; align-content:start; }
+  .pics figure { margin:0; } .pics img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; background:#222; display:block; }
+  .pics figcaption { font-size:11px; color:var(--muted); text-align:center; margin-top:2px; }
+  .top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+  .title { font-weight:600; font-size:16px; } .meta { color:var(--muted); font-size:12px; }
+  .badge { white-space:nowrap; font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; border:1px solid currentColor; }
+  .v-recalled { color:var(--red); } .v-closer_look { color:var(--amber); } .v-cleared { color:var(--green); } .v-no_match, .v-error { color:var(--muted); }
+  .why { margin:8px 0; font-size:14px; }
+  .evid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0; }
+  .evid div { background:#0b0f14; border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:12px; }
+  .evid b { display:block; color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:.4px; }
+  .recall { border-left:3px solid var(--border); padding-left:10px; font-size:13px; margin-top:6px; }
+  .recall .rt { font-weight:600; } .recall .f { color:var(--muted); }
+  .links { font-size:13px; margin-top:8px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+  a { color:var(--blue); text-decoration:none; } a:hover { text-decoration:underline; }
+  .linkbtn { background:none; border:1px solid var(--border); color:var(--fg); border-radius:6px; padding:3px 10px; cursor:pointer; font:inherit; font-size:12px; }
+  .group { background:var(--card); border:1px solid var(--border); border-left:4px solid var(--amber); border-radius:10px; padding:14px; margin-bottom:12px; }
+  .group.recalled { border-left-color:var(--red); }
+  .group .strip { display:flex; gap:6px; overflow-x:auto; margin:10px 0 6px; }
+  .group .strip img { width:76px; height:76px; object-fit:cover; border-radius:6px; flex:none; }
+  .group .gt { font-size:16px; font-weight:600; }
+  .empty { color:var(--muted); text-align:center; padding:30px; }
+  .note { color:var(--muted); font-size:12px; margin-top:18px; }
+  .modal { position:fixed; inset:0; background:#000a; display:none; align-items:center; justify-content:center; z-index:9; }
+  .modal.on { display:flex; }
+  .modal .box { background:var(--card); border:1px solid var(--border); border-radius:10px; width:min(760px,94vw); max-height:88vh; display:flex; flex-direction:column; padding:14px; gap:10px; }
+  .modal textarea { width:100%; flex:1; min-height:340px; background:#0b0f14; color:var(--fg); border:1px solid var(--border); border-radius:6px; padding:10px; font:13px/1.45 ui-monospace,Menlo,monospace; }
+  select, input { background:#0b0f14; color:var(--fg); border:1px solid var(--border); border-radius:6px; padding:5px 8px; font:inherit; }
+  @media (max-width:760px) { .pipe { grid-template-columns:1fr 1fr; } .card { grid-template-columns:1fr; } .evid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Recall<span>Radar</span></h1>
+  <p class="sub">Recalled products are for sale near you right now, and we find them. Every listing in an area, checked against every federal recall record (<span id="nrec">…</span> CPSC recalls, newest <span id="newest">…</span>).</p>
+
+  <div class="panel">
+    <div class="row" style="margin-bottom:10px">
+      <span class="label">Area</span>
+      <select id="area">
+        <option value="32.7157,-117.1611">San Diego (downtown)</option>
+        <option value="32.8801,-117.2340">UCSD / La Jolla</option>
+        <option value="32.6401,-117.0842">Chula Vista</option>
+        <option value="33.1192,-117.0864">Escondido</option>
+        <option value="34.0522,-118.2437">Los Angeles</option>
+        <option value="here">Use my location</option>
+      </select>
+      <span class="label" style="margin-left:10px">Radius</span>
+      <select id="radius"><option>10</option><option>20</option><option selected>30</option><option>50</option></select>
+      <span class="meta">miles</span>
+    </div>
+    <div class="row">
+      <span class="label">Categories</span>
+      <span id="cats" class="row"></span>
+      <button class="go" id="go">Sweep</button>
+    </div>
+  </div>
+
+  <details class="panel" id="checkbox"><summary style="cursor:pointer"><b>Check one item</b> <span class="meta">(bonus: photo of something at a garage sale or in your home)</span></summary>
+    <div class="row" style="margin-top:10px">
+      <input type="file" id="ck-file" accept="image/*" capture="environment">
+      <input type="text" id="ck-text" placeholder="optional: words on the label" style="flex:1;min-width:180px">
+      <button class="linkbtn" id="ck-go">Check</button>
+    </div>
+    <div id="ck-out" style="margin-top:10px"></div>
+  </details>
+
+  <div class="pipe">
+    <div class="stage bd" id="s-search"><span class="tag">BRIGHT DATA</span><div class="n" id="n-listings">0</div><div class="t">listings pulled from OfferUp<br><span id="n-queries">0/0</span> searches</div><div class="bar"><i id="b-search"></i></div></div>
+    <div class="stage" id="s-photos"><span class="tag g">GEMINI</span><div class="n" id="n-photos">0</div><div class="t">listing photos read<br>brand, product, model on label</div><div class="bar"><i id="b-photos"></i></div></div>
+    <div class="stage" id="s-shortlist"><div class="n" id="n-short">0</div><div class="t">share a brand or model with<br>one of <span id="nrec2">9,511</span> recalls</div><div class="bar"><i id="b-short"></i></div></div>
+    <div class="stage bd" id="s-unlock"><span class="tag">BRIGHT DATA</span><div class="n" id="n-unlock">0</div><div class="t">full listings fetched<br><span id="n-bdreq">0</span> Bright Data requests</div><div class="bar"><i id="b-unlock"></i></div></div>
+    <div class="stage" id="s-judge"><span class="tag g">GEMINI</span><div class="n" id="n-judged">0</div><div class="t">photo vs recall verdicts<br><span id="n-hits">0</span> matches</div><div class="bar"><i id="b-judge"></i></div></div>
+  </div>
+
+  <div class="feed" id="feed"><div>Pick an area and categories, then press Sweep. Or browse the last sweep below.</div></div>
+
+  <div id="map"></div>
+
+  <div class="stats" id="filters">
+    <button class="chip on" data-f="all">All <b id="c-all">0</b></button>
+    <button class="chip" data-f="recalled"><span class="v-recalled">●</span> Recalled <b id="c-recalled">0</b></button>
+    <button class="chip" data-f="closer_look"><span class="v-closer_look">●</span> Needs a closer look <b id="c-closer_look">0</b></button>
+    <button class="chip" data-f="cleared"><span class="v-cleared">●</span> Cleared <b id="c-cleared">0</b></button>
+    <span style="margin-left:auto" class="meta">showing</span><select id="sweeppick"></select>
+  </div>
+
+  <div id="list"><div class="empty">Loading…</div></div>
+
+  <p class="note">Verdicts are automated: Gemini reads the seller's photos and text against the CPSC recall record, and code checks model numbers against the recall's model list. "Matches a recalled product" means the listing looks like a recalled item, not that the seller did anything wrong; most sellers don't know. Check the label before acting. Listing data: OfferUp, fetched through Bright Data. Recall data: saferproducts.gov.</p>
+</main>
+
+<div class="modal" id="modal"><div class="box">
+  <div class="row"><b id="m-title">Draft report</b><span style="margin-left:auto"></span>
+    <button class="chip on" data-r="seller">To the seller</button><button class="chip" data-r="platform">To OfferUp</button><button class="chip" data-r="regulator">To CPSC</button>
+  </div>
+  <textarea id="m-text"></textarea>
+  <div class="row"><span class="meta">Drafts only. Nothing is sent automatically; a person reviews first.</span><span style="margin-left:auto"></span><button class="linkbtn" id="m-copy">Copy</button><button class="linkbtn" id="m-close">Close</button></div>
+</div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const img = u => u ? '/api/img?u=' + encodeURIComponent(u) : '';
+const BADGE = { recalled: 'MATCHES A RECALL', closer_look: 'NEEDS A CLOSER LOOK', cleared: 'CLEARED', no_match: 'NO MATCH', error: 'ERROR' };
+const openGroups = new Set();
+let filter = 'all', results = [], lastT = -1, polling = null, sweepId = null, cfg = null, report = null;
+
+async function init() {
+  cfg = await (await fetch('/api/config')).json();
+  $('nrec').textContent = $('nrec2').textContent = cfg.recalls_indexed.toLocaleString();
+  $('newest').textContent = cfg.latest_recall;
+  $('cats').innerHTML = Object.entries(cfg.categories).map(([k, v], i) =>
+    `<button class="chip ${i === 0 ? 'on' : ''}" data-c="${k}" title="${esc(cfg.queries[k].join(', '))}">${esc(v)}</button>`).join('');
+  $('cats').onclick = e => { const b = e.target.closest('[data-c]'); if (b) b.classList.toggle('on'); };
+  await loadResults();
+  const st = await (await fetch('/api/status')).json();
+  if (st.running) startPolling();
+}
+
+async function loadResults() {
+  const r = await (await fetch('/api/results' + (sweepId ? '?sweep_id=' + sweepId : ''))).json();
+  results = r.results; sweepId = sweepId || r.sweep_id;
+  const sw = await (await fetch('/api/sweeps')).json();
+  const cur = sw.find(x => x.sweep_id === r.sweep_id);
+  if (cur && cur.stats && !polling_on) { try { const st = JSON.parse(cur.stats); st.running = false; st.events = []; showStatus(st); } catch {} }
+  $('sweeppick').innerHTML = sw.filter(x => x.n > 0).map(x => {
+    let q = []; try { q = JSON.parse(x.queries); } catch {}
+    const label = Array.isArray(q) ? q.slice(0, 3).join(', ') + (q.length > 3 ? ` +${q.length - 3}` : '') : 'rejudge';
+    return `<option value="${x.sweep_id}" ${x.sweep_id === r.sweep_id ? 'selected' : ''}>${x.started.slice(5, 16).replace('T', ' ')} · ${esc(label)} · ${x.n}</option>`;
+  }).join('');
+  render();
+}
+
+function card(x) {
+  const r = x.recall || {};
+  const facts = [r.units && ('Units: ' + r.units), r.injuries && r.injuries.slice(0, 220)].filter(Boolean).join(' · ');
+  return `<div class="card ${x.verdict}" id="c-${x.listing_id}">
+    <div class="pics">
+      <figure><img src="${img(x.photo)}" loading="lazy"><figcaption>Seller's photo</figcaption></figure>
+      <figure>${r.image ? `<img src="${img(r.image)}" loading="lazy">` : '<div style="aspect-ratio:1;border:1px dashed #333;border-radius:6px"></div>'}<figcaption>Recalled product (CPSC)</figcaption></figure>
+    </div>
+    <div>
+      <div class="top"><div><div class="title">${esc(x.title)}</div>
+        <div class="meta">$${esc(x.price)} · ${esc(x.city)} · OfferUp${x.post_date ? ' · posted ' + x.post_date.slice(0, 10) : ''} · found by search "${esc(x.query)}"</div></div>
+        <span class="badge v-${x.verdict}">${BADGE[x.verdict] || x.verdict}</span></div>
+      <div class="why">${esc(x.reason)}</div>
+      <div class="evid">
+        <div><b>In the listing</b>${esc(x.listing_evidence || '-')}</div>
+        <div><b>In the recall record</b>${esc(x.recall_evidence || '-')}</div>
+      </div>
+      ${r.title ? `<div class="recall"><div class="rt">${esc(r.title)}</div><div class="f">${esc(r.date)} · remedy: ${esc(r.remedy_type)}${x.model_check ? ' · model check: ' + esc(x.model_check.replace('_', ' ')) : ''}</div><div class="f">${esc(facts)}</div></div>` : ''}
+      <div class="links"><a href="${x.url}" target="_blank">Open listing ↗</a>${r.url ? `<a href="${r.url}" target="_blank">Open recall record ↗</a>` : ''}
+        <button class="linkbtn" onclick="openReport('${x.listing_id}')">Draft report</button>
+        <button class="linkbtn" onclick="say(this,'${x.listing_id}','en')">🔊 Listen</button>
+        <button class="linkbtn" onclick="say(this,'${x.listing_id}','es')">🔊 Escuchar</button>
+        <span class="meta">${x.photo_read && x.photo_read.brand ? 'photo read: ' + esc([x.photo_read.brand, x.photo_read.product_line, (x.photo_read.model_numbers || []).join(' ')].filter(Boolean).join(' · ')) : ''}</span></div>
+    </div></div>`;
+}
+
+let map = null, layer = null;
+const COLOR = { recalled: '#f85149', closer_look: '#d29922', cleared: '#3fb950' };
+function drawMap(shown) {
+  if (!window.L) { $('map').style.display = 'none'; return; }
+  if (!map) {
+    map = L.map('map', { zoomControl: true, attributionControl: true }).setView([32.8, -117.1], 9);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 18, className: 'dark-tiles' }).addTo(map);
+    layer = L.layerGroup().addTo(map);
+  }
+  layer.clearLayers();
+  const pts = [];
+  shown.forEach(x => {
+    if (x.lat == null || x.lon == null) return;
+    const jitter = () => (Math.random() - .5) * .004;   // OfferUp gives rounded coordinates; spread overlapping dots
+    const m = L.circleMarker([x.lat + jitter(), x.lon + jitter()], { radius: x.verdict === 'recalled' ? 9 : 7, color: COLOR[x.verdict] || '#888', fillColor: COLOR[x.verdict] || '#888', fillOpacity: .75, weight: 2 });
+    m.bindPopup(`<b>${esc(x.title)}</b><br>$${esc(x.price)} · ${esc(x.city)}<br><span style="color:${COLOR[x.verdict]}">${BADGE[x.verdict]}</span><br>${esc((x.recall || {}).title || '').slice(0, 90)}<br><a href="#c-${x.listing_id}">see card</a> · <a href="${x.url}" target="_blank">listing</a>`);
+    m.addTo(layer); pts.push([x.lat, x.lon]);
+  });
+  if (pts.length) map.fitBounds(pts, { padding: [30, 30], maxZoom: 11 });
+}
+
+function render() {
+  const n = v => results.filter(x => x.verdict === v).length;
+  $('c-all').textContent = results.length;
+  ['recalled', 'closer_look', 'cleared'].forEach(v => $('c-' + v).textContent = n(v));
+  const shown = results.filter(x => filter === 'all' || x.verdict === filter);
+  // collapse 4+ listings that match the same recall with the same verdict into one group card
+  const groups = {};
+  shown.forEach(x => { const k = x.verdict + ':' + ((x.recall || {}).id || x.listing_id); (groups[k] = groups[k] || []).push(x); });
+  const done = new Set(); let html = '';
+  shown.forEach(x => {
+    const k = x.verdict + ':' + ((x.recall || {}).id || x.listing_id);
+    if (done.has(k)) return; done.add(k);
+    const g = groups[k];
+    if (g.length < 4 || openGroups.has(k)) { html += g.map(card).join(''); return; }
+    const r = x.recall || {};
+    const prices = g.map(y => parseFloat(y.price)).filter(p => !isNaN(p));
+    const cities = [...new Set(g.map(y => (y.city || '').replace(', CA', '')))];
+    html += `<div class="group ${x.verdict}"><div class="top"><div><div class="gt">${g.length} listings ${x.verdict === 'recalled' ? 'match' : 'may match'}: ${esc(r.title || '')}</div>
+      <div class="meta">$${Math.min(...prices)}-$${Math.max(...prices)} · ${esc(cities.slice(0, 6).join(', '))}${cities.length > 6 ? ' and more' : ''} · recall ${esc(r.date || '')} · remedy: ${esc(r.remedy_type || '')}</div></div>
+      <span class="badge v-${x.verdict}">${BADGE[x.verdict]}</span></div>
+      <div class="why">${esc(x.reason)}</div>
+      <div class="strip">${g.map(y => `<img src="${img(y.photo)}" title="${esc(y.title)} $${esc(y.price)}" loading="lazy">`).join('')}</div>
+      <div class="links">${r.url ? `<a href="${r.url}" target="_blank">Open recall record ↗</a>` : ''}<button class="linkbtn" onclick="openGroups.add('${k}'); render()">Show all ${g.length}</button></div></div>`;
+  });
+  $('list').innerHTML = html || '<div class="empty">No matches yet.</div>';
+  drawMap(shown);
+}
+
+$('sweeppick').onchange = e => { sweepId = e.target.value; openGroups.clear(); loadResults(); };
+$('filters').onclick = e => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  filter = b.dataset.f; document.querySelectorAll('#filters [data-f]').forEach(c => c.classList.toggle('on', c === b)); render();
+};
+
+function pct(a, b) { return b ? Math.min(100, 100 * a / b) + '%' : '0%'; }
+function showStatus(s) {
+  const stages = ['search', 'photos', 'shortlist', 'unlock', 'judge'];
+  stages.forEach(k => $('s-' + k).classList.toggle('active', s.running && s.stage === k));
+  $('n-listings').textContent = s.listings ?? 0;
+  $('n-queries').textContent = `${s.queries_done ?? 0}/${s.queries_total ?? 0}`;
+  $('n-photos').textContent = s.photos_read ?? 0;
+  $('n-short').textContent = s.shortlisted ?? 0;
+  $('n-unlock').textContent = s.bd_done ?? 0;
+  $('n-bdreq').textContent = (s.bd && s.bd.requests) ?? 0;
+  $('n-judged').textContent = s.judged ?? 0;
+  $('n-hits').textContent = (s.recalled || 0) + (s.closer_look || 0);
+  $('b-search').style.width = pct(s.queries_done, s.queries_total);
+  $('b-photos').style.width = pct((s.photos_read || 0) + (s.photo_errors || 0), s.listings);
+  $('b-short').style.width = ['unlock', 'judge', 'done'].includes(s.stage) ? '100%' : '0%';
+  $('b-unlock').style.width = pct(s.bd_done, s.bd_total);
+  $('b-judge').style.width = pct(s.judged, s.judge_total);
+  if (s.events && s.events.length) {
+    const f = $('feed');
+    if (lastT < 0) f.innerHTML = '';
+    s.events.forEach(e => { const d = document.createElement('div'); d.className = e.kind; d.textContent = `${e.t.toFixed(1)}s  ${e.msg}`; f.appendChild(d); lastT = e.t; });
+    f.scrollTop = f.scrollHeight;
+  }
+  $('go').disabled = !!s.running; $('go').textContent = s.running ? 'Sweeping…' : 'Sweep';
+}
+
+let polling_on = false;
+function startPolling() {
+  clearInterval(polling); let tick = 0; polling_on = true;
+  polling = setInterval(async () => {
+    const s = await (await fetch('/api/status?since=' + lastT)).json();
+    showStatus(s);
+    if (++tick % 3 === 0 || !s.running) { sweepId = s.sweep_id; await loadResults(); }
+    if (!s.running) { clearInterval(polling); polling_on = false; }
+  }, 1000);
+}
+
+$('go').onclick = async () => {
+  const cats = [...document.querySelectorAll('[data-c].on')].map(b => b.dataset.c);
+  if (!cats.length) return alert('Pick at least one category');
+  let [lat, lon] = $('area').value.split(',').map(Number);
+  if ($('area').value === 'here') {
+    try { const p = await new Promise((ok, no) => navigator.geolocation.getCurrentPosition(ok, no)); lat = p.coords.latitude; lon = p.coords.longitude; }
+    catch { return alert('Location not available'); }
+  }
+  $('feed').innerHTML = ''; lastT = -1; results = []; render();
+  const r = await fetch('/api/sweep', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ categories: cats, lat, lon, radius: +$('radius').value }) });
+  if (!r.ok) return alert(await r.text());
+  sweepId = (await r.json()).sweep_id; startPolling();
+};
+
+let audio = null;
+async function say(btn, id, lang) {
+  if (audio) audio.pause();
+  const old = btn.textContent; btn.textContent = '…';
+  audio = new Audio('/api/speak/' + id + '?lang=' + lang);
+  audio.oncanplay = () => btn.textContent = old; audio.onerror = () => { btn.textContent = old; alert('Voice failed'); };
+  audio.play();
+}
+
+$('ck-go').onclick = async () => {
+  const f = $('ck-file').files[0]; if (!f) return alert('Choose a photo');
+  $('ck-out').innerHTML = '<span class="meta">Reading the photo and checking 9,511 recalls…</span>';
+  const fd = new FormData(); fd.append('photo', f); fd.append('text', $('ck-text').value);
+  const r = await fetch('/api/check', { method: 'POST', body: fd });
+  if (!r.ok) { $('ck-out').textContent = 'Failed: ' + await r.text(); return; }
+  const x = await r.json(); const rc = x.recall || {}; const id = x.identity || {};
+  $('ck-out').innerHTML = `<div class="card ${x.verdict}" style="grid-template-columns:160px 1fr">
+    <div class="pics" style="grid-template-columns:1fr"><img src="${URL.createObjectURL(f)}"></div>
+    <div><div class="top"><div class="title">${esc([id.brand, id.product_line || id.product_type].filter(Boolean).join(' · ') || 'Your item')}</div>
+    <span class="badge v-${x.verdict}">${BADGE[x.verdict] || x.verdict}</span></div>
+    <div class="why">${esc(x.reason)}</div>
+    ${rc.title ? `<div class="recall"><div class="rt">${esc(rc.title)}</div><div class="f">${esc(rc.date)} · remedy: ${esc(rc.remedy)}</div></div><div class="links"><a href="${rc.url}" target="_blank">Open recall record ↗</a></div>` : ''}
+    <div class="meta" style="margin-top:6px">photo read: ${esc(JSON.stringify({brand: id.brand, model: id.model_numbers, text: id.visible_text}))}</div></div></div>`;
+};
+
+async function openReport(id) {
+  report = await (await fetch('/api/report/' + id)).json();
+  $('modal').classList.add('on'); showReport('seller');
+}
+function showReport(k) { $('m-text').value = report[k]; document.querySelectorAll('[data-r]').forEach(b => b.classList.toggle('on', b.dataset.r === k)); }
+document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => showReport(b.dataset.r));
+$('m-close').onclick = () => $('modal').classList.remove('on');
+$('m-copy').onclick = () => navigator.clipboard.writeText($('m-text').value);
+init();
+</script>
+</body>
+</html>
