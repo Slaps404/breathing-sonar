@@ -128,6 +128,34 @@ def model_shortcut(listing: dict, ident: dict | None, cands: list[dict]) -> dict
     return None
 
 
+import os
+
+JUDGE_MODE = {"mode": os.getenv("JUDGE_MODE", "cascade"), "threshold": 0.9}   # "cascade" | "llm"
+
+
+def tree_shortcut(listing: dict, ident: dict | None, cands: list[dict]) -> dict | None:
+    """Decision-tree judge for confident, low-stakes cases. Never says 'recalled' on its own."""
+    if JUDGE_MODE["mode"] != "cascade":
+        return None
+    from . import decide
+    c, facts = decide.best_candidate(listing, ident, cands)
+    got = decide.predict(facts)
+    if not got:
+        return None
+    verdict, conf, path = got
+    if conf < JUDGE_MODE["threshold"] or verdict == "recalled":
+        return None
+    rec = c["recall"]
+    out = {"verdict": verdict, "recall_id": rec["recall_id"] if verdict != "no_match" else 0,
+           "confidence": round(conf, 2), "photo_index": 0, "reason": decide.explain(facts, rec, verdict),
+           "listing_evidence": ", ".join(filter(None, [(ident or {}).get("brand"), (ident or {}).get("product_line")])),
+           "recall_evidence": rec["title"][:120], "_model": "decision-tree", "tree_path": path}
+    if verdict != "no_match":
+        out = apply_rules(out, rec, listing, ident)
+    out["stage"] = "tree"
+    return out
+
+
 async def judge_many(con, http, items: list[tuple[dict, dict | None]], batch: int = 5, on_done=None) -> dict:
     """Judge many listings with fewer model calls: listings whose best candidate recall is the same
     are judged together, up to `batch` per request. Returns {listing_id: verdict}."""
@@ -139,7 +167,7 @@ async def judge_many(con, http, items: list[tuple[dict, dict | None]], batch: in
             results[listing["listing_id"]] = {"verdict": "no_match", "recall_id": 0, "stage": "text",
                                               "reason": "No recall shares a brand or model."}
             continue
-        short = model_shortcut(listing, ident, cands)
+        short = model_shortcut(listing, ident, cands) or tree_shortcut(listing, ident, cands)
         if short:
             results[listing["listing_id"]] = short
             continue

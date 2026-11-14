@@ -33,7 +33,7 @@ def _new_state(sweep_id, queries):
             "queries_total": len(queries), "queries_done": 0, "listings": 0,
             "photos_read": 0, "photo_errors": 0, "shortlisted": 0,
             "bd_total": 0, "bd_done": 0, "bd_live": 0, "bd_cached": 0, "bd_failed": 0,
-            "judged": 0, "judge_total": 0, "recalled": 0, "closer_look": 0, "cleared": 0, "no_match": 0, "judge_errors": 0,
+            "judged": 0, "judge_total": 0, "recalled": 0, "closer_look": 0, "cleared": 0, "no_match": 0, "judge_errors": 0, "by_tree": 0, "by_code": 0, "by_gemini": 0,
             "events": [], "error": None}
 
 
@@ -107,7 +107,7 @@ async def _search(http, con, queries, lat, lon, radius):
     return list(seen.values())
 
 
-async def _identify(http, con, listings, batch=8):
+async def _identify(http, con, listings, batch=16):
     STATE["stage"] = "photos"
     if not vision.available():
         _event("No Gemini key: skipping photo reading, title text only", "warn")
@@ -198,7 +198,10 @@ async def _judge(http, con, sweep_id, short, idents):
         STATE["judged"] += 1
         key = "judge_errors" if v["verdict"] == "error" else v["verdict"]
         STATE[key] = STATE.get(key, 0) + 1
-        ev = {k: v.get(k) for k in ("listing_evidence", "recall_evidence", "photo_index", "model_check", "candidates", "_model")}
+        by = {"tree": "by_tree", "code": "by_code", "vision": "by_gemini"}.get(v.get("stage"))
+        if by:
+            STATE[by] = STATE.get(by, 0) + 1
+        ev = {k: v.get(k) for k in ("listing_evidence", "recall_evidence", "photo_index", "model_check", "candidates", "_model", "tree_path")}
         con.execute("""INSERT OR REPLACE INTO verdicts (listing_id, recall_id, sweep_id, verdict, confidence, reason, evidence, stage)
                        VALUES (?,?,?,?,?,?,?,?)""",
                     (lid, v.get("recall_id") or 0, sweep_id, v["verdict"], v.get("confidence"),
