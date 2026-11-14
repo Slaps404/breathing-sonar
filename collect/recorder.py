@@ -33,15 +33,16 @@ def probe_snr_db(frame, k0, k1):
     """Probe band power vs the quiet band just above it (same idea as cir() in dsp.js)."""
     power = np.abs(np.fft.rfft(frame)) ** 2
     noise = power[k1 + 10:k1 + 60].mean()
-    return float(10 * np.log10(power[k0:k1 + 1].mean() / max(noise, 1e-30)))
+    return float(10 * np.log10(max(power[k0:k1 + 1].mean(), 1e-30) / max(noise, 1e-30)))
 
 
 class Recorder:
-    def __init__(self, amp=0.7):
-        self.amp = amp
-        self.probe, self.k0, self.k1 = make_probe()
+    def __init__(self, amp=0.7, f0=18000, f1=20000):
+        self.amp, self.f0, self.f1 = amp, f0, f1
+        self.probe, self.k0, self.k1 = make_probe(f0=f0, f1=f1)
         self.P = len(self.probe)
         self.running = False
+        self.distance_cm = None  # rough chest-to-laptop distance; kept between takes
 
     def start(self):
         DATA.mkdir(exist_ok=True)
@@ -49,6 +50,7 @@ class Recorder:
         self.id = "take-" + self.started.strftime("%Y-%m-%dT%H-%M-%S-") + f"{self.started.microsecond // 1000:03d}Z"
         self.pos = 0            # samples played and recorded so far
         self.labels, self.snrs = [], []
+        self.distances = [] if self.distance_cm is None else [{"cm": self.distance_cm, "sample": 0, "t": 0.0}]
         self.peak, self.xruns, self.snr = 0.0, 0, None
         self.q = queue.Queue()
         self.wav = wave.open(str(DATA / (self.id + ".wav")), "wb")
@@ -85,6 +87,11 @@ class Recorder:
     def label(self, name):
         self.labels.append({"label": name, "sample": self.pos, "t": round(self.pos / SR, 3)})
 
+    def set_distance(self, cm):
+        self.distance_cm = cm
+        if self.running:
+            self.distances.append({"cm": cm, "sample": self.pos, "t": round(self.pos / SR, 3)})
+
     def seconds(self):
         return self.pos / SR
 
@@ -96,10 +103,11 @@ class Recorder:
         self.wav.close()
         meta = {
             "id": self.id, "source": "mac-menubar", "started": self.started.isoformat(),
-            "sampleRate": SR, "P": self.P, "f0": 18000, "f1": 20000, "amp": self.amp,
+            "sampleRate": SR, "P": self.P, "f0": self.f0, "f1": self.f1, "amp": self.amp,
             "samples": samples, "seconds": round(samples / SR, 2), "labels": self.labels,
+            "distances": self.distances,
             "peak": round(self.peak, 4), "xruns": self.xruns,
-            "snrMedianDb": float(np.median(self.snrs)) if self.snrs else None,
+            "snrMedianDb": round(float(np.median(self.snrs)), 1) if self.snrs else None,
             "input": sd.query_devices(kind="input")["name"], "output": sd.query_devices(kind="output")["name"],
             "probe": [round(float(v), 6) for v in self.probe],
         }

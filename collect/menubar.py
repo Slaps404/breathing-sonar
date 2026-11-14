@@ -16,17 +16,24 @@ LABELS = {
     "Moving around": "moving",
     "Away from laptop": "empty room",
 }
+# rough chest-to-laptop distance, menu text -> centimetres
+DISTANCES = {"About 20 cm": 20, "About 30 cm": 30, "About 40 cm": 40, "About 50 cm": 50, "About 60 cm": 60,
+             "About 80 cm": 80, "About 1 m": 100, "About 1.5 m": 150, "2 m or more": 200}
 
 
 class SonarApp(rumps.App):
     def __init__(self):
         super().__init__("Sonar", title="◌ sonar", quit_button=None)
-        self.rec = Recorder()
+        # 20-22 kHz at low level: above what most people can hear. 18-20 kHz was audible and unpleasant.
+        self.rec = Recorder(amp=0.15, f0=20000, f1=22000)
         self.current = None
         self.toggle = rumps.MenuItem("Start recording", callback=self.on_toggle)
         self.items = {text: rumps.MenuItem(text, callback=self.on_label) for text in LABELS}
         self.status = rumps.MenuItem("Not recording")
-        self.menu = [self.toggle, self.status, None, *self.items.values(), None,
+        self.distance = rumps.MenuItem("Distance: not set")
+        for text in DISTANCES:
+            self.distance.add(rumps.MenuItem(text, callback=self.on_distance))
+        self.menu = [self.toggle, self.status, None, *self.items.values(), None, self.distance, None,
                      rumps.MenuItem("Open data folder", callback=self.on_open),
                      rumps.MenuItem("Quit", callback=self.on_quit)]
 
@@ -47,6 +54,13 @@ class SonarApp(rumps.App):
             self.on_toggle(None)        # picking a label also starts a recording
         if self.rec.running:
             self.set_label(sender.title)
+
+    def on_distance(self, sender):
+        # Logged with its sample count, so you can change distance in the middle of a take.
+        self.rec.set_distance(DISTANCES[sender.title])
+        self.distance.title = "Distance: " + sender.title.lower()
+        for item in self.distance.values():
+            item.state = int(item is sender)
 
     def set_label(self, text):
         self.current = text
