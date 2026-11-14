@@ -59,7 +59,9 @@ class Recorder:
         self.writer = threading.Thread(target=self._write, daemon=True)
         self.writer.start()
         # blocksize = one probe period, so every mic block lines up with the probe.
-        self.stream = sd.Stream(samplerate=SR, blocksize=self.P, channels=(1, 2), dtype="float32", callback=self._audio)
+        # latency="high": a bigger safety buffer, so a busy laptop is less likely to drop audio.
+        self.stream = sd.Stream(samplerate=SR, blocksize=self.P, channels=(1, 2), dtype="float32",
+                                latency="high", callback=self._audio)
         self.stream.start()
         self.running = True
 

@@ -126,8 +126,11 @@ class SonarApp(rumps.App):
         if self.rec.running:
             self.save()
             word += ", saved"
+        if self.rec.xruns > 5:          # dropped audio leaves holes in the take; say so right away
+            word, self.hide_at_extra = f"{self.rec.xruns} audio dropouts: redo", 8
         self.overlay.show(word.upper(), self.status.title)
-        self.hide_at = time.monotonic() + 4     # the 1 s tick below hides the banner
+        self.hide_at = time.monotonic() + 4 + getattr(self, "hide_at_extra", 0)   # the 1 s tick hides the banner
+        self.hide_at_extra = 0
 
     def on_toggle(self, _):
         if self.guide:                  # "Stop and save" during a guided take ends the guide too
