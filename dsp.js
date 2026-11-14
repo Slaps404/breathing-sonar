@@ -238,6 +238,63 @@ function apneaStep(st, disp, rate, nowMs) {
   return null;
 }
 
+// ---------- range-mode breath-hold detector (fitted on two real takes) ----------
+// Measures breathing-speed motion (0.15-0.6 Hz) of the echoes in a zone of distance slices over
+// the last 8 s, and compares it with the person's own level over the last minute of still time.
+// Alert when it drops 6 dB (to a quarter) below that level for 2 s, while the person is not
+// moving. Movement (fast echo change 10 dB above the quiet floor) blocks alerts, because a
+// person who is moving is not in a breath hold.
+const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120 };
+function makeHold() { return { alerting: false, holdStart: null, below: 0, quiet: 0, last: null, B: [], M: [], moving: [] }; }
+// IQ = list of channels (each with .I/.Q history) in the zone; fast = channels for movement.
+function holdFeatures(zone, fast, rate) {
+  const n = Math.round(HOLD.winSec * rate);
+  if (zone[0].I.length < n) return null;
+  // DFT only at the bins inside 0.15-0.6 Hz, with a Hann window; real and imaginary parts separately
+  const bins = []; for (let k = 1; k < n / 2; k++) { const f = k * rate / n; if (f >= 0.15 && f <= 0.6) bins.push(k); }
+  let B = 0;
+  for (const ch of zone) {
+    const a0 = ch.I.length - n;
+    for (const part of [ch.I, ch.Q]) {
+      let m = 0; for (let i = 0; i < n; i++) m += part[a0 + i]; m /= n;
+      for (const k of bins) {
+        let re = 0, im = 0;
+        for (let i = 0; i < n; i++) {
+          const w = 0.5 - 0.5 * Math.cos(2 * Math.PI * (i + 1) / (n + 1)), v = (part[a0 + i] - m) * w, ph = 2 * Math.PI * k * i / n;
+          re += v * Math.cos(ph); im -= v * Math.sin(ph);
+        }
+        B += re * re + im * im;
+      }
+    }
+  }
+  const k2 = Math.round(2 * rate); let M = 0, c = 0;
+  for (const ch of fast) {
+    const L = ch.I.length;
+    for (let i = L - k2 + 1; i < L; i++) { M += (ch.I[i] - ch.I[i - 1]) ** 2 + (ch.Q[i] - ch.Q[i - 1]) ** 2; c++; }
+  }
+  return { B: 10 * Math.log10(B + 1e-30), M: 10 * Math.log10(M / c + 1e-30) };
+}
+function pct(xs, q) { const a = [...xs].sort((x, y) => x - y); return a[Math.min(a.length - 1, Math.floor(q * a.length))]; }
+function holdStep(st, feat, nowMs) {
+  if (!feat) return null;
+  const dt = st.last === null ? 0 : (nowMs - st.last) / 1000; st.last = nowMs;
+  st.M.push([nowMs, feat.M]); while (st.M[0][0] < nowMs - HOLD.floorSec * 1000) st.M.shift();
+  const moving = feat.M > pct(st.M.map(x => x[1]), 0.2) + HOLD.moveDb;
+  st.moving = moving;
+  if (!moving) st.B.push([nowMs, feat.B]);
+  while (st.B.length && st.B[0][0] < nowMs - HOLD.baseSec * 1000) st.B.shift();
+  if (moving) { st.quiet = 0; st.below = 0; } else st.quiet += dt;
+  if (st.B.length < 45) return null;   // need ~10 s of still history (analyze runs ~5 times a second)
+  const base = pct(st.B.map(x => x[1]), 0.75);
+  st.base = base; st.level = feat.B;
+  if (!st.alerting) {
+    if (st.quiet >= HOLD.quietSec && feat.B < base - HOLD.dropDb) { st.below += dt; st.holdStart ??= nowMs; }
+    else { st.below = 0; st.holdStart = null; }
+    if (st.below >= HOLD.confirmSec) { st.alerting = true; return 'start'; }
+  } else if (moving || feat.B > base - HOLD.dropDb / 2) { st.alerting = false; st.below = 0; st.holdStart = null; return 'end'; }
+  return null;
+}
+
 // ---------- Mode 1: steady tones ----------
 class ToneSonar {
   constructor(freqs, rate = 100) {
@@ -306,7 +363,7 @@ function cir(p, frame) {
 }
 
 class RangeSonar {
-  constructor({ minR = 0.2, maxR = 1.2, showR = 3 } = {}) {
+  constructor({ minR = 0.2, maxR = 1.2, showR = 3, zone = [0.29, 0.57] } = {}) {
     this.mode = 'range';
     this.p = makeProbe(); this.rate = this.p.rate; this.dr = this.p.dr;
     this.chs = Array.from({ length: this.p.L }, () => makeChannel(this.p.lambda, this.rate));
@@ -316,7 +373,8 @@ class RangeSonar {
     this.i0 = null; this.frames = 0; this.snr = 0;
     this.minR = minR; this.maxR = maxR;
     this.lock = null; this.manual = false; this.lastPick = -1e9; this.lowSince = null;
-    this.apnea = makeApnea(); this.best = null; this.scores = [];
+    this.zone = zone;   // distances (m) the hold detector watches; setLock moves it
+    this.apnea = makeHold(); this.best = null; this.scores = [];
   }
   tap(rel) { return (this.i0 + rel) % this.p.L; }
   ingestFrame(frame) { const c = cir(this.p, frame); this.ingestCIR(c.re, c.im, c.snr); }
@@ -338,7 +396,10 @@ class RangeSonar {
       if (this.depth.length > 20 * this.rate) this.depth.shift();
     }
   }
-  setLock(rangeM) { this.lock = Math.round(rangeM / this.dr); this.manual = true; this.apnea = makeApnea(); }
+  setLock(rangeM) {
+    this.lock = Math.round(rangeM / this.dr); this.manual = true; this.apnea = makeHold();
+    this.zone = [Math.max(0.2, rangeM - 0.05), rangeM + 0.23];   // chest echoes plus their later bounces
+  }
   // Score every slice in the subject zone: breathing-likeness x strength of the moving echo.
   pick(nowMs) {
     const r0 = Math.max(1, Math.round(this.minR / this.dr)), r1 = Math.round(this.maxR / this.dr);
@@ -377,7 +438,7 @@ class RangeSonar {
     const curScore = (this.scores.find(s => s[0] === this.lock) || [0, 0])[1];
     if (!this.apnea.alerting && this.apnea.holdStart === null && this.lowSince !== null &&
         nowMs - this.lowSince > 20000 && best[1] > 2 * curScore) {
-      this.lock = best[0]; this.lowSince = null; this.apnea = makeApnea();
+      this.lock = best[0]; this.lowSince = null;
     }
   }
   analyze(nowMs) {
@@ -387,11 +448,15 @@ class RangeSonar {
     const ch = this.chs[this.tap(this.lock)];
     if (!analyzeChannel(ch)) return null;
     this.best = ch;
-    return { ch, event: apneaStep(this.apnea, ch.disp, this.rate, nowMs) };
+    const r0 = Math.round(this.zone[0] / this.dr), r1 = Math.round(this.zone[1] / this.dr);
+    const zone = [], fast = [];
+    for (let r = r0; r <= r1; r++) zone.push(this.chs[this.tap(r)]);
+    for (let r = 1; r <= 12; r++) fast.push(this.chs[this.tap(r)]);
+    return { ch, event: holdStep(this.apnea, holdFeatures(zone, fast, this.rate), nowMs) };
   }
 }
 
 const api = { C, SR, TONE_WORKLET, PROBE_WORKLET, APNEA, std, fft, fitCircle, breathingSpectrum,
-  makeChannel, pushIQ, analyzeChannel, makeApnea, apneaStep, makeProbe, cir, ToneSonar, RangeSonar };
+  makeChannel, pushIQ, analyzeChannel, makeApnea, apneaStep, HOLD, makeHold, holdFeatures, holdStep, makeProbe, cir, ToneSonar, RangeSonar };
 if (typeof module !== 'undefined') module.exports = api; else window.DSP = api;
 })();
