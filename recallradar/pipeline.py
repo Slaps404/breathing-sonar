@@ -73,6 +73,11 @@ async def judge_listing(con, http, listing: dict, ident: dict | None) -> dict:
                 "listing_evidence": ", ".join(c["ev"]["brand_hit"] + c["ev"]["model_hit"]), "recall_evidence": "",
                 "confidence": 0.5, "photo_index": 0}
     out = await vision.judge(http, listing, cands)
+    return postprocess(out, listing, ident, cands)
+
+
+def postprocess(out: dict, listing: dict, ident: dict | None, cands: list[dict]) -> dict:
+    """Code rules applied to the model's answer (same for single and batched judging)."""
     out["stage"] = "vision"
     out["candidates"] = [c["recall"]["recall_id"] for c in cands]
     # Rule: brand is the recalling company + same product phrase + recent recall + no readable model -> closer look,
@@ -101,3 +106,80 @@ async def judge_listing(con, http, listing: dict, ident: dict | None) -> dict:
     if out["verdict"] != "no_match" and not rec:
         rec = cands[0]["recall"]; out["recall_id"] = rec["recall_id"]
     return apply_rules(out, rec, listing, ident)
+
+
+def model_shortcut(listing: dict, ident: dict | None, cands: list[dict]) -> dict | None:
+    """No model call needed: a recalled model number is readable in the title/description/label and the brand agrees."""
+    brand = ((ident or {}).get("brand") or "") + " " + listing["title"]
+    for c in cands:
+        rec = c["recall"]
+        status, lm, rm = model_check(listing, ident, rec)
+        if status == "listed" and (match.brand_is_recaller((ident or {}).get("brand") or "", rec)
+                                   or any(match.brand_is_recaller(w, rec) for w in brand.split()[:3])):
+            hit = [m for m in lm if m.replace("-", "") in {x.replace("-", "") for x in rm}]
+            out = {"verdict": "recalled", "recall_id": rec["recall_id"], "confidence": 0.95, "photo_index": 0,
+                   "reason": f"Model {', '.join(hit)} is readable in the listing and is on this recall's model list.",
+                   "listing_evidence": f"model {', '.join(hit)}", "recall_evidence": f"recalled models: {rec['models'][:120]}",
+                   "brands_agree": True, "named_product_match": ", ".join(hit), "_model": "code"}
+            out = postprocess(out, listing, ident, cands)
+            out["stage"] = "code"
+            return out
+    return None
+
+
+async def judge_many(con, http, items: list[tuple[dict, dict | None]], batch: int = 5, on_done=None) -> dict:
+    """Judge many listings with fewer model calls: listings whose best candidate recall is the same
+    are judged together, up to `batch` per request. Returns {listing_id: verdict}."""
+    import asyncio
+    results, groups = {}, {}
+    for listing, ident in items:
+        cands = shortlist(con, listing, ident)
+        if not cands:
+            results[listing["listing_id"]] = {"verdict": "no_match", "recall_id": 0, "stage": "text",
+                                              "reason": "No recall shares a brand or model."}
+            continue
+        short = model_shortcut(listing, ident, cands)
+        if short:
+            results[listing["listing_id"]] = short
+            continue
+        groups.setdefault(cands[0]["recall"]["recall_id"], []).append((listing, ident, cands))
+    if on_done:
+        for lid, v in results.items():
+            on_done(lid, v)
+    chunks = []
+    for g in groups.values():
+        chunks += [g[i:i + batch] for i in range(0, len(g), batch)]
+
+    async def run(chunk):
+        if len(chunk) == 1:
+            listing, ident, cands = chunk[0]
+            outs = [await vision.judge(http, listing, cands)]
+        else:
+            union, seen = [], set()
+            for _, _, cands in chunk:
+                for c in cands:
+                    if c["recall"]["recall_id"] not in seen and len(union) < 4:
+                        seen.add(c["recall"]["recall_id"]); union.append(c)
+            outs = await vision.judge_batch(http, [l for l, _, _ in chunk], union)
+        for (listing, ident, cands), out in zip(chunk, outs):
+            if out is None:
+                v = {"verdict": "error", "recall_id": 0, "reason": "missing from batch answer", "stage": "error"}
+            else:
+                allc = cands + [c for c in (union if len(chunk) > 1 else []) if c not in cands]
+                v = postprocess(out, listing, ident, allc)
+            results[listing["listing_id"]] = v
+            if on_done:
+                on_done(listing["listing_id"], v)
+
+    async def safe(chunk):
+        try:
+            await run(chunk)
+        except Exception as e:
+            for listing, _, _ in chunk:
+                v = {"verdict": "error", "recall_id": 0, "reason": str(e)[:200], "stage": "error"}
+                results[listing["listing_id"]] = v
+                if on_done:
+                    on_done(listing["listing_id"], v)
+
+    await asyncio.gather(*[safe(c) for c in chunks])
+    return results

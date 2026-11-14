@@ -13,11 +13,13 @@ import json
 import re
 
 import httpx
-from fastapi import FastAPI, HTTPException
+import hashlib
+
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 
-from . import offerup, sweep, vision, voice
+from . import offerup, pipeline, sweep, vision, voice
 from .config import ROOT
 from .db import connect
 
@@ -184,3 +186,18 @@ async def speak(listing_id: str, lang: str = "en"):
     except Exception as e:
         raise HTTPException(502, f"voice failed: {str(e)[:120]}")
     return Response(audio, media_type="audio/mpeg")
+
+
+@app.post("/api/check")
+async def check(photo: UploadFile = File(...), text: str = Form("")):
+    """Check one item: a photo (and optional words from the label). Same matcher as the sweep."""
+    data = await photo.read()
+    if len(data) > 8_000_000:
+        raise HTTPException(413, "photo too large")
+    item = {"listing_id": "upload-" + hashlib.sha1(data).hexdigest()[:12], "title": text or "item photo",
+            "description": "", "thumb": "", "photo_bytes": data}
+    ident = await vision.identify(_http, item)
+    v = await pipeline.judge_listing(con, _http, item, ident)
+    return {"identity": ident, "verdict": v.get("verdict"), "reason": v.get("reason"),
+            "listing_evidence": v.get("listing_evidence"), "recall_evidence": v.get("recall_evidence"),
+            "model_check": v.get("model_check"), "recall": _recall_card(v["recall_id"]) if v.get("recall_id") else None}

@@ -97,6 +97,15 @@
     </div>
   </div>
 
+  <details class="panel" id="checkbox"><summary style="cursor:pointer"><b>Check one item</b> <span class="meta">(bonus: photo of something at a garage sale or in your home)</span></summary>
+    <div class="row" style="margin-top:10px">
+      <input type="file" id="ck-file" accept="image/*" capture="environment">
+      <input type="text" id="ck-text" placeholder="optional: words on the label" style="flex:1;min-width:180px">
+      <button class="linkbtn" id="ck-go">Check</button>
+    </div>
+    <div id="ck-out" style="margin-top:10px"></div>
+  </details>
+
   <div class="pipe">
     <div class="stage bd" id="s-search"><span class="tag">BRIGHT DATA</span><div class="n" id="n-listings">0</div><div class="t">listings pulled from OfferUp<br><span id="n-queries">0/0</span> searches</div><div class="bar"><i id="b-search"></i></div></div>
     <div class="stage" id="s-photos"><span class="tag g">GEMINI</span><div class="n" id="n-photos">0</div><div class="t">listing photos read<br>brand, product, model on label</div><div class="bar"><i id="b-photos"></i></div></div>
@@ -305,6 +314,22 @@ async function say(btn, id, lang) {
   audio.oncanplay = () => btn.textContent = old; audio.onerror = () => { btn.textContent = old; alert('Voice failed'); };
   audio.play();
 }
+
+$('ck-go').onclick = async () => {
+  const f = $('ck-file').files[0]; if (!f) return alert('Choose a photo');
+  $('ck-out').innerHTML = '<span class="meta">Reading the photo and checking 9,511 recalls…</span>';
+  const fd = new FormData(); fd.append('photo', f); fd.append('text', $('ck-text').value);
+  const r = await fetch('/api/check', { method: 'POST', body: fd });
+  if (!r.ok) { $('ck-out').textContent = 'Failed: ' + await r.text(); return; }
+  const x = await r.json(); const rc = x.recall || {}; const id = x.identity || {};
+  $('ck-out').innerHTML = `<div class="card ${x.verdict}" style="grid-template-columns:160px 1fr">
+    <div class="pics" style="grid-template-columns:1fr"><img src="${URL.createObjectURL(f)}"></div>
+    <div><div class="top"><div class="title">${esc([id.brand, id.product_line || id.product_type].filter(Boolean).join(' · ') || 'Your item')}</div>
+    <span class="badge v-${x.verdict}">${BADGE[x.verdict] || x.verdict}</span></div>
+    <div class="why">${esc(x.reason)}</div>
+    ${rc.title ? `<div class="recall"><div class="rt">${esc(rc.title)}</div><div class="f">${esc(rc.date)} · remedy: ${esc(rc.remedy)}</div></div><div class="links"><a href="${rc.url}" target="_blank">Open recall record ↗</a></div>` : ''}
+    <div class="meta" style="margin-top:6px">photo read: ${esc(JSON.stringify({brand: id.brand, model: id.model_numbers, text: id.visible_text}))}</div></div></div>`;
+};
 
 async function openReport(id) {
   report = await (await fetch('/api/report/' + id)).json();

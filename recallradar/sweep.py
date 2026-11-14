@@ -191,27 +191,23 @@ async def _detail_fresh(http, li):
 async def _judge(http, con, sweep_id, short, idents):
     STATE["stage"] = "judge"
     STATE["judge_total"] = len(short)
-    sem = asyncio.Semaphore(LIMITS["judge"])
+    by_id = {li["listing_id"]: li for li in short}
 
-    async def one(li):
-        async with sem:
-            try:
-                v = await pipeline.judge_listing(con, http, li, idents.get(li["listing_id"]))
-            except Exception as e:
-                v = {"verdict": "error", "recall_id": 0, "reason": str(e)[:200], "stage": "error"}
+    def done(lid, v):
+        li = by_id[lid]
         STATE["judged"] += 1
         key = "judge_errors" if v["verdict"] == "error" else v["verdict"]
         STATE[key] = STATE.get(key, 0) + 1
         ev = {k: v.get(k) for k in ("listing_evidence", "recall_evidence", "photo_index", "model_check", "candidates", "_model")}
         con.execute("""INSERT OR REPLACE INTO verdicts (listing_id, recall_id, sweep_id, verdict, confidence, reason, evidence, stage)
                        VALUES (?,?,?,?,?,?,?,?)""",
-                    (li["listing_id"], v.get("recall_id") or 0, sweep_id, v["verdict"], v.get("confidence"),
+                    (lid, v.get("recall_id") or 0, sweep_id, v["verdict"], v.get("confidence"),
                      v.get("reason"), json.dumps(ev), v.get("stage")))
         con.commit()
         if v["verdict"] in ("recalled", "closer_look", "cleared"):
             _event(f"{v['verdict'].upper()}: '{li['title'][:45]}' {li.get('city','')}", v["verdict"])
 
-    await asyncio.gather(*[one(li) for li in short])
+    await pipeline.judge_many(con, http, [(li, idents.get(li["listing_id"])) for li in short], on_done=done)
 
 
 if __name__ == "__main__":

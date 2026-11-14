@@ -114,11 +114,12 @@ ID_SCHEMA = {
 
 
 async def identify(http: httpx.AsyncClient, listing: dict) -> dict:
-    img = await fetch_image(http, listing["thumb"])
+    img = listing.get("photo_bytes") or await fetch_image(http, listing["thumb"])
     prompt = (f"Marketplace listing titled: {listing['title']!r}. Identify the product in the photo. "
               "Read any brand, product name and model/style number printed on the item or its box. "
               "Only report text you can actually read or that is in the title; do not guess model numbers.")
-    return await _generate(ID_MODELS, [_img(img), prompt], ID_SCHEMA, cache_key="id2:" + listing["thumb"])
+    key = "id2:" + (listing["thumb"] if not listing.get("photo_bytes") else hashlib.sha1(img).hexdigest())
+    return await _generate(ID_MODELS, [_img(img), prompt], ID_SCHEMA, cache_key=key)
 
 
 JUDGE_SCHEMA = {
@@ -165,6 +166,9 @@ async def recall_image(http: httpx.AsyncClient, rec: dict) -> bytes | None:
 async def judge(http: httpx.AsyncClient, listing: dict, cands: list[dict]) -> dict:
     parts = []
     photos = (listing.get("photos") or [listing["thumb"]])[:3]
+    if listing.get("photo_bytes"):
+        parts += ["Listing photo 0:", _img(listing["photo_bytes"])]
+        photos = []
     for i, u in enumerate(photos):
         try:
             parts += [f"Listing photo {i}:", _img(await fetch_image(http, u))]
@@ -221,4 +225,42 @@ async def identify_batch(http: httpx.AsyncClient, listings: list[dict]) -> dict:
             out[idx[i]["listing_id"]] = it
             p = CACHE / ("gem_" + hashlib.sha1(("id2:" + idx[i]["thumb"]).encode()).hexdigest() + ".json")
             p.write_text(json.dumps(it))
+    return out
+
+
+JUDGE_BATCH_SCHEMA = {"type": "object", "properties": {"items": {"type": "array", "items": {
+    "type": "object", "properties": {"index": {"type": "integer"}, **JUDGE_SCHEMA["properties"]},
+    "required": ["index"] + JUDGE_SCHEMA["required"]}}}, "required": ["items"]}
+
+
+async def judge_batch(http: httpx.AsyncClient, listings: list[dict], cands: list[dict]) -> list[dict | None]:
+    """Judge several listings against the same candidate recalls in ONE request.
+    The recall texts and photos are sent once; each listing gets up to 2 photos."""
+    parts = ["CANDIDATE RECALLS:"]
+    for c in cands:
+        rec = c["recall"]
+        parts.append(
+            f"--- RECALL id={rec['recall_id']} date={rec['date']}\nTitle: {rec['title']}\nProducts: {rec['products']}\n"
+            f"Description: {rec['description'][:1500]}\nRecalled model numbers: {rec['models'][:300]}\n"
+            f"Remedy ({rec['remedy_type']}): {rec['remedy'][:300]}")
+        ri = await recall_image(http, rec)
+        if ri:
+            parts += [f"Photo of recalled product (recall id={rec['recall_id']}):", _img(ri)]
+    parts.append("LISTINGS TO JUDGE (each independently):")
+    for i, li in enumerate(listings):
+        parts.append(f"=== LISTING index={i}\ntitle: {li['title']!r}\ndescription: {(li.get('description') or '')[:800]!r}")
+        for j, u in enumerate((li.get("photos") or [li["thumb"]])[:2]):
+            try:
+                parts += [f"listing {i} photo {j}:", _img(await fetch_image(http, u))]
+            except Exception:
+                pass
+    parts.append(JUDGE_RULES + "\nReturn one item per listing, with its index. photo_index refers to that listing's photos.")
+    key = "judgeb1:" + ",".join(li["listing_id"] for li in listings) + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands)
+    res = await _generate(JUDGE_MODELS, parts, JUDGE_BATCH_SCHEMA, cache_key=key)
+    out: list = [None] * len(listings)
+    for it in res.get("items", []):
+        i = it.pop("index", -1)
+        if 0 <= i < len(listings):
+            it["_model"] = res.get("_model")
+            out[i] = it
     return out
