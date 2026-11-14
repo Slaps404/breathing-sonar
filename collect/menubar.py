@@ -5,9 +5,11 @@ with the exact sample it happened at. Recordings land in data/.
 """
 import signal
 import subprocess
+import time
 
 import rumps
 
+from guide import CUES, DEFAULT_PLAN, LEAD_IN, Overlay, parse_plan
 from recorder import DATA, Recorder
 
 # menu text -> label written to the JSON (same names as the phone collector)
@@ -22,6 +24,8 @@ DISTANCES = {"About 20 cm": 20, "About 30 cm": 30, "About 40 cm": 40, "About 50 
              "About 80 cm": 80, "About 1 m": 100, "About 1.5 m": 150, "2 m or more": 200}
 
 IDLE = "◌"
+MENU_TEXT = {label: text for text, label in LABELS.items()}
+PLAN_FILE = DATA / "plan.txt"   # your last intervals, kept between runs
 
 
 class SonarApp(rumps.App):
@@ -39,12 +43,96 @@ class SonarApp(rumps.App):
         self.distance = rumps.MenuItem("Distance: not set")
         for text in DISTANCES:
             self.distance.add(rumps.MenuItem(text, callback=self.on_distance))
-        self.menu = [self.toggle, self.status, None, *self.items.values(), None, self.distance, None,
+        self.plan = PLAN_FILE.read_text().strip() if PLAN_FILE.exists() else DEFAULT_PLAN
+        self.guide = None       # running guided take: {"steps", "i", "t0" (lead-in start), "ends"}
+        self.overlay = None
+        self.hide_at = 0
+        self.guided = rumps.MenuItem("Start guided take", callback=self.on_guided)
+        self.plan_item = rumps.MenuItem("Set intervals: " + self.plan, callback=self.on_plan)
+        self.guide_timer = rumps.Timer(self.guide_tick, 0.2)
+        self.menu = [self.toggle, self.status, None, self.guided, self.plan_item, None,
+                     *self.items.values(), None, self.distance, None,
                      rumps.MenuItem("Open data folder", callback=self.on_open),
                      rumps.MenuItem("Quit", callback=self.on_quit)]
 
-    def on_toggle(self, _):
+    def on_plan(self, _):
+        win = rumps.Window("Intervals in seconds, separated by commas. End with x5 to repeat 5 times.\n"
+                           "Words: normal, hold, moving, away.", "Guided take intervals",
+                           default_text=self.plan, ok="Save", cancel="Cancel", dimensions=(320, 24)).run()
+        if not win.clicked:
+            return
+        try:
+            parse_plan(win.text)
+        except ValueError as err:
+            rumps.alert("Intervals not saved", str(err))
+            return
+        self.plan = win.text.strip()
+        DATA.mkdir(exist_ok=True)
+        PLAN_FILE.write_text(self.plan)
+        self.plan_item.title = "Set intervals: " + self.plan
+
+    def on_guided(self, _):
+        if self.guide:                  # second click cancels; anything recorded so far is saved
+            self.end_guide("Cancelled")
+            return
         if self.rec.running:
+            rumps.alert("Stop the current recording first")
+            return
+        self.guide = {"steps": parse_plan(self.plan), "i": -1, "t0": time.monotonic(), "ends": []}
+        self.overlay = self.overlay or Overlay()
+        self.guided.title = "Cancel guided take"
+        self.guide_timer.start()
+
+    def guide_tick(self, _):
+        g = self.guide
+        if not g:
+            return
+        steps = g["steps"]
+        if g["i"] < 0:                  # lead-in: not recording yet
+            left = LEAD_IN - (time.monotonic() - g["t0"])
+            if left > 0:
+                self.overlay.show(f"GET READY  {left:.0f}", "first: " + CUES[steps[0][0]].lower())
+                return
+            try:
+                self.rec.plan = self.plan
+                self.rec.start()
+            except Exception as err:    # e.g. no microphone permission
+                self.end_guide("Could not start")
+                rumps.alert("Could not start recording", str(err))
+                return
+            self.toggle.title = "Stop and save"
+            total = 0
+            for _, dur in steps:
+                total += dur
+                g["ends"].append(total)
+        # Phases follow the recording's own clock (samples recorded), not the wall clock.
+        now = self.rec.seconds()
+        i = max(g["i"], 0)
+        while i < len(steps) and now >= g["ends"][i]:
+            i += 1
+        if i >= len(steps):
+            self.end_guide("Done")
+            return
+        if i != g["i"]:
+            g["i"] = i
+            self.set_label(MENU_TEXT[steps[i][0]])
+        nxt = "next: " + CUES[steps[i + 1][0]].lower() if i + 1 < len(steps) else "last one"
+        self.overlay.show(f"{CUES[steps[i][0]]}  {g['ends'][i] - now:.0f}", f"{i + 1} of {len(steps)}, {nxt}", steps[i][0])
+
+    def end_guide(self, word):
+        self.guide = None
+        self.guide_timer.stop()
+        self.guided.title = "Start guided take"
+        if self.rec.running:
+            self.save()
+            word += ", saved"
+        self.overlay.show(word.upper(), self.status.title)
+        self.hide_at = time.monotonic() + 4     # the 1 s tick below hides the banner
+
+    def on_toggle(self, _):
+        if self.guide:                  # "Stop and save" during a guided take ends the guide too
+            self.end_guide("Stopped")
+        elif self.rec.running:
             self.save()
         else:
             try:
@@ -87,6 +175,8 @@ class SonarApp(rumps.App):
     def tick(self, _):
         if self.stop_requested:         # `kill <pid>` saves the take instead of losing it
             self.on_quit(None)
+        if self.overlay and not self.guide and time.monotonic() > self.hide_at:
+            self.overlay.hide()
         if not self.rec.running:
             return
         s = int(self.rec.seconds())

@@ -28,6 +28,7 @@ Prototype only. Not a medical device.
 Raw mic audio plus label timestamps, saved to `data/` (not committed).
 
 - **Mac menu bar:** `.venv/bin/python collect/menubar.py`. Click the `◌ sonar` icon, start, then pick what you are doing (breathing, holding breath, moving, away). Setup once: `python3 -m venv .venv && .venv/bin/pip install rumps sounddevice numpy`.
+- **Guided take (hands-free):** in the same menu, `Set intervals` takes a plan like `normal 30, hold 20, x5` (seconds, `x5` repeats it 5 times; words: normal, hold, moving, away). `Start guided take` gives a 5 s get-ready countdown, then a silent banner at the top of the screen shows what to do and counts down. Labels are written automatically and the take saves itself at the end.
 - **Phone page:** `python3 collect/server.py`, then expose port 8787 over HTTPS (phones only allow mic access on HTTPS pages).
 
 Each take is a `.wav` and a `.json`. The JSON holds the labels as `{label, sample, t}` and one period of the probe; WAV sample `n` lines up with `probe[n % P]`.

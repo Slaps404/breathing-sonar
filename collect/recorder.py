@@ -43,6 +43,7 @@ class Recorder:
         self.P = len(self.probe)
         self.running = False
         self.distance_cm = None  # rough chest-to-laptop distance; kept between takes
+        self.plan = None         # guided-take interval text, if the take was guided
 
     def start(self):
         DATA.mkdir(exist_ok=True)
@@ -105,7 +106,7 @@ class Recorder:
             "id": self.id, "source": "mac-menubar", "started": self.started.isoformat(),
             "sampleRate": SR, "P": self.P, "f0": self.f0, "f1": self.f1, "amp": self.amp,
             "samples": samples, "seconds": round(samples / SR, 2), "labels": self.labels,
-            "distances": self.distances,
+            "distances": self.distances, "plan": self.plan,
             "peak": round(self.peak, 4), "xruns": self.xruns,
             "snrMedianDb": round(float(np.median(self.snrs)), 1) if self.snrs else None,
             "input": sd.query_devices(kind="input")["name"], "output": sd.query_devices(kind="output")["name"],
