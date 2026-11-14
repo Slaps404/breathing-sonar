@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: var(--font-sans); color: var(--foreground); font-size: 14px; line-height: 1.45; }
+  .wrap { width: 100%; }
+  h3 { font-size: 13px; font-weight: 600; margin: 22px 0 6px; }
+  .sub { color: var(--muted-foreground); font-size: 12.5px; margin: 0 0 8px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; margin: 6px 0; }
+  .lab { color: var(--muted-foreground); font-size: 12.5px; min-width: 92px; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .seg button { font: inherit; font-size: 12.5px; padding: 5px 11px; border: 0; background: transparent; color: var(--foreground); cursor: pointer; border-right: 1px solid var(--border); }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--secondary); font-weight: 600; }
+  .presets button { font: inherit; font-size: 12.5px; padding: 6px 11px; border: 1px solid var(--border); border-radius: var(--radius); background: transparent; color: var(--foreground); cursor: pointer; }
+  .presets button.on { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+  input[type=range] { width: 150px; accent-color: var(--foreground); }
+  .val { font-family: var(--font-mono); font-size: 12px; min-width: 52px; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+  .stage { position: relative; width: 100%; }
+  #scene { position: relative; height: 62px; border-bottom: 1px solid var(--border); }
+  .who { position: absolute; bottom: 6px; transform: translateX(-50%); text-align: center; font-size: 11.5px; white-space: nowrap; transition: left .15s; }
+  .who i { display: block; width: 18px; height: 18px; border-radius: 50%; margin: 3px auto 0; border: 2px solid var(--background); }
+  .laptop { position: absolute; left: 0; bottom: 6px; font-size: 11.5px; }
+  .laptop i { display: block; width: 8px; height: 22px; border-radius: 2px; background: var(--foreground); margin-top: 3px; }
+  #fallBox { position: relative; height: 200px; }
+  #fall { width: 100%; height: 200px; display: block; }
+  #direct { position: absolute; top: 0; left: 0; height: 100%; background: repeating-linear-gradient(135deg, var(--muted-foreground) 0 1px, transparent 1px 6px); opacity: .45; pointer-events: none; }
+  #lock { position: absolute; top: 0; height: 100%; border: 2px solid var(--chart-1); border-radius: 3px; box-sizing: border-box; pointer-events: none; transition: left .15s; }
+  .tside { position: absolute; right: 4px; font-size: 11px; color: var(--muted-foreground); pointer-events: none; }
+  #axis { position: relative; height: 20px; font-size: 11px; color: var(--muted-foreground); }
+  #axis span { position: absolute; top: 3px; transform: translateX(-50%); }
+  #axis span:first-child { transform: none; }
+  #tip { position: absolute; display: none; padding: 3px 7px; font-size: 11.5px; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border); border-radius: 6px; pointer-events: none; white-space: nowrap; z-index: 3; }
+  #trace { width: 100%; height: 130px; display: block; }
+  .status { display: flex; align-items: baseline; gap: 12px; margin: 4px 0 2px; flex-wrap: wrap; }
+  #chip { font-weight: 600; font-size: 15px; }
+  #why { color: var(--muted-foreground); font-size: 12.5px; }
+  .legend { font-size: 12px; color: var(--muted-foreground); display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+  .hatch { display: inline-block; width: 14px; height: 10px; margin-right: 6px; vertical-align: -1px; background: repeating-linear-gradient(135deg, var(--muted-foreground) 0 1px, transparent 1px 4px); }
+  .box { display: inline-block; width: 12px; height: 10px; margin-right: 6px; vertical-align: -1px; border: 2px solid var(--chart-1); border-radius: 2px; box-sizing: border-box; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row presets" id="presets">
+    <span class="lab">Try a case</span>
+    <button data-p="breathe">1. Breathing</button>
+    <button data-p="hold">2. Holding breath</button>
+    <button data-p="move">3. You move</button>
+    <button data-p="far">4. Person walks behind you</button>
+    <button data-p="same">5. Person at your distance</button>
+  </div>
+  <div class="row">
+    <span class="lab"><span class="dot" style="background:var(--chart-1)"></span>You</span>
+    <span class="seg" id="youMode"><button data-v="breathe">Breathing</button><button data-v="hold">Holding</button><button data-v="move">Moving</button></span>
+    <input type="range" id="youD" min="25" max="90" value="34"><span class="val" id="youDv"></span>
+  </div>
+  <div class="row">
+    <span class="lab"><span class="dot" style="background:var(--chart-2)"></span>Other person</span>
+    <span class="seg" id="otherMode"><button data-v="off">None</button><button data-v="breathe">Sitting, breathing</button><button data-v="walk">Walking</button></span>
+    <input type="range" id="otherD" min="30" max="230" value="150"><span class="val" id="otherDv"></span>
+  </div>
+
+  <h3>Step 1: sort echoes by distance</h3>
+  <p class="sub">Each column is one distance slice. Each row is a moment in time, newest at the top. Stronger shading means the echo from that distance is changing, so something is moving there.</p>
+  <div class="stage">
+    <div id="scene">
+      <div class="laptop">laptop<i></i></div>
+      <div class="who" id="youWho">you<i style="background:var(--chart-1)"></i></div>
+      <div class="who" id="otherWho">other<i style="background:var(--chart-2)"></i></div>
+    </div>
+    <div id="fallBox">
+      <canvas id="fall"></canvas>
+      <div id="direct"></div>
+      <div id="lock"></div>
+      <span class="tside" style="top:3px">now</span><span class="tside" style="bottom:3px">12 s ago</span>
+      <div id="tip"></div>
+    </div>
+    <div id="axis"></div>
+  </div>
+  <div class="legend">
+    <span><span class="box"></span>slice the code watches (nearest one with breathing-like motion)</span>
+    <span><span class="hatch"></span>first 20 cm: drowned out by the speaker's own sound</span>
+  </div>
+
+  <h3>Step 2: read only the watched slice, then judge its speed and size</h3>
+  <p class="sub">Echo change in the watched slice over the last 30 s. Slow and regular means breathing. Flat means a hold. Fast and large means body movement.</p>
+  <canvas id="trace"></canvas>
+  <div class="status"><span id="chip"></span><span id="why"></span></div>
+</div>
+
+<script>
+const N = 42, CM = 6, MAX = N * CM, FPS = 20, DT = 1 / FPS, ROWS = 240, TR = 30 * FPS;
+const S = { you: 'breathe', youD: 34, other: 'off', otherD: 150, preset: 'breathe' };
+const PRESETS = {
+  breathe: { you: 'breathe', youD: 34, other: 'off', otherD: 150 },
+  hold:    { you: 'hold',    youD: 34, other: 'off', otherD: 150 },
+  move:    { you: 'move',    youD: 34, other: 'off', otherD: 150 },
+  far:     { you: 'breathe', youD: 34, other: 'walk', otherD: 150 },
+  same:    { you: 'hold',    youD: 34, other: 'breathe', otherD: 38 },
+};
+const $ = id => document.getElementById(id);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim() || '#888';
+const randn = () => { let u = 0; for (let i = 0; i < 6; i++) u += Math.random(); return (u - 3) * 1.41; };
+
+// ---- simulated echoes: one number per distance slice per frame ----
+let t = 0;
+const fastY = new Float32Array(N), fastO = new Float32Array(N);
+function frame() {
+  t += DT;
+  const sig = new Float32Array(N);
+  const spread = (centerCm, amp, sigma = 1.2) => {
+    const c = centerCm / CM - 0.5;
+    for (let i = 0; i < N; i++) sig[i] += amp * Math.exp(-((i - c) ** 2) / (2 * sigma * sigma));
+  };
+  if (S.you === 'breathe') spread(S.youD, Math.sin(2 * Math.PI * 0.27 * t));
+  if (S.you === 'move') {
+    spread(S.youD, 0.6 * Math.sin(2 * Math.PI * 0.27 * t));       // breathing is still there, just buried
+    for (let i = 3; i < N; i++) {
+      const d = (i + 0.5) * CM, inBody = d < S.youD + 26 ? 1 : 0;
+      fastY[i] = 0.55 * fastY[i] + 1.9 * randn() * inBody; sig[i] += fastY[i];
+    }
+  }
+  const fall = Math.min(1, 70 / S.otherD);                          // farther = weaker echo
+  if (S.other === 'breathe') spread(S.otherD, 0.9 * fall * Math.sin(2 * Math.PI * 0.21 * t + 1.3));
+  if (S.other === 'walk') {
+    const wob = S.otherD + 14 * Math.sin(t * 0.9);
+    for (let i = 3; i < N; i++) {
+      const d = (i + 0.5) * CM, near = Math.exp(-((d - wob) ** 2) / (2 * 16 * 16));
+      fastO[i] = 0.55 * fastO[i] + 2.4 * fall * randn() * near; sig[i] += fastO[i];
+    }
+  }
+  for (let i = 0; i < N; i++) sig[i] += 0.03 * randn();
+  return sig;
+}
+
+// ---- drawing ----
+const fall = $('fall'), trace = $('trace');
+const off = document.createElement('canvas'); off.width = N; off.height = ROWS;
+const octx = off.getContext('2d');
+const hist = [];
+function pushRow(sig) {
+  octx.globalAlpha = 1; octx.globalCompositeOperation = 'copy';
+  octx.drawImage(off, 0, 0, N, ROWS - 1, 0, 1, N, ROWS - 1);
+  octx.globalCompositeOperation = 'source-over';
+  octx.clearRect(0, 0, N, 1);
+  octx.fillStyle = css('--foreground');
+  for (let i = 0; i < N; i++) { octx.globalAlpha = Math.min(1, Math.abs(sig[i]) / 1.6) ** 0.75; octx.fillRect(i, 0, 1, 1); }
+  hist.push(sig[lockIdx()]); if (hist.length > TR) hist.shift();
+}
+const lockIdx = () => Math.min(N - 1, Math.max(0, Math.round(S.youD / CM - 0.5)));
+function fit(c) {
+  const r = devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  if (c.width !== Math.round(w * r)) { c.width = Math.round(w * r); c.height = Math.round(h * r); }
+  const x = c.getContext('2d'); x.setTransform(r, 0, 0, r, 0, 0); return [x, w, h];
+}
+function draw() {
+  let [x, w, h] = fit(fall);
+  x.clearRect(0, 0, w, h); x.imageSmoothingEnabled = true; x.drawImage(off, 0, 0, N, ROWS, 0, 0, w, h);
+  [x, w, h] = fit(trace);
+  x.clearRect(0, 0, w, h);
+  x.strokeStyle = css('--border'); x.lineWidth = 1; x.beginPath(); x.moveTo(0, h / 2); x.lineTo(w, h / 2); x.stroke();
+  x.strokeStyle = css('--chart-1'); x.lineWidth = 2; x.lineJoin = 'round'; x.beginPath();
+  const n = hist.length;
+  for (let i = 0; i < n; i++) {
+    const px = w - (n - 1 - i) / (TR - 1) * w, py = h / 2 - Math.max(-1, Math.min(1, hist[i] / 1.7)) * (h / 2 - 4);
+    i ? x.lineTo(px, py) : x.moveTo(px, py);
+  }
+  x.stroke();
+  x.fillStyle = css('--muted-foreground'); x.font = '11px ' + (css('--font-sans') || 'sans-serif');
+  x.fillText('30 s ago', 2, h - 4); x.textAlign = 'right'; x.fillText('now', w - 2, h - 4); x.textAlign = 'left';
+}
+
+// ---- the judgement: same idea as the real code ----
+function judge() {
+  const n = hist.length; if (n < 5 * FPS) return ['Warming up', ''];
+  let fast = 0; for (let i = n - 2 * FPS + 1; i < n; i++) fast += (hist[i] - hist[i - 1]) ** 2;
+  fast = Math.sqrt(fast / (2 * FPS));
+  const k = FPS / 2, sm = [];
+  for (let i = n - 15 * FPS < k ? k : n - 15 * FPS; i < n; i++) { let a = 0; for (let j = 0; j < k; j++) a += hist[i - j]; sm.push(a / k); }
+  const rec = sm.slice(-5 * FPS), m = rec.reduce((a, b) => a + b, 0) / rec.length;
+  const slow = Math.sqrt(rec.reduce((a, b) => a + (b - m) ** 2, 0) / rec.length);
+  if (fast > 0.5) return ['▲ Movement: reading paused', 'Changes are fast and large, so this is not breathing. The code waits for it to stop.'];
+  if (slow < 0.25) return ['■ No breathing seen (hold)', 'The watched slice is flat: the echo is there but not changing.'];
+  const mm = sm.reduce((a, b) => a + b, 0) / sm.length; let up = 0;
+  for (let i = 1; i < sm.length; i++) if (sm[i - 1] < mm && sm[i] >= mm) up++;
+  const bpm = Math.round(up * 60 / (sm.length / FPS));
+  return ['● Breathing, about ' + bpm + ' per minute', 'Slow, regular, small change in one slice.'];
+}
+function note() {
+  if (S.other === 'off') return '';
+  const gap = Math.abs(S.otherD - S.youD);
+  if (gap < 12) return ' The other person is within about 9 cm of your distance, so their echo lands in your slice. One mic cannot separate the two: this reading is partly theirs.';
+  if (gap < 24) return ' The other person is close to your distance, so some of their motion leaks into your slice.';
+  return ' The other person is ' + gap + ' cm away from your slice, so their motion stays in its own columns and is ignored.';
+}
+
+// ---- controls ----
+function sync() {
+  for (const [id, key] of [['youMode', 'you'], ['otherMode', 'other']])
+    for (const b of $(id).children) b.classList.toggle('on', b.dataset.v === S[key]);
+  for (const b of $('presets').querySelectorAll('button')) b.classList.toggle('on', b.dataset.p === S.preset);
+  $('youD').value = S.youD; $('otherD').value = S.otherD;
+  $('youDv').textContent = S.youD + ' cm'; $('otherDv').textContent = S.other === 'off' ? '' : S.otherD + ' cm';
+  $('otherD').disabled = S.other === 'off';
+  $('youWho').style.left = S.youD / MAX * 100 + '%';
+  $('otherWho').style.left = S.otherD / MAX * 100 + '%'; $('otherWho').style.display = S.other === 'off' ? 'none' : '';
+  $('direct').style.width = 20 / MAX * 100 + '%';
+  $('lock').style.left = (lockIdx() - 0.5) / N * 100 + '%'; $('lock').style.width = 2 / N * 100 + '%';
+}
+for (const [id, key] of [['youMode', 'you'], ['otherMode', 'other']])
+  $(id).addEventListener('click', e => { if (e.target.dataset.v) { S[key] = e.target.dataset.v; S.preset = null; sync(); } });
+$('presets').addEventListener('click', e => { const p = e.target.dataset.p; if (p) { Object.assign(S, PRESETS[p], { preset: p }); sync(); } });
+$('youD').addEventListener('input', e => { S.youD = +e.target.value; S.preset = null; hist.length = 0; sync(); });
+$('otherD').addEventListener('input', e => { S.otherD = +e.target.value; S.preset = null; sync(); });
+for (let d = 0; d <= 200; d += 50) { const s = document.createElement('span'); s.style.left = d / MAX * 100 + '%'; s.textContent = d + (d ? '' : ' cm from laptop'); $('axis').appendChild(s); }
+$('fallBox').addEventListener('mousemove', e => {
+  const r = $('fallBox').getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top, tip = $('tip');
+  tip.textContent = Math.round(px / r.width * MAX) + ' cm, ' + (py / r.height * ROWS / FPS).toFixed(0) + ' s ago';
+  tip.style.display = 'block'; tip.style.left = Math.min(px + 10, r.width - 110) + 'px'; tip.style.top = Math.max(0, py - 26) + 'px';
+});
+$('fallBox').addEventListener('mouseleave', () => { $('tip').style.display = 'none'; });
+
+// ---- run: fill 30 s of history first so it is never blank ----
+sync();
+for (let i = 0; i < TR; i++) pushRow(frame());
+function tick() { pushRow(frame()); draw(); const [a, b] = judge(); $('chip').textContent = a; $('why').textContent = b + note(); }
+tick(); setInterval(tick, 1000 / FPS);
+addEventListener('resize', draw);
+console.log('status:', $('chip').textContent);
+</script>
+</body>
+</html>
