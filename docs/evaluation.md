@@ -68,3 +68,13 @@ Gemini judge requests: 74 -> 46 (four-category sweep, 160 listings; tree decided
 Photo reading moved from 8 to 16 thumbnails per request: on 48 listings, brands agree 48/48 (counting Future Motion =
 Onewheel, Oculus = Meta), model numbers 44/48.
 Known-8 regression: 8/8 (Onewheel and Peloton decided by the tree; not independent, some were training data).
+
+## Full sweep with the new Gemini key (gemini-3.6-flash judge), UCSD / La Jolla, 30 mi
+
+All 5 categories, 790 listings, 96 s end to end, 0 errors (183 of 215 item details cached from earlier
+overlapping sweeps). 215 shortlisted; verdicts: 17 recalled, 106 closer look, 11 cleared, 81 no match.
+Decided by: tree 96, model-number check 2, Gemini 117.
+
+"Recalled" precision by eye: 17 / 17 plausible, 3 borderline (two Graco Rock 'n Grow playards, where the recall covers
+only the inclined-sleeper accessory; one Dream On Me rail with brand and design match but no readable model).
+New finds: Fisher-Price Jonathan Adler Deluxe Rock 'n Play ($30), Anker EverFrost battery cooler ($800).
