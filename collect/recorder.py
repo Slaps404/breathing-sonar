@@ -5,6 +5,8 @@ Sample n of the WAV lines up with probe[n % P] (plus a fixed speaker-to-mic dela
 because the speaker and mic run in one audio stream.
 """
 import json
+import os
+import subprocess
 import queue
 import threading
 import wave
@@ -48,7 +50,9 @@ class Recorder:
     def start(self):
         DATA.mkdir(exist_ok=True)
         self.started = datetime.now(timezone.utc)
-        self.id = "take-" + self.started.strftime("%Y-%m-%dT%H-%M-%S-") + f"{self.started.microsecond // 1000:03d}Z"
+        # SONAR_WHO: whose take this is (set by the friend kit), so takes from different people stay apart
+        who = "".join(c for c in os.environ.get("SONAR_WHO", "") if c.isalnum() or c in "-_")
+        self.id = (who + "-" if who else "") + "take-" + self.started.strftime("%Y-%m-%dT%H-%M-%S-") + f"{self.started.microsecond // 1000:03d}Z"
         self.pos = 0            # samples played and recorded so far
         self.labels, self.snrs = [], []
         self.distances = [] if self.distance_cm is None else [{"cm": self.distance_cm, "sample": 0, "t": 0.0}]
@@ -108,7 +112,8 @@ class Recorder:
             "id": self.id, "source": "mac-menubar", "started": self.started.isoformat(),
             "sampleRate": SR, "P": self.P, "f0": self.f0, "f1": self.f1, "amp": self.amp,
             "samples": samples, "seconds": round(samples / SR, 2), "labels": self.labels,
-            "distances": self.distances, "plan": self.plan,
+            "distances": self.distances, "plan": self.plan, "who": os.environ.get("SONAR_WHO") or None,
+            "machine": subprocess.run(["sysctl", "-n", "hw.model"], capture_output=True, text=True).stdout.strip(),
             "peak": round(self.peak, 4), "xruns": self.xruns,
             "snrMedianDb": round(float(np.median(self.snrs)), 1) if self.snrs else None,
             "input": sd.query_devices(kind="input")["name"], "output": sd.query_devices(kind="output")["name"],

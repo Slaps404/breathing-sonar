@@ -32,3 +32,6 @@ Raw mic audio plus label timestamps, saved to `data/` (not committed).
 - **Phone page:** `python3 collect/server.py`, then expose port 8787 over HTTPS (phones only allow mic access on HTTPS pages).
 
 Each take is a `.wav` and a `.json`. The JSON holds the labels as `{label, sample, t}` and one period of the probe; WAV sample `n` lines up with `probe[n % P]`.
+
+## Friend kit (collect takes on other Macs)
+`tools/make-kit.sh` builds `dist/sonar-recorder-kit.zip`: the menu bar recorder, a double-click `Start Recorder.command` (installs on first run, asks the person's name, warns if muted), and `READ ME FIRST.txt`. Quitting packs their takes into `~/Desktop/sonar-takes-<name>.zip` to send back. Takes are named `<name>-take-...` and their JSON records `who` and `machine`.
