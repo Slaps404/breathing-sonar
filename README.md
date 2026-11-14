@@ -23,3 +23,10 @@ Pressing Stop downloads the run as JSON.
 - `node tools/analyze.js <run.json>`: signal strength and motion per 5 s for a recorded run.
 
 Prototype only. Not a medical device.
+
+---
+
+## Also in this repo: RecallRadar
+
+A second SanD Hacks 2026 project lives in [`recall-radar/`](recall-radar/): it sweeps local resale listings and finds
+products under a federal safety recall, with the evidence for each match. See [`recall-radar/README.md`](recall-radar/README.md).
