@@ -203,12 +203,14 @@ function analyzeChannel(ch, winSec = 20) {
       prev = a; disp[i] = (a + off) * k;
     }
   } else {
-    // No clean ring yet: straight-line (PCA) projection, scaled roughly to mm.
+    // No clean ring yet: straight-line (PCA) projection, converted to an angle relative to the
+    // whole echo in this channel (|mean|). A small wobble on a big still echo is a small angle,
+    // so noise reads as ~0 mm instead of being blown up to a fixed size.
     let mx = 0, my = 0; for (let i = 0; i < n; i++) { mx += xs[i]; my += ys[i]; } mx /= n; my /= n;
     let cxx = 0, cxy = 0, cyy = 0;
     for (let i = 0; i < n; i++) { const dx = xs[i] - mx, dy = ys[i] - my; cxx += dx * dx; cxy += dx * dy; cyy += dy * dy; }
-    const th = 0.5 * Math.atan2(2 * cxy, cxx - cyy), spread = Math.sqrt((cxx + cyy) / n) || 1;
-    for (let i = 0; i < n; i++) disp[i] = ((xs[i] - mx) * Math.cos(th) + (ys[i] - my) * Math.sin(th)) / (3 * spread) * k;
+    const th = 0.5 * Math.atan2(2 * cxy, cxx - cyy), R = Math.hypot(mx, my) || 1;
+    for (let i = 0; i < n; i++) disp[i] = ((xs[i] - mx) * Math.cos(th) + (ys[i] - my) * Math.sin(th)) / R * k;
   }
   disp = detrend(movingAvg(disp, Math.max(1, Math.round(rate / 4)))); // drop jitter faster than ~4 Hz
   const spec = breathingSpectrum(disp, rate);
