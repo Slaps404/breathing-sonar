@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RecallRadar</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root { --bg:#0d1117; --card:#161b22; --border:#30363d; --fg:#e6edf3; --muted:#8b949e; --red:#f85149; --amber:#d29922; --green:#3fb950; --blue:#58a6ff; --bd:#3d7eff; }
   * { box-sizing: border-box; }
@@ -30,6 +32,8 @@
   .feed { font:12px ui-monospace,Menlo,monospace; color:var(--muted); max-height:120px; overflow:auto; background:#0b0f14; border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-bottom:14px; }
   .feed div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .feed .bd { color:#8fb4ff; } .feed .recalled { color:var(--red); font-weight:600; } .feed .closer_look { color:var(--amber); } .feed .cleared { color:var(--green); } .feed .error { color:#ff7b72; } .feed .done { color:var(--fg); font-weight:600; }
+  #map { height:320px; border-radius:10px; border:1px solid var(--border); margin-bottom:14px; background:#0b0f14; }
+  .leaflet-popup-content { font:13px system-ui; } .leaflet-container { background:#0b0f14; }
   .stats { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
   .stats .chip b { margin-left:4px; }
   .card { display:grid; grid-template-columns:300px 1fr; gap:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px; }
@@ -97,6 +101,8 @@
 
   <div class="feed" id="feed"><div>Pick an area and categories, then press Sweep. Or browse the last sweep below.</div></div>
 
+  <div id="map"></div>
+
   <div class="stats" id="filters">
     <button class="chip on" data-f="all">All <b id="c-all">0</b></button>
     <button class="chip" data-f="recalled"><span class="v-recalled">●</span> Recalled <b id="c-recalled">0</b></button>
@@ -147,7 +153,7 @@ async function loadResults() {
 function card(x) {
   const r = x.recall || {};
   const facts = [r.units && ('Units: ' + r.units), r.injuries && r.injuries.slice(0, 220)].filter(Boolean).join(' · ');
-  return `<div class="card ${x.verdict}">
+  return `<div class="card ${x.verdict}" id="c-${x.listing_id}">
     <div class="pics">
       <figure><img src="${img(x.photo)}" loading="lazy"><figcaption>Seller's photo</figcaption></figure>
       <figure>${r.image ? `<img src="${img(r.image)}" loading="lazy">` : '<div style="aspect-ratio:1;border:1px dashed #333;border-radius:6px"></div>'}<figcaption>Recalled product (CPSC)</figcaption></figure>
@@ -164,8 +170,31 @@ function card(x) {
       ${r.title ? `<div class="recall"><div class="rt">${esc(r.title)}</div><div class="f">${esc(r.date)} · remedy: ${esc(r.remedy_type)}${x.model_check ? ' · model check: ' + esc(x.model_check.replace('_', ' ')) : ''}</div><div class="f">${esc(facts)}</div></div>` : ''}
       <div class="links"><a href="${x.url}" target="_blank">Open listing ↗</a>${r.url ? `<a href="${r.url}" target="_blank">Open recall record ↗</a>` : ''}
         <button class="linkbtn" onclick="openReport('${x.listing_id}')">Draft report</button>
+        <button class="linkbtn" onclick="say(this,'${x.listing_id}','en')">🔊 Listen</button>
+        <button class="linkbtn" onclick="say(this,'${x.listing_id}','es')">🔊 Escuchar</button>
         <span class="meta">${x.photo_read && x.photo_read.brand ? 'photo read: ' + esc([x.photo_read.brand, x.photo_read.product_line, (x.photo_read.model_numbers || []).join(' ')].filter(Boolean).join(' · ')) : ''}</span></div>
     </div></div>`;
+}
+
+let map = null, layer = null;
+const COLOR = { recalled: '#f85149', closer_look: '#d29922', cleared: '#3fb950' };
+function drawMap(shown) {
+  if (!window.L) { $('map').style.display = 'none'; return; }
+  if (!map) {
+    map = L.map('map', { zoomControl: true, attributionControl: true }).setView([32.8, -117.1], 9);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 18 }).addTo(map);
+    layer = L.layerGroup().addTo(map);
+  }
+  layer.clearLayers();
+  const pts = [];
+  shown.forEach(x => {
+    if (x.lat == null || x.lon == null) return;
+    const jitter = () => (Math.random() - .5) * .004;   // OfferUp gives rounded coordinates; spread overlapping dots
+    const m = L.circleMarker([x.lat + jitter(), x.lon + jitter()], { radius: x.verdict === 'recalled' ? 9 : 7, color: COLOR[x.verdict] || '#888', fillColor: COLOR[x.verdict] || '#888', fillOpacity: .75, weight: 2 });
+    m.bindPopup(`<b>${esc(x.title)}</b><br>$${esc(x.price)} · ${esc(x.city)}<br><span style="color:${COLOR[x.verdict]}">${BADGE[x.verdict]}</span><br>${esc((x.recall || {}).title || '').slice(0, 90)}<br><a href="#c-${x.listing_id}">see card</a> · <a href="${x.url}" target="_blank">listing</a>`);
+    m.addTo(layer); pts.push([x.lat, x.lon]);
+  });
+  if (pts.length) map.fitBounds(pts, { padding: [30, 30], maxZoom: 11 });
 }
 
 function render() {
@@ -174,6 +203,7 @@ function render() {
   ['recalled', 'closer_look', 'cleared'].forEach(v => $('c-' + v).textContent = n(v));
   const shown = results.filter(x => filter === 'all' || x.verdict === filter);
   $('list').innerHTML = shown.length ? shown.map(card).join('') : '<div class="empty">No matches yet.</div>';
+  drawMap(shown);
 }
 
 $('filters').onclick = e => {
@@ -231,6 +261,15 @@ $('go').onclick = async () => {
   if (!r.ok) return alert(await r.text());
   sweepId = (await r.json()).sweep_id; startPolling();
 };
+
+let audio = null;
+async function say(btn, id, lang) {
+  if (audio) audio.pause();
+  const old = btn.textContent; btn.textContent = '…';
+  audio = new Audio('/api/speak/' + id + '?lang=' + lang);
+  audio.oncanplay = () => btn.textContent = old; audio.onerror = () => { btn.textContent = old; alert('Voice failed'); };
+  audio.play();
+}
 
 async function openReport(id) {
   report = await (await fetch('/api/report/' + id)).json();

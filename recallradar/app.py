@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 
-from . import offerup, sweep, vision
+from . import offerup, sweep, vision, voice
 from .config import ROOT
 from .db import connect
 
@@ -169,3 +169,18 @@ def report(listing_id: str):
     cpsc = (f"Report to SaferProducts.gov / CPSC Office of Compliance\n\nA product that {level} a recalled product "
             f"is offered for resale online.\n\n{evidence}\n\n{facts}")
     return {"verdict": r["verdict"], "seller": seller, "platform": platform, "regulator": cpsc}
+
+
+@app.get("/api/speak/{listing_id}")
+async def speak(listing_id: str, lang: str = "en"):
+    row = con.execute("SELECT sweep_id FROM verdicts WHERE listing_id=? ORDER BY created DESC LIMIT 1", (listing_id,)).fetchone()
+    if not row:
+        raise HTTPException(404)
+    card = next((c for c in results(row[0])["results"] if c["listing_id"] == listing_id), None)
+    if not card:
+        raise HTTPException(404)
+    try:
+        audio = await voice.speak(card, "es" if lang == "es" else "en")
+    except Exception as e:
+        raise HTTPException(502, f"voice failed: {str(e)[:120]}")
+    return Response(audio, media_type="audio/mpeg")
