@@ -48,3 +48,23 @@ Other four categories: 499 listings, 160 shortlisted (32%), 106 flagged, 11 matc
 - Judging: listings sharing a candidate recall go 5 per request; readable recalled model numbers skip the model.
 - 499-listing sweep: 4 min 16 s end to end (partly cached). Infant sleep re-judge, 64 listings: 5 min 12 s.
 - Paid Gemini tier would remove the rate limit.
+
+## Decision-tree judge (cascade)
+
+A depth-4 decision tree (`recallradar/decide.py`) maps plain facts about the best candidate recall (brand is the
+recalling company, readable model on/off the recall's list, recall covers all models, same product phrase, repair
+remedy, recent recall, ...) to a verdict. Trained on 207 verdicts from the Gemini + rules pipeline.
+
+| Confidence cutoff | Tree decides | Agrees with Gemini pipeline | False "recalled" |
+|---|---|---|---|
+| none (tree alone) | 100% | 72% | 8 |
+| 0.80 | 64% | 86.5% | 0 |
+| **0.90 (used)** | **46%** | **91.7%** | **0** |
+
+Cross-validated. Guard: the tree may say no match / closer look / cleared, never "recalled"; that always needs Gemini
+or an exact model-number match. Agreement with Gemini is not ground truth.
+
+Gemini judge requests: 74 -> 46 (four-category sweep, 160 listings; tree decided 90), 32 -> 25 (infant sleep).
+Photo reading moved from 8 to 16 thumbnails per request: on 48 listings, brands agree 48/48 (counting Future Motion =
+Onewheel, Oculus = Meta), model numbers 44/48.
+Known-8 regression: 8/8 (Onewheel and Peloton decided by the tree; not independent, some were training data).

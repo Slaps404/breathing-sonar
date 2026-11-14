@@ -111,7 +111,7 @@
     <div class="stage" id="s-photos"><span class="tag g">GEMINI</span><div class="n" id="n-photos">0</div><div class="t">listing photos read<br>brand, product, model on label</div><div class="bar"><i id="b-photos"></i></div></div>
     <div class="stage" id="s-shortlist"><div class="n" id="n-short">0</div><div class="t">share a brand or model with<br>one of <span id="nrec2">9,511</span> recalls</div><div class="bar"><i id="b-short"></i></div></div>
     <div class="stage bd" id="s-unlock"><span class="tag">BRIGHT DATA</span><div class="n" id="n-unlock">0</div><div class="t">full listings fetched<br><span id="n-bdreq">0</span> Bright Data requests</div><div class="bar"><i id="b-unlock"></i></div></div>
-    <div class="stage" id="s-judge"><span class="tag g">GEMINI</span><div class="n" id="n-judged">0</div><div class="t">photo vs recall verdicts<br><span id="n-hits">0</span> matches</div><div class="bar"><i id="b-judge"></i></div></div>
+    <div class="stage" id="s-judge"><span class="tag g">GEMINI</span><div class="n" id="n-judged">0</div><div class="t">verdicts, <span id="n-hits">0</span> matches<br><span id="n-by">tree · code · Gemini</span></div><div class="bar"><i id="b-judge"></i></div></div>
   </div>
 
   <div class="feed" id="feed"><div>Pick an area and categories, then press Sweep. Or browse the last sweep below.</div></div>
@@ -195,6 +195,7 @@ function card(x) {
         <button class="linkbtn" onclick="openReport('${x.listing_id}')">Draft report</button>
         <button class="linkbtn" onclick="say(this,'${x.listing_id}','en')">🔊 Listen</button>
         <button class="linkbtn" onclick="say(this,'${x.listing_id}','es')">🔊 Escuchar</button>
+        <span class="meta">decided by ${x.stage === 'tree' ? 'decision tree' : x.stage === 'code' ? 'model-number check' : 'Gemini + rules'} · </span>
         <span class="meta">${x.photo_read && x.photo_read.brand ? 'photo read: ' + esc([x.photo_read.brand, x.photo_read.product_line, (x.photo_read.model_numbers || []).join(' ')].filter(Boolean).join(' · ')) : ''}</span></div>
     </div></div>`;
 }
@@ -266,6 +267,7 @@ function showStatus(s) {
   $('n-bdreq').textContent = (s.bd && s.bd.requests) ?? 0;
   $('n-judged').textContent = s.judged ?? 0;
   $('n-hits').textContent = (s.recalled || 0) + (s.closer_look || 0);
+  $('n-by').textContent = `${s.by_tree || 0} tree · ${s.by_code || 0} code · ${s.by_gemini || 0} Gemini`;
   $('b-search').style.width = pct(s.queries_done, s.queries_total);
   $('b-photos').style.width = pct((s.photos_read || 0) + (s.photo_errors || 0), s.listings);
   $('b-short').style.width = ['unlock', 'judge', 'done'].includes(s.stage) ? '100%' : '0%';
