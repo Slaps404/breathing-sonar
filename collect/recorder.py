@@ -46,6 +46,7 @@ class Recorder:
         self.running = False
         self.distance_cm = None  # rough chest-to-laptop distance; kept between takes
         self.plan = None         # guided-take interval text, if the take was guided
+        self.track = None        # friend-kit track step id (tracks.py), if any
 
     def start(self):
         DATA.mkdir(exist_ok=True)
@@ -112,7 +113,7 @@ class Recorder:
             "id": self.id, "source": "mac-menubar", "started": self.started.isoformat(),
             "sampleRate": SR, "P": self.P, "f0": self.f0, "f1": self.f1, "amp": self.amp,
             "samples": samples, "seconds": round(samples / SR, 2), "labels": self.labels,
-            "distances": self.distances, "plan": self.plan, "who": os.environ.get("SONAR_WHO") or None,
+            "distances": self.distances, "plan": self.plan, "track": self.track, "who": os.environ.get("SONAR_WHO") or None,
             "machine": subprocess.run(["sysctl", "-n", "hw.model"], capture_output=True, text=True).stdout.strip(),
             "peak": round(self.peak, 4), "xruns": self.xruns,
             "snrMedianDb": round(float(np.median(self.snrs)), 1) if self.snrs else None,

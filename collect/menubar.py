@@ -9,6 +9,7 @@ import time
 
 import rumps
 
+import tracks
 from guide import CUES, DEFAULT_PLAN, LEAD_IN, Overlay, parse_plan
 from recorder import DATA, Recorder
 
@@ -50,7 +51,14 @@ class SonarApp(rumps.App):
         self.guided = rumps.MenuItem("Start guided take", callback=self.on_guided)
         self.plan_item = rumps.MenuItem("Set intervals: " + self.plan, callback=self.on_plan)
         self.guide_timer = rumps.Timer(self.guide_tick, 0.2)
-        self.menu = [self.toggle, self.status, None, self.guided, self.plan_item, None,
+        # Friend track: a list of set-up takes (tracks.py). The tier picks how many.
+        self.track_step = None          # step id of the guided take running now, if it came from the track
+        self.next_item = rumps.MenuItem("Next take", callback=self.on_next)
+        self.tier_menu = rumps.MenuItem("How much to help")
+        for n in tracks.NAMES:
+            self.tier_menu.add(rumps.MenuItem(tracks.label(n), callback=self.on_tier))
+        self.refresh_track()
+        self.menu = [self.next_item, self.tier_menu, None, self.toggle, self.status, None, self.guided, self.plan_item, None,
                      *self.items.values(), None, self.distance, None,
                      rumps.MenuItem("Open data folder", callback=self.on_open),
                      rumps.MenuItem("Quit", callback=self.on_quit)]
@@ -71,14 +79,52 @@ class SonarApp(rumps.App):
         PLAN_FILE.write_text(self.plan)
         self.plan_item.title = "Set intervals: " + self.plan
 
-    def on_guided(self, _):
+    def refresh_track(self):
+        n = tracks.tier() or 1
+        for k, item in zip(tracks.NAMES, self.tier_menu.values()):
+            item.state = int(k == n)
+        left, total = len(tracks.todo(n)), tracks.count(n)
+        self.next_item.title = (f"Next take ({total - left + 1} of {total})" if left
+                                else f"All {total} takes done, thank you! Quit to save")
+
+    def on_tier(self, sender):
+        tracks.set_tier(next(k for k in tracks.NAMES if tracks.label(k) == sender.title))
+        self.refresh_track()
+
+    def on_next(self, _):
+        if self.guide or self.rec.running:
+            rumps.alert("Finish the current take first")
+            return
+        n = tracks.tier() or 1
+        todo = tracks.todo(n)
+        if not todo:
+            rumps.alert("All done", "Thank you! Choose Quit to pack the takes into a zip on your Desktop.\n"
+                        "Want to help more? Pick a bigger option under How much to help.")
+            return
+        step_id, _, cm, plan, setup = todo[0]
+        k = tracks.count(n) - len(todo) + 1
+        if not rumps.alert(f"Take {k} of {tracks.count(n)}", setup + "\n\nAfter you click Start: hands off the laptop, "
+                           "and follow the banner at the top of the screen.", ok="Start", cancel="Not now"):
+            return
+        if cm:
+            self.on_distance(next(i for t, i in self.distance.items() if DISTANCES[t] == cm))
+        else:                           # nobody in front of the laptop: no chest distance
+            self.rec.set_distance(None)
+            self.distance.title = "Distance: nobody there"
+            for item in self.distance.values():
+                item.state = 0
+        self.track_step = step_id
+        self.on_guided(None, plan)
+
+    def on_guided(self, _, plan=None):
         if self.guide:                  # second click cancels; anything recorded so far is saved
             self.end_guide("Cancelled")
             return
         if self.rec.running:
             rumps.alert("Stop the current recording first")
             return
-        self.guide = {"steps": parse_plan(self.plan), "i": -1, "t0": time.monotonic(), "ends": []}
+        plan = plan or self.plan
+        self.guide = {"plan": plan, "steps": parse_plan(plan), "i": -1, "t0": time.monotonic(), "ends": []}
         self.overlay = self.overlay or Overlay()
         self.guided.title = "Cancel guided take"
         self.guide_timer.start()
@@ -94,7 +140,7 @@ class SonarApp(rumps.App):
                 self.overlay.show(f"GET READY  {left:.0f}", "first: " + CUES[steps[0][0]].lower())
                 return
             try:
-                self.rec.plan = self.plan
+                self.rec.plan, self.rec.track = g["plan"], self.track_step
                 self.rec.start()
             except Exception as err:    # e.g. no microphone permission
                 self.end_guide("Could not start")
@@ -123,13 +169,20 @@ class SonarApp(rumps.App):
         self.guide = None
         self.guide_timer.stop()
         self.guided.title = "Start guided take"
+        finished = word == "Done"
         if self.rec.running:
             self.save()
             word += ", saved"
         if self.rec.xruns > 5:          # dropped audio leaves holes in the take; say so right away
-            word, self.hide_at_extra = f"{self.rec.xruns} audio dropouts: redo", 8
+            word, self.hide_at_extra, finished = f"{self.rec.xruns} audio dropouts: redo", 8, False
         if self.rec.snr is not None and self.rec.snr < 15:   # the probe never reached the mic
-            word, self.hide_at_extra = "no echo: unmute, volume up, redo", 8
+            word, self.hide_at_extra, finished = "no echo: unmute, volume up, redo", 8, False
+        if self.track_step:             # a bad or cancelled take stays on the list, so Next take repeats it
+            if finished:
+                tracks.mark_done(self.track_step)
+            self.track_step = None
+            self.rec.track = None
+            self.refresh_track()
         self.overlay.show(word.upper(), self.status.title)
         self.hide_at = time.monotonic() + 4 + getattr(self, "hide_at_extra", 0)   # the 1 s tick hides the banner
         self.hide_at_extra = 0
