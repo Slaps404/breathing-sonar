@@ -7,7 +7,13 @@ const D = require('../dsp.js');
 const file = process.argv[2];
 const r = JSON.parse(fs.readFileSync(file));
 const hi = process.argv.indexOf('--hold');
-const hold = hi > 0 ? process.argv[hi + 1].split(',').map(Number) : null;
+let hold = hi > 0 ? process.argv[hi + 1].split(',').map(Number) : null;
+// Guided runs log when each phase started; use the logged hold window.
+if (!hold && r.cues) {
+  const i = r.cues.findIndex(c => c.phase === 'hold');
+  if (i >= 0) hold = [r.cues[i].t, r.cues[i + 1] ? r.cues[i + 1].t : Infinity];
+  console.log('cues:', r.cues.map(c => `${c.t}s ${c.phase}`).join(', '));
+}
 const mode = r.mode || 'tones';
 
 function report(label, rate, n, feed, sonar, getCh) {

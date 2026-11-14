@@ -11,6 +11,8 @@
   canvas { background: #111823; border: 1px solid #263445; display: block; margin: 12px 0; width: 100%; }
   .stat { display: inline-block; margin-right: 32px; font-size: 18px; color: #9fb0c2; }
   .stat b { font-size: 34px; color: #e6edf3; }
+  #cue { display: none; padding: 16px; font-size: 30px; margin: 12px 0; background: #1f6feb; }
+  #cue.hold { background: #d29922; color: #0b0f14; }
   #alert { display: none; background: #b42318; padding: 14px; font-size: 26px; margin: 12px 0; }
   table { border-collapse: collapse; margin-top: 6px; }
   td, th { padding: 4px 14px; text-align: left; border-bottom: 1px solid #263445; }
@@ -20,7 +22,7 @@
 </style>
 </head>
 <body>
-<h2>Ultrasound breathing test</h2>
+<h2>Ultrasound breathing test <span class="hint">v2</span></h2>
 <p class="hint">
   Built-in speaker and mic only (no headphones, no Bluetooth). Sit 30-80 cm from the laptop, chest facing the screen, stay still.
   On macOS set Control Center &gt; Mic Mode to <b>Standard</b> (Voice Isolation filters out the ultrasound).
@@ -37,6 +39,11 @@
   <label>Subject zone <input id="minR" type="number" step="0.1" value="0.2"> to <input id="maxR" type="number" step="0.1" value="1.2"> m</label>
 </div>
 
+<div class="row" style="margin-top:8px">
+  <label><input type="checkbox" id="guided" checked> Guided test: breathe <input id="gB" type="number" value="60"> s,
+  hold <input id="gH" type="number" value="20"> s, breathe <input id="gA" type="number" value="10"> s, then auto-stop</label>
+</div>
+<div id="cue"></div>
 <div id="alert">No breathing detected. Are you okay?</div>
 
 <div style="margin-top:14px">
@@ -62,7 +69,7 @@ Stop downloads the run as JSON for <code>node tools/replay.js</code>.</p>
 <script src="dsp.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-let ctx, node, stream, timer, sonar, rec = null, t0 = 0;
+let ctx, node, stream, timer, sonar, rec = null, t0 = 0, plan = null, phase = null;
 
 async function start() {
   const mode = document.querySelector('input[name=mode]:checked').value;
@@ -102,6 +109,8 @@ async function start() {
   ctx.createMediaStreamSource(stream).connect(node);
   node.connect(ctx.destination);
   t0 = performance.now();
+  plan = $('guided').checked ? [['breathe', +$('gB').value], ['hold', +$('gH').value], ['breathe again', +$('gA').value]] : null;
+  phase = null; rec.cues = [];
   $('depthBox').style.display = mode === 'range' ? '' : 'none';
   $('toneBox').style.display = mode === 'tones' ? '' : 'none';
   $('whereLbl').textContent = mode === 'range' ? 'Chest at' : 'Best tone';
@@ -121,10 +130,38 @@ function stop() {
     a.click();
   }
   rec = null;
+  $('cue').style.display = 'none';
   $('start').disabled = false; $('stop').disabled = true;
 }
 
+// Seconds of audio recorded so far (the same clock the recording uses).
+function dataTime() {
+  if (!rec) return 0;
+  return (sonar.mode === 'range' ? rec.re.length : rec.I[0].length) / sonar.rate;
+}
+
+// Guided test: show what to do now, with a countdown, and log when each phase starts.
+const CUE_TEXT = { 'breathe': 'Breathe normally. Sit still.', 'hold': 'HOLD YOUR BREATH', 'breathe again': 'Breathe again' };
+function runCues() {
+  if (!plan || !rec) return;
+  const t = dataTime();
+  let end = 0, cur = null;
+  for (const [name, dur] of plan) { end += dur; if (t < end) { cur = name; break; } }
+  if (!cur) { stop(); return; }
+  if (cur !== phase) {
+    phase = cur;
+    rec.cues.push({ t: +t.toFixed(2), phase: cur });
+    speechSynthesis.speak(new SpeechSynthesisUtterance(cur === 'hold' ? 'Hold your breath now' : cur === 'breathe' ? 'Breathe normally' : 'Breathe'));
+  }
+  const c = $('cue');
+  c.style.display = 'block';
+  c.className = phase === 'hold' ? 'hold' : '';
+  c.textContent = `${CUE_TEXT[phase]}  ${Math.ceil(end - t)} s`;
+}
+
 function tick() {
+  runCues();
+  if (!rec && plan) return; // auto-stopped
   const now = performance.now();
   const res = sonar.analyze(now);
   const ch = res && res.ch;
@@ -147,7 +184,7 @@ function tick() {
     setSnr(Math.min(...sonar.freqs.map((_, k) => sonar.snr(k))));
     renderTable();
   }
-  if (rec) rec.snaps.push({ t: +((now - t0) / 1000).toFixed(2), bpm: ch ? ch.bpm : null, quality: ch ? ch.quality : 0,
+  if (rec) rec.snaps.push({ t: +dataTime().toFixed(2), bpm: ch ? ch.bpm : null, quality: ch ? ch.quality : 0,
     alerting: sonar.apnea.alerting, lock: sonar.mode === 'range' ? sonar.lock : undefined });
   drawWave(ch);
 }
