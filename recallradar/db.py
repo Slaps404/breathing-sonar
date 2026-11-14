@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS verdicts (
   listing_id TEXT, recall_id INTEGER, sweep_id TEXT,
   verdict TEXT, confidence REAL, reason TEXT, evidence TEXT, stage TEXT,
   created TEXT DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (listing_id, recall_id)
+  PRIMARY KEY (listing_id, sweep_id)
 );
 CREATE TABLE IF NOT EXISTS sweeps (
   sweep_id TEXT PRIMARY KEY, started TEXT, finished TEXT, stats TEXT, queries TEXT

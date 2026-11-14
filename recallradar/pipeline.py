@@ -81,6 +81,14 @@ async def judge_listing(con, http, listing: dict, ident: dict | None) -> dict:
         out.update(verdict="closer_look", recall_id=top["recall"]["recall_id"],
                    reason=f"Same brand and product type as this recall, which covers only certain models; "
                           f"no model number is visible. Photo check said: {out['reason']}")
+    # Rule: "recalled" needs a named product/model match and agreeing brands; look-alikes are at most "closer look"
+    if out["verdict"] == "recalled" and not (out.get("brands_agree") and (out.get("named_product_match") or "").strip()):
+        if out.get("brands_agree"):
+            out["verdict"] = "closer_look"
+            out["reason"] = "Same brand and similar product, but no recalled product name or model is visible. " + out["reason"]
+        else:
+            out["verdict"] = "no_match"
+            out["reason"] = f"Different brand ({out.get('listing_brand') or 'unknown'}). " + out["reason"]
     rec = next((c["recall"] for c in cands if c["recall"]["recall_id"] == out.get("recall_id")), None)
     if out["verdict"] != "no_match" and not rec:
         rec = cands[0]["recall"]; out["recall_id"] = rec["recall_id"]

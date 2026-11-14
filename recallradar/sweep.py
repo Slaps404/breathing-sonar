@@ -107,27 +107,38 @@ async def _search(http, con, queries, lat, lon, radius):
     return list(seen.values())
 
 
-async def _identify(http, con, listings):
+async def _identify(http, con, listings, batch=8):
     STATE["stage"] = "photos"
     if not vision.available():
         _event("No Gemini key: skipping photo reading, title text only", "warn")
         return {}
     sem = asyncio.Semaphore(LIMITS["identify"])
     out = {}
+    todo = [li for li in listings if li.get("thumb")]
+    groups = [todo[i:i + batch] for i in range(0, len(todo), batch)]
 
-    async def one(li):
+    async def one(group):
         async with sem:
             try:
-                ident = await vision.identify(http, li)
-                out[li["listing_id"]] = ident
-                con.execute("INSERT OR REPLACE INTO identities VALUES (?,?)", (li["listing_id"], json.dumps(ident)))
-                STATE["photos_read"] += 1
-                if ident.get("model_numbers") or (ident.get("brand") and ident["brand"].lower() not in li["title"].lower()):
-                    _event(f"Photo read: '{li['title'][:40]}' -> {pipeline.identity_text(ident)[:70]}")
+                got = await vision.identify_batch(http, group)
             except Exception as e:
+                STATE["photo_errors"] += len(group)
+                _event(f"Photo batch failed: {str(e)[:80]}", "error")
+                return
+        for li in group:
+            ident = got.get(li["listing_id"])
+            if not ident:
                 STATE["photo_errors"] += 1
+                continue
+            out[li["listing_id"]] = ident
+            con.execute("INSERT OR REPLACE INTO identities VALUES (?,?)", (li["listing_id"], json.dumps(ident)))
+            STATE["photos_read"] += 1
+            brand = (ident.get("brand") or "").strip()
+            if ident.get("model_numbers") or (brand and brand.lower() not in li["title"].lower()):
+                _event(f"Photo read: '{li['title'][:40]}' -> {pipeline.identity_text(ident)[:70]}")
+        con.commit()
 
-    await asyncio.gather(*[one(li) for li in listings if li.get("thumb")])
+    await asyncio.gather(*[one(g) for g in groups])
     con.commit()
     return out
 
@@ -192,8 +203,7 @@ async def _judge(http, con, sweep_id, short, idents):
         key = "judge_errors" if v["verdict"] == "error" else v["verdict"]
         STATE[key] = STATE.get(key, 0) + 1
         ev = {k: v.get(k) for k in ("listing_evidence", "recall_evidence", "photo_index", "model_check", "candidates", "_model")}
-        con.execute("DELETE FROM verdicts WHERE listing_id=?", (li["listing_id"],))
-        con.execute("""INSERT INTO verdicts (listing_id, recall_id, sweep_id, verdict, confidence, reason, evidence, stage)
+        con.execute("""INSERT OR REPLACE INTO verdicts (listing_id, recall_id, sweep_id, verdict, confidence, reason, evidence, stage)
                        VALUES (?,?,?,?,?,?,?,?)""",
                     (li["listing_id"], v.get("recall_id") or 0, sweep_id, v["verdict"], v.get("confidence"),
                      v.get("reason"), json.dumps(ev), v.get("stage")))

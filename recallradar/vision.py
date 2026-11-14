@@ -128,8 +128,12 @@ JUDGE_SCHEMA = {
         "listing_evidence": {"type": "string", "description": "exact text quoted from listing, or the photo detail (e.g. 'box in photo 2 reads ...')"},
         "recall_evidence": {"type": "string", "description": "exact words from the recall record that match"},
         "photo_index": {"type": "integer", "description": "which listing photo (0-based) shows the evidence"},
+        "listing_brand": {"type": "string", "description": "brand readable in the listing photo or text, empty if none"},
+        "brands_agree": {"type": "boolean", "description": "listing brand is the recalled brand (or no brand visible but the product name matches)"},
+        "named_product_match": {"type": "string", "description": "the specific product name or model number from the recall that the listing shows by name, label, or model. Empty if it is only a similar-looking design"},
     },
-    "required": ["recall_id", "verdict", "confidence", "reason", "listing_evidence", "recall_evidence", "photo_index"],
+    "required": ["recall_id", "verdict", "confidence", "reason", "listing_evidence", "recall_evidence", "photo_index",
+                 "listing_brand", "brands_agree", "named_product_match"],
 }
 
 JUDGE_RULES = """You check whether a used item for sale matches a product under a U.S. CPSC safety recall.
@@ -138,6 +142,8 @@ Verdicts:
 - closer_look: likely the same brand and product, but you cannot confirm the model (recall covers only some models and none is readable), OR the recall's remedy is a repair/firmware/part fix so this unit may already be fixed.
 - cleared: same brand/type, but the listing shows a model or version the recall does NOT include.
 - no_match: different product or brand.
+"recalled" requires BOTH: the brands agree, AND the listing shows a recalled product by its name, label or model number
+(or the recall covers all models of that exact product type from that brand). A similar shape or color alone is not enough.
 Judge only the main item for sale. Ignore objects in the background of the photo.
 Be strict: a look-alike of a generic shape (e.g. any bassinet) is not a match without a brand, name or design cue that the recall describes.
 Quote evidence exactly. Neutral wording: say "matches a recalled product", never accuse the seller."""
@@ -172,5 +178,44 @@ async def judge(http: httpx.AsyncClient, listing: dict, cands: list[dict]) -> di
         if ri:
             parts += [f"Photo of recalled product (recall id={rec['recall_id']}):", _img(ri)]
     parts.append(JUDGE_RULES)
-    key = "judge4:" + listing["listing_id"] + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands) + ":" + str(len(photos))
+    key = "judge5:" + listing["listing_id"] + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands) + ":" + str(len(photos))
     return await _generate(JUDGE_MODELS, parts, JUDGE_SCHEMA, cache_key=key)
+
+
+BATCH_SCHEMA = {"type": "object", "properties": {"items": {"type": "array", "items": {
+    "type": "object", "properties": {"index": {"type": "integer"}, **ID_SCHEMA["properties"]},
+    "required": ["index"] + ID_SCHEMA["required"]}}}, "required": ["items"]}
+
+
+async def identify_batch(http: httpx.AsyncClient, listings: list[dict]) -> dict:
+    """Read several listing thumbnails in ONE request (8x fewer calls than one-by-one). Returns {listing_id: identity}."""
+    out, todo = {}, []
+    for li in listings:  # reuse single-item cache if present
+        p = CACHE / ("gem_" + hashlib.sha1(("id2:" + li["thumb"]).encode()).hexdigest() + ".json")
+        if p.exists():
+            out[li["listing_id"]] = json.loads(p.read_text())
+        else:
+            todo.append(li)
+    if not todo:
+        return out
+    parts, idx = [], []
+    for li in todo:
+        try:
+            data = await fetch_image(http, li["thumb"])
+        except Exception:
+            continue
+        parts += [f"Item {len(idx)}: listing titled {li['title']!r}", _img(data)]
+        idx.append(li)
+    parts.append("For EACH item above, identify the product in its photo. Read any brand, product name and "
+                 "model/style number printed on the item or its box. Only report text you can actually read or "
+                 "that is in the title; do not guess model numbers. Return one entry per item with its index.")
+    key = "idb1:" + "|".join(li["thumb"] for li in idx)
+    res = await _generate(ID_MODELS, parts, BATCH_SCHEMA, cache_key=key)
+    for it in res.get("items", []):
+        i = it.pop("index", -1)
+        if 0 <= i < len(idx):
+            it["_model"] = res.get("_model")
+            out[idx[i]["listing_id"]] = it
+            p = CACHE / ("gem_" + hashlib.sha1(("id2:" + idx[i]["thumb"]).encode()).hexdigest() + ".json")
+            p.write_text(json.dumps(it))
+    return out
