@@ -18,8 +18,10 @@ from google.genai import types
 from .config import CACHE, gemini_key
 from .offerup import fetch_image
 
-ID_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash"]
-JUDGE_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash"]  # 3.6 first once billing is on
+ID_MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"]
+JUDGE_MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"]  # 3.6 first once billing is on
+
+_exhausted: set = set()   # models that hit their daily cap this process; skip them
 
 _client = None
 
@@ -67,7 +69,7 @@ async def _generate(models, contents, schema, cache_key=None):
     if path and path.exists():
         return json.loads(path.read_text())
     last = None
-    for model in models:
+    for model in [m for m in models if m not in _exhausted] or models:
         for attempt in range(3):
             try:
                 await _rate_slot()
@@ -85,6 +87,7 @@ async def _generate(models, contents, schema, cache_key=None):
                 msg = str(e)
                 print(f"[gemini] {model} attempt {attempt}: {type(e).__name__} {msg[:90]}", flush=True)
                 if "PerDay" in msg:
+                    _exhausted.add(model)
                     break                                   # daily cap: try the next model
                 await asyncio.sleep(_retry_delay(e) or 2 * (attempt + 1))
     raise RuntimeError(f"Gemini failed: {str(last)[:200]}")

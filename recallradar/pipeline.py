@@ -4,6 +4,8 @@ import re
 from . import match, vision
 from .recalls import extract_models
 
+RECENT = "2020-11-01"   # only recent recalls can promote a no-match to "closer look"
+
 
 def identity_text(ident: dict | None) -> str:
     if not ident:
@@ -44,7 +46,7 @@ def apply_rules(verdict: dict, rec: dict | None, listing: dict | None = None, id
         if status == "listed" and v != "recalled":
             verdict["verdict"] = "recalled"
             verdict["reason"] = f"Model {', '.join(lm)} appears in the recall's model list. " + verdict["reason"]
-        elif status == "not_listed" and v == "recalled":
+        elif status == "not_listed" and v in ("recalled", "closer_look"):
             verdict["verdict"] = "cleared"
             verdict["reason"] = (f"Same brand, but the listing shows model {', '.join(lm)}, which is not among the "
                                  f"recalled models ({', '.join(rm[:8])}).")
@@ -73,14 +75,20 @@ async def judge_listing(con, http, listing: dict, ident: dict | None) -> dict:
     out = await vision.judge(http, listing, cands)
     out["stage"] = "vision"
     out["candidates"] = [c["recall"]["recall_id"] for c in cands]
-    top = cands[0]
-    if (out["verdict"] == "no_match" and top.get("why") == "brand+type"
-            and match.brand_is_recaller(top.get("brand", ""), top["recall"])
-            and model_check(listing, ident, top["recall"])[0] == "unknown" and top["recall"]["models"]):
-        # Rule: same brand + same product type, recall covers only some models, none readable -> closer look
-        out.update(verdict="closer_look", recall_id=top["recall"]["recall_id"],
-                   reason=f"Same brand and product type as this recall, which covers only certain models; "
-                          f"no model number is visible. Photo check said: {out['reason']}")
+    # Rule: brand is the recalling company + same product phrase + recent recall + no readable model -> closer look,
+    # even if the model said no_match (it cannot rule out a model it cannot see).
+    if out["verdict"] == "no_match":
+        brand = (ident or {}).get("brand") or ""
+        text = " ".join([listing["title"], (ident or {}).get("product_type") or "", (ident or {}).get("product_line") or ""])
+        for c in cands:
+            rec = c["recall"]
+            phr = match.product_phrase_match(rec, text, brand)
+            if (phr and match.brand_is_recaller(brand, rec) and rec["date"] >= RECENT
+                    and rec["models"] and model_check(listing, ident, rec)[0] == "unknown"):
+                out.update(verdict="closer_look", recall_id=rec["recall_id"],
+                           reason=f"Same brand and product ({phr[0]}) as a recall that covers only certain models "
+                                  f"({', '.join(rec['models'].split()[:4])}); no model number is visible, so check the label.")
+                break
     # Rule: "recalled" needs a named product/model match and agreeing brands; look-alikes are at most "closer look"
     if out["verdict"] == "recalled" and not (out.get("brands_agree") and (out.get("named_product_match") or "").strip()):
         if out.get("brands_agree"):

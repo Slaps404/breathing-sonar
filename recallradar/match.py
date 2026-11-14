@@ -281,3 +281,13 @@ def brand_is_recaller(brand: str, rec: dict) -> bool:
         return False
     head = _norm_brand(re.split(r"\bDue to\b", rec["title"])[0])
     return re.search(r"\b" + re.escape(b) + r"\b", head) is not None
+
+
+def product_phrase_match(rec: dict, listing_text: str, brand: str = "") -> list[str]:
+    """Two-word product phrases from the recall's product name/headline that also appear in the listing
+    (e.g. 'power bank', 'circular saw', 'bed rail'). Brand words do not count."""
+    bw = type_words(brand) | type_words(" ".join(re.findall(r"^[^ ]+", rec["title"])))
+    head = re.split(r"\bDue to\b", rec["title"])[0] + " " + rec["products"]
+    rp = {" ".join(stem(w) for w in p.split()) for p in bigrams(words(head))}
+    lp = {" ".join(stem(w) for w in p.split()) for p in bigrams(words(listing_text))}
+    return sorted(p for p in rp & lp if not set(p.split()) & bw and not set(p.split()) <= TYPE_STOP)
