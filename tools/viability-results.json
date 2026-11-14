@@ -14,27 +14,6 @@
   {
    "name": "alone, quiet room",
    "mode": "range",
-   "seed": 5,
-   "rateOK": 1,
-   "latency": 7.6,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 48.005009097411225,
-   "onChest": 1,
-   "events": [
-    [
-     67.6,
-     "start"
-    ],
-    [
-     81.4,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "alone, quiet room",
-   "mode": "range",
    "seed": 3,
    "rateOK": 1,
    "latency": 6.8,
@@ -56,16 +35,37 @@
   {
    "name": "alone, quiet room",
    "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.82795601712848,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "range",
    "seed": 4,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 47.889631857834,
    "onChest": 1,
    "events": [
     [
-     67.8,
+     67.6,
      "start"
     ],
     [
@@ -98,20 +98,20 @@
   {
    "name": "alone, quiet room",
    "mode": "range",
-   "seed": 2,
+   "seed": 5,
    "rateOK": 1,
-   "latency": 7.2,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 47.82795601712848,
+   "snr": 48.005009097411225,
    "onChest": 1,
    "events": [
     [
-     67.2,
+     67.6,
      "start"
     ],
     [
-     81.6,
+     81.4,
      "end"
     ]
    ]
@@ -184,14 +184,14 @@
    "mode": "range",
    "seed": 4,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 47.88611798111813,
    "onChest": 1,
    "events": [
     [
-     67.8,
+     67.6,
      "start"
     ],
     [
@@ -217,27 +217,6 @@
     ],
     [
      81.4,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "alone, quiet room",
-   "mode": "tones",
-   "seed": 2,
-   "rateOK": 1,
-   "latency": 7.2,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 57.78035142533217,
-   "onChest": null,
-   "events": [
-    [
-     67.2,
-     "start"
-    ],
-    [
-     81.6,
      "end"
     ]
    ]
@@ -287,20 +266,20 @@
   {
    "name": "alone, quiet room",
    "mode": "tones",
-   "seed": 5,
+   "seed": 2,
    "rateOK": 1,
-   "latency": 7.6,
+   "latency": 7.2,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 58.12084698200786,
+   "snr": 57.78035142533217,
    "onChest": null,
    "events": [
     [
-     67.6,
+     67.2,
      "start"
     ],
     [
-     81.4,
+     81.6,
      "end"
     ]
    ]
@@ -318,6 +297,27 @@
    "events": [
     [
      67.8,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "alone, quiet room",
+   "mode": "tones",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 58.12084698200786,
+   "onChest": null,
+   "events": [
+    [
+     67.6,
      "start"
     ],
     [
@@ -394,18 +394,39 @@
    "mode": "range",
    "seed": 4,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 47.89118216018936,
    "onChest": 1,
    "events": [
     [
-     67.8,
+     67.6,
      "start"
     ],
     [
      81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 1 m",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.75027967697065,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     80.4,
      "end"
     ]
    ]
@@ -434,48 +455,6 @@
   {
    "name": "walker passing at 1 m",
    "mode": "tones",
-   "seed": 2,
-   "rateOK": 1,
-   "latency": 7.2,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 57.75027967697065,
-   "onChest": null,
-   "events": [
-    [
-     67.2,
-     "start"
-    ],
-    [
-     80.4,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "walker passing at 2 m",
-   "mode": "range",
-   "seed": 5,
-   "rateOK": 1,
-   "latency": 7.6,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 48.00337812731983,
-   "onChest": 1,
-   "events": [
-    [
-     67.6,
-     "start"
-    ],
-    [
-     81.4,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "walker passing at 1 m",
-   "mode": "tones",
    "seed": 3,
    "rateOK": 1,
    "latency": 6.8,
@@ -490,27 +469,6 @@
     ],
     [
      79,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "walker passing at 1 m",
-   "mode": "tones",
-   "seed": 5,
-   "rateOK": 1,
-   "latency": 7.6,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 58.0233048906628,
-   "onChest": null,
-   "events": [
-    [
-     67.6,
-     "start"
-    ],
-    [
-     81.4,
      "end"
     ]
    ]
@@ -537,22 +495,43 @@
    ]
   },
   {
-   "name": "walker passing at 3 m",
-   "mode": "range",
-   "seed": 2,
+   "name": "walker passing at 1 m",
+   "mode": "tones",
+   "seed": 5,
    "rateOK": 1,
-   "latency": 7.2,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 47.82678961206882,
-   "onChest": 1,
+   "snr": 58.0233048906628,
+   "onChest": null,
    "events": [
     [
-     67.2,
+     67.6,
      "start"
     ],
     [
-     81.6,
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.00337812731983,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.4,
      "end"
     ]
    ]
@@ -581,16 +560,37 @@
   {
    "name": "walker passing at 3 m",
    "mode": "range",
-   "seed": 4,
+   "seed": 2,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": 7.2,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 47.88909532517632,
+   "snr": 47.82678961206882,
    "onChest": 1,
    "events": [
     [
-     67.8,
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.54428798803188,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
      "start"
     ],
     [
@@ -621,39 +621,18 @@
    ]
   },
   {
-   "name": "walker passing at 2 m",
-   "mode": "tones",
-   "seed": 1,
+   "name": "walker passing at 3 m",
+   "mode": "range",
+   "seed": 4,
    "rateOK": 1,
-   "latency": 7.2,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 57.54428798803188,
-   "onChest": null,
+   "snr": 47.88909532517632,
+   "onChest": 1,
    "events": [
     [
-     67.2,
-     "start"
-    ],
-    [
-     81.4,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "walker passing at 2 m",
-   "mode": "tones",
-   "seed": 2,
-   "rateOK": 1,
-   "latency": 7.2,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 57.783629925317264,
-   "onChest": null,
-   "events": [
-    [
-     67.2,
+     67.6,
      "start"
     ],
     [
@@ -675,6 +654,27 @@
    "events": [
     [
      67.6,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 2 m",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.783629925317264,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
      "start"
     ],
     [
@@ -783,7 +783,7 @@
      "start"
     ],
     [
-     81.6,
+     81,
      "end"
     ]
    ]
@@ -804,7 +804,7 @@
      "start"
     ],
     [
-     79,
+     78.6,
      "end"
     ]
    ]
@@ -825,49 +825,7 @@
      "start"
     ],
     [
-     79.8,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "walker passing at 3 m",
-   "mode": "tones",
-   "seed": 1,
-   "rateOK": 1,
-   "latency": 7.2,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 57.53142779991903,
-   "onChest": null,
-   "events": [
-    [
-     67.2,
-     "start"
-    ],
-    [
-     81.4,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "walker passing at 3 m",
-   "mode": "tones",
-   "seed": 3,
-   "rateOK": 1,
-   "latency": 6.8,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 57.71437950377308,
-   "onChest": null,
-   "events": [
-    [
-     66.8,
-     "start"
-    ],
-    [
-     81,
+     80.6,
      "end"
     ]
    ]
@@ -896,6 +854,48 @@
   {
    "name": "walker passing at 3 m",
    "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": 6.8,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.71437950377308,
+   "onChest": null,
+   "events": [
+    [
+     66.8,
+     "start"
+    ],
+    [
+     81,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.53142779991903,
+   "onChest": null,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "walker passing at 3 m",
+   "mode": "tones",
    "seed": 4,
    "rateOK": 1,
    "latency": 7.8,
@@ -906,27 +906,6 @@
    "events": [
     [
      67.8,
-     "start"
-    ],
-    [
-     81.4,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "walker passing at 0.7 m (just behind)",
-   "mode": "range",
-   "seed": 5,
-   "rateOK": 1,
-   "latency": 7.6,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 48.0000727586974,
-   "onChest": 1,
-   "events": [
-    [
-     67.6,
      "start"
     ],
     [
@@ -957,22 +936,22 @@
    ]
   },
   {
-   "name": "seated person breathing 1.5 m",
+   "name": "walker passing at 0.7 m (just behind)",
    "mode": "range",
-   "seed": 1,
+   "seed": 5,
    "rateOK": 1,
-   "latency": 7.2,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 47.949265645804076,
+   "snr": 48.0000727586974,
    "onChest": 1,
    "events": [
     [
-     67.2,
+     67.6,
      "start"
     ],
     [
-     81.4,
+     81.2,
      "end"
     ]
    ]
@@ -994,6 +973,27 @@
     ],
     [
      81.6,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "seated person breathing 1.5 m",
+   "mode": "range",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.949265645804076,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.4,
      "end"
     ]
    ]
@@ -1024,14 +1024,14 @@
    "mode": "range",
    "seed": 4,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 47.889427869043544,
    "onChest": 1,
    "events": [
     [
-     67.8,
+     67.6,
      "start"
     ],
     [
@@ -1039,18 +1039,6 @@
      "end"
     ]
    ]
-  },
-  {
-   "name": "walker passing at 0.7 m (just behind)",
-   "mode": "tones",
-   "seed": 2,
-   "rateOK": 0.9142857142857143,
-   "latency": null,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 57.74032632354506,
-   "onChest": null,
-   "events": []
   },
   {
    "name": "walker passing at 0.7 m (just behind)",
@@ -1072,6 +1060,18 @@
      "end"
     ]
    ]
+  },
+  {
+   "name": "walker passing at 0.7 m (just behind)",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 0.9142857142857143,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 57.74032632354506,
+   "onChest": null,
+   "events": []
   },
   {
    "name": "seated person breathing 1.5 m",
@@ -1187,6 +1187,27 @@
    ]
   },
   {
+   "name": "person standing 1.5 m, fidgeting",
+   "mode": "range",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": 7.2,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.753344165321835,
+   "onChest": 1,
+   "events": [
+    [
+     67.2,
+     "start"
+    ],
+    [
+     81.6,
+     "end"
+    ]
+   ]
+  },
+  {
    "name": "seated person breathing 1.5 m",
    "mode": "tones",
    "seed": 1,
@@ -1273,27 +1294,6 @@
   {
    "name": "person standing 1.5 m, fidgeting",
    "mode": "range",
-   "seed": 2,
-   "rateOK": 1,
-   "latency": 7.2,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 47.753344165321835,
-   "onChest": 1,
-   "events": [
-    [
-     67.2,
-     "start"
-    ],
-    [
-     81.6,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "person standing 1.5 m, fidgeting",
-   "mode": "range",
    "seed": 3,
    "rateOK": 1,
    "latency": 6.8,
@@ -1338,14 +1338,14 @@
    "mode": "range",
    "seed": 4,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 47.783138350486304,
    "onChest": 1,
    "events": [
     [
-     67.8,
+     67.6,
      "start"
     ],
     [
@@ -1412,7 +1412,7 @@
      "start"
     ],
     [
-     81.6,
+     81.2,
      "end"
     ]
    ]
@@ -1443,18 +1443,18 @@
    "mode": "range",
    "seed": 4,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 47.23988991686967,
    "onChest": 1,
    "events": [
     [
-     67.8,
+     67.6,
      "start"
     ],
     [
-     81.4,
+     81.2,
      "end"
     ]
    ]
@@ -1481,27 +1481,6 @@
    ]
   },
   {
-   "name": "person standing 1 m, fidgeting",
-   "mode": "range",
-   "seed": 5,
-   "rateOK": 1,
-   "latency": 7.6,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 47.443322393772206,
-   "onChest": 1,
-   "events": [
-    [
-     67.6,
-     "start"
-    ],
-    [
-     81.4,
-     "end"
-    ]
-   ]
-  },
-  {
    "name": "person standing 1.5 m, fidgeting",
    "mode": "tones",
    "seed": 2,
@@ -1518,6 +1497,27 @@
     ],
     [
      81.4,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "range",
+   "seed": 5,
+   "rateOK": 1,
+   "latency": 7.6,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.443322393772206,
+   "onChest": 1,
+   "events": [
+    [
+     67.6,
+     "start"
+    ],
+    [
+     81.2,
      "end"
     ]
    ]
@@ -1601,7 +1601,7 @@
      "start"
     ],
     [
-     81.2,
+     81.4,
      "end"
     ]
    ]
@@ -1628,6 +1628,51 @@
    ]
   },
   {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 56.227644866190445,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 55.56097725552884,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "person standing 1 m, fidgeting",
+   "mode": "tones",
+   "seed": 1,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 1,
+   "breathMin": 0.5833333333333334,
+   "snr": 54.24848622025248,
+   "onChest": null,
+   "events": [
+    [
+     87.6,
+     "start"
+    ],
+    [
+     91.8,
+     "end"
+    ]
+   ]
+  },
+  {
    "name": "person standing 0.7 m, fidgeting",
    "mode": "range",
    "seed": 3,
@@ -1643,7 +1688,7 @@
      "start"
     ],
     [
-     81,
+     80,
      "end"
     ]
    ]
@@ -1651,41 +1696,12 @@
   {
    "name": "person standing 1 m, fidgeting",
    "mode": "tones",
-   "seed": 1,
-   "rateOK": 1,
-   "latency": 7.2,
-   "falseAlarms": 1,
-   "breathMin": 0.5833333333333334,
-   "snr": 54.24848622025248,
-   "onChest": null,
-   "events": [
-    [
-     67.2,
-     "start"
-    ],
-    [
-     79.4,
-     "end"
-    ],
-    [
-     87.6,
-     "start"
-    ],
-    [
-     91.8,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "person standing 1 m, fidgeting",
-   "mode": "tones",
-   "seed": 2,
+   "seed": 4,
    "rateOK": 1,
    "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 56.227644866190445,
+   "snr": 55.33593810990946,
    "onChest": null,
    "events": []
   },
@@ -1694,14 +1710,14 @@
    "mode": "range",
    "seed": 4,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": 7.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 45.3271397771989,
    "onChest": 1,
    "events": [
     [
-     67.8,
+     67.6,
      "start"
     ],
     [
@@ -1713,83 +1729,32 @@
   {
    "name": "person standing 1 m, fidgeting",
    "mode": "tones",
-   "seed": 3,
+   "seed": 5,
    "rateOK": 1,
-   "latency": 6.8,
+   "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 55.56097725552884,
+   "snr": 55.51530469188003,
    "onChest": null,
-   "events": [
-    [
-     66.8,
-     "start"
-    ],
-    [
-     80.6,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "person standing 1 m, fidgeting",
-   "mode": "tones",
-   "seed": 4,
-   "rateOK": 1,
-   "latency": 7.8,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 55.33593810990946,
-   "onChest": null,
-   "events": [
-    [
-     67.8,
-     "start"
-    ],
-    [
-     79.6,
-     "end"
-    ]
-   ]
+   "events": []
   },
   {
    "name": "person standing 0.7 m, fidgeting",
    "mode": "range",
    "seed": 5,
    "rateOK": 1,
-   "latency": 7.6,
+   "latency": 8,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 45.54731246031117,
    "onChest": 1,
    "events": [
     [
-     67.6,
+     68,
      "start"
     ],
     [
-     81.2,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "person standing 1 m, fidgeting",
-   "mode": "tones",
-   "seed": 5,
-   "rateOK": 1,
-   "latency": 7.8,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 55.51530469188003,
-   "onChest": null,
-   "events": [
-    [
-     67.8,
-     "start"
-    ],
-    [
-     79.4,
+     81.4,
      "end"
     ]
    ]
@@ -1831,7 +1796,7 @@
      "start"
     ],
     [
-     81.6,
+     81,
      "end"
     ]
    ]
@@ -1845,6 +1810,18 @@
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 52.64096040523783,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "tones",
+   "seed": 2,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 49.4506678301196,
    "onChest": null,
    "events": []
   },
@@ -1864,7 +1841,28 @@
      "start"
     ],
     [
-     81,
+     80.8,
+     "end"
+    ]
+   ]
+  },
+  {
+   "name": "person standing 0.7 m, fidgeting",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 1,
+   "breathMin": 0.5833333333333334,
+   "snr": 50.81374907564769,
+   "onChest": null,
+   "events": [
+    [
+     87,
+     "start"
+    ],
+    [
+     92.4,
      "end"
     ]
    ]
@@ -1885,40 +1883,7 @@
      "start"
     ],
     [
-     81.4,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "person standing 0.7 m, fidgeting",
-   "mode": "tones",
-   "seed": 2,
-   "rateOK": 1,
-   "latency": null,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 49.4506678301196,
-   "onChest": null,
-   "events": []
-  },
-  {
-   "name": "person standing 0.7 m, fidgeting",
-   "mode": "tones",
-   "seed": 3,
-   "rateOK": 1,
-   "latency": null,
-   "falseAlarms": 1,
-   "breathMin": 0.5833333333333334,
-   "snr": 50.81374907564769,
-   "onChest": null,
-   "events": [
-    [
-     87,
-     "start"
-    ],
-    [
-     92.4,
+     81,
      "end"
     ]
    ]
@@ -1972,7 +1937,7 @@
      "start"
     ],
     [
-     81.4,
+     81,
      "end"
     ]
    ]
@@ -1993,7 +1958,7 @@
      "start"
     ],
     [
-     81.4,
+     81.2,
      "end"
     ]
    ]
@@ -2014,7 +1979,7 @@
      "start"
     ],
     [
-     81.2,
+     81.4,
      "end"
     ]
    ]
@@ -2035,7 +2000,7 @@
      "start"
     ],
     [
-     80.8,
+     74.2,
      "end"
     ]
    ]
@@ -2056,7 +2021,7 @@
      "start"
     ],
     [
-     81.4,
+     81.2,
      "end"
     ]
    ]
@@ -2077,7 +2042,7 @@
      "start"
     ],
     [
-     81,
+     81.2,
      "end"
     ]
    ]
@@ -2087,63 +2052,12 @@
    "mode": "tones",
    "seed": 1,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 47.21805856842551,
    "onChest": null,
-   "events": [
-    [
-     67.8,
-     "start"
-    ],
-    [
-     81,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
-   "mode": "tones",
-   "seed": 4,
-   "rateOK": 1,
-   "latency": 7.8,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 48.153837028939506,
-   "onChest": null,
-   "events": [
-    [
-     67.8,
-     "start"
-    ],
-    [
-     80.6,
-     "end"
-    ]
-   ]
-  },
-  {
-   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
-   "mode": "tones",
-   "seed": 3,
-   "rateOK": 1,
-   "latency": 6.8,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 47.89846935962112,
-   "onChest": null,
-   "events": [
-    [
-     66.8,
-     "start"
-    ],
-    [
-     80.6,
-     "end"
-    ]
-   ]
+   "events": []
   },
   {
    "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
@@ -2160,23 +2074,38 @@
   {
    "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
    "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 47.89846935962112,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "tones",
+   "seed": 4,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 48.153837028939506,
+   "onChest": null,
+   "events": []
+  },
+  {
+   "name": "demo table (2 standing 1-1.5 m, walkers 1+2 m, x3 noise)",
+   "mode": "tones",
    "seed": 5,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 48.11909404501753,
    "onChest": null,
-   "events": [
-    [
-     67.8,
-     "start"
-    ],
-    [
-     80.8,
-     "end"
-    ]
-   ]
+   "events": []
   },
   {
    "name": "street: same, wind x30",
@@ -2194,7 +2123,7 @@
      "start"
     ],
     [
-     81.8,
+     81.4,
      "end"
     ]
    ]
@@ -2203,13 +2132,22 @@
    "name": "street: same, wind x30",
    "mode": "range",
    "seed": 2,
-   "rateOK": 0.5142857142857142,
-   "latency": null,
+   "rateOK": 1,
+   "latency": 10,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 20.424126227291634,
-   "onChest": 0,
-   "events": []
+   "onChest": 1,
+   "events": [
+    [
+     70,
+     "start"
+    ],
+    [
+     71.6,
+     "end"
+    ]
+   ]
   },
   {
    "name": "street: same, wind x30",
@@ -2253,39 +2191,6 @@
    "events": []
   },
   {
-   "name": "street: same, wind x30",
-   "mode": "range",
-   "seed": 4,
-   "rateOK": 0.017142857142857144,
-   "latency": null,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 17.717989694537618,
-   "onChest": 0,
-   "events": []
-  },
-  {
-   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
-   "mode": "tones",
-   "seed": 3,
-   "rateOK": 1,
-   "latency": 6.8,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 37.135309680815396,
-   "onChest": null,
-   "events": [
-    [
-     66.8,
-     "start"
-    ],
-    [
-     80.8,
-     "end"
-    ]
-   ]
-  },
-  {
    "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
    "mode": "tones",
    "seed": 2,
@@ -2298,46 +2203,52 @@
    "events": []
   },
   {
+   "name": "street: same, wind x30",
+   "mode": "range",
+   "seed": 4,
+   "rateOK": 0.7257142857142858,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 17.717989694537618,
+   "onChest": 1,
+   "events": []
+  },
+  {
+   "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 1,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 37.135309680815396,
+   "onChest": null,
+   "events": []
+  },
+  {
    "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
    "mode": "tones",
    "seed": 4,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 34.25987578931251,
    "onChest": null,
-   "events": [
-    [
-     67.8,
-     "start"
-    ],
-    [
-     80.8,
-     "end"
-    ]
-   ]
+   "events": []
   },
   {
    "name": "street: walkers 2+3 m, helper kneeling 1 m, wind x10",
    "mode": "tones",
    "seed": 5,
    "rateOK": 1,
-   "latency": 7.8,
+   "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 33.609679578739595,
    "onChest": null,
-   "events": [
-    [
-     67.8,
-     "start"
-    ],
-    [
-     80.8,
-     "end"
-    ]
-   ]
+   "events": []
   },
   {
    "name": "street: same, wind x30",
@@ -2364,37 +2275,59 @@
    "name": "street: same, wind x100",
    "mode": "range",
    "seed": 1,
-   "rateOK": 0,
-   "latency": null,
+   "rateOK": 1,
+   "latency": 9.6,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 5.312032421425413,
-   "onChest": 0,
-   "events": []
+   "onChest": 1,
+   "events": [
+    [
+     69.6,
+     "start"
+    ],
+    [
+     79.6,
+     "end"
+    ]
+   ]
   },
   {
    "name": "street: same, wind x100",
    "mode": "range",
    "seed": 2,
-   "rateOK": 0.24571428571428572,
+   "rateOK": 0.7028571428571428,
    "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 10.404756075521806,
-   "onChest": 0,
+   "onChest": 1,
    "events": []
   },
   {
    "name": "street: same, wind x100",
    "mode": "range",
    "seed": 3,
-   "rateOK": 0.17142857142857143,
+   "rateOK": 0.005714285714285714,
    "latency": null,
-   "falseAlarms": 0,
+   "falseAlarms": 2,
    "breathMin": 0.5833333333333334,
    "snr": 10.23712270954664,
    "onChest": 0,
-   "events": []
+   "events": [
+    [
+     49.2,
+     "start"
+    ],
+    [
+     51.4,
+     "end"
+    ],
+    [
+     91.6,
+     "start"
+    ]
+   ]
   },
   {
    "name": "street: same, wind x30",
@@ -2412,24 +2345,24 @@
    "name": "street: same, wind x100",
    "mode": "range",
    "seed": 4,
-   "rateOK": 0,
+   "rateOK": 0.9542857142857143,
    "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 8.195760694561269,
-   "onChest": 0,
+   "onChest": 1,
    "events": []
   },
   {
    "name": "street: same, wind x100",
    "mode": "range",
    "seed": 5,
-   "rateOK": 0.06285714285714286,
+   "rateOK": 0.7828571428571428,
    "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 7.082364226035816,
-   "onChest": 0,
+   "onChest": 1,
    "events": []
   },
   {
@@ -2496,7 +2429,7 @@
      "start"
     ],
     [
-     81.8,
+     81.4,
      "end"
     ]
    ]
@@ -2505,13 +2438,22 @@
    "name": "street: walkers only, wind x30",
    "mode": "range",
    "seed": 2,
-   "rateOK": 0.4114285714285714,
-   "latency": null,
+   "rateOK": 1,
+   "latency": 10,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 20.42283079365191,
-   "onChest": 0,
-   "events": []
+   "onChest": 1,
+   "events": [
+    [
+     70,
+     "start"
+    ],
+    [
+     71.6,
+     "end"
+    ]
+   ]
   },
   {
    "name": "street: walkers only, wind x30",
@@ -2542,12 +2484,24 @@
    "name": "street: walkers only, wind x30",
    "mode": "range",
    "seed": 4,
-   "rateOK": 0.022857142857142857,
+   "rateOK": 1,
    "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
    "snr": 17.708565941590653,
-   "onChest": 0,
+   "onChest": 1,
+   "events": []
+  },
+  {
+   "name": "street: same, wind x100",
+   "mode": "tones",
+   "seed": 3,
+   "rateOK": 0.9942857142857143,
+   "latency": null,
+   "falseAlarms": 0,
+   "breathMin": 0.5833333333333334,
+   "snr": 17.299296199836775,
+   "onChest": null,
    "events": []
   },
   {
@@ -2577,24 +2531,24 @@
   {
    "name": "street: same, wind x100",
    "mode": "tones",
-   "seed": 4,
-   "rateOK": 1,
+   "seed": 5,
+   "rateOK": 0.6,
    "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 14.501783061155782,
+   "snr": 13.683674478942915,
    "onChest": null,
    "events": []
   },
   {
    "name": "street: same, wind x100",
    "mode": "tones",
-   "seed": 3,
-   "rateOK": 0.9942857142857143,
+   "seed": 4,
+   "rateOK": 1,
    "latency": null,
    "falseAlarms": 0,
    "breathMin": 0.5833333333333334,
-   "snr": 17.299296199836775,
+   "snr": 14.501783061155782,
    "onChest": null,
    "events": []
   },
@@ -2614,18 +2568,6 @@
      "start"
     ]
    ]
-  },
-  {
-   "name": "street: same, wind x100",
-   "mode": "tones",
-   "seed": 5,
-   "rateOK": 0.6,
-   "latency": null,
-   "falseAlarms": 0,
-   "breathMin": 0.5833333333333334,
-   "snr": 13.683674478942915,
-   "onChest": null,
-   "events": []
   },
   {
    "name": "street: walkers only, wind x30",
