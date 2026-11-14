@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breathing watch</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Screen 1: setup. Everything needed fits on one screen, no "next" buttons. -->
+<main id="s-setup" class="screen">
+  <h1>If your breathing stops, this laptop calls your friend.</h1>
+  <p class="lede">No account. Nothing is recorded, and nothing leaves this laptop unless that call is made.</p>
+
+  <form id="form" novalidate>
+    <div class="cards">
+      <section class="card">
+        <h2><span class="num">1</span> Who to call</h2>
+        <label for="friendName">Their name</label>
+        <input id="friendName" type="text" autocomplete="off" maxlength="40" placeholder="Sam">
+        <label for="friendPhone">Their phone number</label>
+        <input id="friendPhone" type="tel" autocomplete="off" maxlength="24" placeholder="619 555 0123">
+        <label for="userName">Your name, so they know it is you</label>
+        <input id="userName" type="text" autocomplete="off" maxlength="40" placeholder="What they call you">
+        <label for="place">Where you are <span class="opt">(optional)</span></label>
+        <input id="place" type="text" autocomplete="off" maxlength="120" placeholder="Address, apartment, door code">
+        <p class="note">Someone who picks up and can get to you. Tell them a call from this means: come check on me.</p>
+        <p class="note">No one to list? Never Use Alone stays on the phone with you instead: 877-696-1996.</p>
+        <p id="formErr" class="err" role="alert" hidden></p>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">2</span> Where to sit</h2>
+        <svg class="sit" viewBox="0 0 360 170" role="img" aria-label="Person sitting 30 to 40 centimetres from an open laptop, chest facing the screen">
+          <!-- desk -->
+          <line x1="20" y1="132" x2="250" y2="132" class="ln"/>
+          <!-- laptop: base and screen -->
+          <line x1="60" y1="130" x2="130" y2="130" class="ln thick"/>
+          <line x1="60" y1="130" x2="42" y2="74" class="ln thick"/>
+          <!-- sound waves from laptop to chest -->
+          <path d="M150 92 q8 12 0 24" class="wave"/>
+          <path d="M166 86 q12 18 0 36" class="wave"/>
+          <path d="M182 80 q16 24 0 48" class="wave"/>
+          <!-- person: head, torso, lap -->
+          <circle cx="262" cy="52" r="17" class="ln"/>
+          <path d="M262 70 v6 M236 160 v-56 q0 -26 26 -26 q26 0 26 26 v56" class="ln"/>
+          <!-- distance marker -->
+          <line x1="60" y1="150" x2="236" y2="150" class="dim"/>
+          <line x1="60" y1="144" x2="60" y2="156" class="dim"/>
+          <line x1="236" y1="144" x2="236" y2="156" class="dim"/>
+          <text x="148" y="166" text-anchor="middle" class="dimtxt">30-40 cm</text>
+        </svg>
+        <ul class="sitlist">
+          <li>About 30-40 cm from the screen, roughly a forearm.</li>
+          <li>Chest facing the screen.</li>
+          <li>Hands off the laptop once it starts.</li>
+          <li>Sound on, no headphones. Lid open.</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="startrow">
+      <button id="start" type="submit" class="big"><span class="num">3</span> Start</button>
+      <p class="note">Your browser will ask to use the microphone. Say yes.</p>
+    </div>
+  </form>
+
+  <p class="limits">A prototype, not a medical device. It can miss things, and it only works while you stay in front of this laptop.</p>
+  <p class="forget"><a href="#" id="forget" hidden>Forget these details</a></p>
+</main>
+
+<!-- Screen 2: watching. -->
+<main id="s-watch" class="screen" hidden>
+  <div class="dot" id="dot"></div>
+  <h1 id="watchTitle">Finding your breathing</h1>
+  <p class="lede" id="watchSub">Sit still for a few seconds.</p>
+  <button id="stop" class="quiet">Stop</button>
+  <p class="limits">Leave it running for as long as you are here. It only works while you stay in front of this laptop with the lid open.</p>
+  <p class="stub" id="stubWatch" hidden>Stub controls:
+    <a href="#" data-sim="stopped">breathing stops</a> ·
+    <a href="#" data-sim="lost">signal lost</a> ·
+    <a href="#" data-sim="watching">signal back</a>
+  </p>
+</main>
+
+<!-- Screen 3: breathing stopped. A short window to cancel before the call. -->
+<main id="s-alarm" class="screen alarm" hidden>
+  <h1>Are you okay?</h1>
+  <p class="lede">Calling <b class="fname"></b> in <b id="count">15</b> seconds.</p>
+  <button id="okay" class="big">I'm okay</button>
+  <p class="note">Or press any key.</p>
+  <p class="stub" id="stubAlarm" hidden>Stub controls: <a href="#" data-sim="resumed">breathing resumes</a></p>
+</main>
+
+<!-- Screen 4: the call was made (or failed). Also readable by anyone who walks in. -->
+<main id="s-called" class="screen alarm" hidden>
+  <h1 id="calledTitle"></h1>
+  <p class="lede" id="calledSub"></p>
+  <p class="phone" id="calledPhone"></p>
+  <button id="resume" class="quiet">I'm okay, keep watching</button>
+  <button id="stop2" class="quiet">Stop</button>
+</main>
+
+<script src="hooks.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
