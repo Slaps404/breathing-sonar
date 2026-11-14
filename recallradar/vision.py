@@ -19,7 +19,7 @@ from .config import CACHE, gemini_key
 from .offerup import fetch_image
 
 ID_MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"]
-JUDGE_MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"]  # 3.6 first once billing is on
+JUDGE_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
 
 _exhausted: set = set()   # models that hit their daily cap this process; skip them
 
@@ -185,7 +185,7 @@ async def judge(http: httpx.AsyncClient, listing: dict, cands: list[dict]) -> di
         if ri:
             parts += [f"Photo of recalled product (recall id={rec['recall_id']}):", _img(ri)]
     parts.append(JUDGE_RULES)
-    key = "judge5:" + listing["listing_id"] + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands) + ":" + str(len(photos))
+    key = "judge6:" + listing["listing_id"] + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands) + ":" + str(len(photos))
     return await _generate(JUDGE_MODELS, parts, JUDGE_SCHEMA, cache_key=key)
 
 
@@ -255,7 +255,7 @@ async def judge_batch(http: httpx.AsyncClient, listings: list[dict], cands: list
             except Exception:
                 pass
     parts.append(JUDGE_RULES + "\nReturn one item per listing, with its index. photo_index refers to that listing's photos.")
-    key = "judgeb1:" + ",".join(li["listing_id"] for li in listings) + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands)
+    key = "judgeb2:" + ",".join(li["listing_id"] for li in listings) + ":" + ",".join(str(c["recall"]["recall_id"]) for c in cands)
     res = await _generate(JUDGE_MODELS, parts, JUDGE_BATCH_SCHEMA, cache_key=key)
     out: list = [None] * len(listings)
     for it in res.get("items", []):
