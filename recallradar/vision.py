@@ -7,6 +7,9 @@
 import asyncio
 import hashlib
 import json
+import os
+import re
+import time
 
 import httpx
 from google import genai
@@ -35,14 +38,39 @@ def available() -> bool:
     return bool(gemini_key())
 
 
+RPM = int(os.getenv("GEMINI_RPM", "14"))   # free tier is ~15 requests/minute; raise once billing is on
+_window: list = []
+_lock = asyncio.Lock()
+
+
+async def _rate_slot():
+    """Wait until a request fits under RPM requests per rolling minute."""
+    while True:
+        async with _lock:
+            now = time.time()
+            while _window and now - _window[0] > 60:
+                _window.pop(0)
+            if len(_window) < RPM:
+                _window.append(now)
+                return
+            wait = 60 - (now - _window[0]) + 0.1
+        await asyncio.sleep(wait)
+
+
+def _retry_delay(e) -> float:
+    m = re.search(r"retryDelay'?: '(\d+)s", str(e))
+    return min(float(m.group(1)), 65) if m else 0
+
+
 async def _generate(models, contents, schema, cache_key=None):
     path = CACHE / ("gem_" + hashlib.sha1(cache_key.encode()).hexdigest() + ".json") if cache_key else None
     if path and path.exists():
         return json.loads(path.read_text())
     last = None
     for model in models:
-        for attempt in range(2):
+        for attempt in range(3):
             try:
+                await _rate_slot()
                 r = await asyncio.wait_for(client().aio.models.generate_content(
                     model=model, contents=contents,
                     config=types.GenerateContentConfig(response_mime_type="application/json",
@@ -54,8 +82,11 @@ async def _generate(models, contents, schema, cache_key=None):
                 return out
             except Exception as e:  # 503 busy, 429 rate limit, timeout: retry then fall back
                 last = e
-                print(f"[gemini] {model} attempt {attempt}: {type(e).__name__} {str(e)[:90]}", flush=True)
-                await asyncio.sleep(1.5 * (attempt + 1))
+                msg = str(e)
+                print(f"[gemini] {model} attempt {attempt}: {type(e).__name__} {msg[:90]}", flush=True)
+                if "PerDay" in msg:
+                    break                                   # daily cap: try the next model
+                await asyncio.sleep(_retry_delay(e) or 2 * (attempt + 1))
     raise RuntimeError(f"Gemini failed: {str(last)[:200]}")
 
 

@@ -11,7 +11,7 @@ from datetime import datetime
 
 import httpx
 
-from . import offerup, pipeline, vision
+from . import brightdata, offerup, pipeline, vision
 from .db import connect
 
 CATEGORIES = {
@@ -47,6 +47,9 @@ async def run_sweep(categories: list[str], fresh: bool = False, max_listings: in
     sweep_id = datetime.now().strftime("%m%d-%H%M%S-") + uuid.uuid4().hex[:4]
     queries = [q for c in categories for q in CATEGORIES[c]["queries"]]
     STATE.clear(); STATE.update(_new_state(sweep_id, queries))
+    brightdata.STATS.update(requests=0, ok=0, failed=0, seconds=0.0)
+    STATE["bd"] = brightdata.STATS          # live counters, shared object
+    STATE["transport"] = offerup.TRANSPORT
     STATE.update({"lat": lat, "lon": lon, "radius": radius, "detail_via": detail_via})
     con = connect()
     con.execute("INSERT INTO sweeps (sweep_id, started, queries) VALUES (?,?,?)",
@@ -69,7 +72,7 @@ async def run_sweep(categories: list[str], fresh: bool = False, max_listings: in
         raise
     finally:
         STATE["running"] = False
-        stats = {k: v for k, v in STATE.items() if k != "events"}
+        stats = {k: v for k, v in STATE.items() if k not in ("events",)}
         con.execute("UPDATE sweeps SET finished=?, stats=? WHERE sweep_id=?",
                     (datetime.now().isoformat(), json.dumps(stats), sweep_id))
         con.commit()
@@ -91,7 +94,8 @@ async def _search(http, con, queries, lat, lon, radius):
             seen.setdefault(r["listing_id"], r)
         STATE["queries_done"] += 1
         STATE["listings"] = len(seen)
-        _event(f"OfferUp '{q}': {len(res)} listings ({len(seen)} unique so far)")
+        via = "Bright Data" if offerup.TRANSPORT["mode"] == "brightdata" or offerup.TRANSPORT["direct_blocked"] else "direct"
+        _event(f"OfferUp search '{q}' via {via}: {len(res)} listings ({len(seen)} unique so far)", "bd" if via == "Bright Data" else "info")
 
     await asyncio.gather(*[one(q) for q in queries])
     for r in seen.values():
@@ -157,7 +161,7 @@ async def _unlock(http, con, short, fresh, via):
                             (d["description"], json.dumps(d["photos"]), d["lat"], d["lon"], d["post_date"],
                              d["city"] or li["city"], li["listing_id"]))
                 con.commit()
-                _event(("Bright Data unlocked item page: " if via == "brightdata" else "Item details: ") + f" '{li['title'][:45]}' ({len(d['photos'])} photos)"
+                _event(("Bright Data unlocked item page: " if via == "brightdata" else "Item details via Bright Data: ") + f" '{li['title'][:45]}' ({len(d['photos'])} photos)"
                        + (" [cache]" if d["from_cache"] else ""), "bd")
             except Exception as e:
                 STATE["bd_failed"] += 1

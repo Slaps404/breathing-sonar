@@ -74,7 +74,8 @@ async def judge_listing(con, http, listing: dict, ident: dict | None) -> dict:
     out["stage"] = "vision"
     out["candidates"] = [c["recall"]["recall_id"] for c in cands]
     top = cands[0]
-    if (out["verdict"] == "no_match" and top.get("why") in ("brand+type", None) and (top.get("why") or top["rule"])
+    if (out["verdict"] == "no_match" and top.get("why") == "brand+type"
+            and match.brand_is_recaller(top.get("brand", ""), top["recall"])
             and model_check(listing, ident, top["recall"])[0] == "unknown" and top["recall"]["models"]):
         # Rule: same brand + same product type, recall covers only some models, none readable -> closer look
         out.update(verdict="closer_look", recall_id=top["recall"]["recall_id"],

@@ -5,7 +5,25 @@ import re
 
 import httpx
 
+import os
+
+from . import brightdata
 from .brightdata import unlock
+
+# "brightdata": every OfferUp API call goes through Bright Data Web Unlocker (default; survives IP blocks)
+# "direct": plain requests from this machine (fast, but OfferUp blocks the IP after a few hundred calls)
+TRANSPORT = {"mode": os.getenv("OFFERUP_TRANSPORT", "brightdata"), "direct_blocked": False}
+
+
+async def gql(client: httpx.AsyncClient, payload: dict) -> dict:
+    if TRANSPORT["mode"] == "direct" and not TRANSPORT["direct_blocked"]:
+        r = await client.post(GQL, json=payload, headers=GQL_HEADERS, timeout=30)
+        if r.status_code not in (403, 429):
+            r.raise_for_status()
+            return r.json()
+        TRANSPORT["direct_blocked"] = True   # blocked: switch this run to Bright Data
+    return await brightdata.post_json(client, GQL, payload, {"Origin": "https://offerup.com",
+                                                             "Referer": "https://offerup.com/"})
 from .config import CACHE
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -41,10 +59,8 @@ async def search(client: httpx.AsyncClient, query: str, lat: float = 32.7157, lo
         return json.loads(path.read_text())
     params = [{"key": "q", "value": query}, {"key": "lat", "value": str(lat)}, {"key": "lon", "value": str(lon)},
               {"key": "radius", "value": str(radius)}, {"key": "delivery_param", "value": "p"}]
-    r = await client.post(GQL, json={"operationName": "GetModularFeed", "query": FEED_Q,
-                                     "variables": {"params": params}}, headers=GQL_HEADERS, timeout=30)
-    r.raise_for_status()
-    tiles = r.json()["data"]["modularFeed"]["looseTiles"]
+    data = await gql(client, {"operationName": "GetModularFeed", "query": FEED_Q, "variables": {"params": params}})
+    tiles = data["data"]["modularFeed"]["looseTiles"]
     out = []
     for t in tiles:
         li = t.get("listing") if isinstance(t, dict) else None
@@ -67,10 +83,9 @@ async def detail(client: httpx.AsyncClient, listing_id: str, via: str = "api") -
         if cached:
             li = json.loads(path.read_text())
         else:
-            r = await client.post(GQL, json={"operationName": "GetListing", "query": LISTING_Q,
-                                             "variables": {"listingId": listing_id}}, headers=GQL_HEADERS, timeout=30)
-            r.raise_for_status()
-            li = (r.json().get("data") or {}).get("listing")
+            data = await gql(client, {"operationName": "GetListing", "query": LISTING_Q,
+                                      "variables": {"listingId": listing_id}})
+            li = (data.get("data") or {}).get("listing")
             if not li:
                 raise ValueError("listing not found (sold or removed?)")
             path.write_text(json.dumps(li))

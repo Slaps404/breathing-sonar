@@ -259,13 +259,25 @@ def brand_shortlist(con, title: str, ident: dict, body: str = "", k: int = 3) ->
         seen.add(rec["recall_id"])
         out.append({"recall": rec, "why": "brand+type", "type_overlap": overlap,
                     "score": 10 * len(overlap) + (5 if re.search(r"\ball (models|styles)\b", rec["description"], re.I) else 0)})
-    # also offer strong title-word candidates (the photo reader can name the wrong brand)
+    out.sort(key=lambda c: -c["score"])
+    out = out[: k - 1] if len(out) >= k else out
+    # reserve a slot for the best title-word candidate (the photo reader can name the wrong brand)
     for c in text_stage(con, title, body, k=3):
         if c["recall"]["recall_id"] not in seen and c["rule"] and c["rule"][0] == "recalled":
             seen.add(c["recall"]["recall_id"])
             out.append({"recall": c["recall"], "why": "title", "type_overlap": c["ev"]["product_hit"], "score": 15})
-    out.sort(key=lambda c: -c["score"])
+            break
     for c in out:
         c["ev"] = evidence(con, title + " " + brand + " " + ptype, body, c["recall"])
         c["rule"] = rule_verdict(c["recall"], c["ev"])
+        c["brand"] = brand
     return out[:k]
+
+
+def brand_is_recaller(brand: str, rec: dict) -> bool:
+    """True if the brand is named in the recall's headline (the company or brand doing the recall)."""
+    b = _norm_brand(brand)
+    if b in GENERIC_BRANDS or len(b) < 3:
+        return False
+    head = _norm_brand(re.split(r"\bDue to\b", rec["title"])[0])
+    return re.search(r"\b" + re.escape(b) + r"\b", head) is not None
