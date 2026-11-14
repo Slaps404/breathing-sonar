@@ -181,7 +181,7 @@ def listing_model_numbers(text: str) -> list[str]:
             if re.search(r"(model|style|item|mod)\s*(#|no\.?|number)?\s*:?\s*" + m, text, re.I):
                 out.append(m)
             continue
-        if re.search(r"[A-Z]{4,}", m):
+        if re.search(r"[A-Z]{4,}", m) or re.match(r"^\d+-?IN-?\d+$", m) or re.match(r"^(\d+-)?\d+(M|T|Y|MO|MOS|PC|PCS|X)$", m):
             continue
         out.append(m)
     return out
@@ -199,4 +199,73 @@ def text_stage(con, title: str, body: str = "", k: int = 3) -> list[dict]:
         out.append({"recall": rec, "ev": ev, "rule": rv})
     out.sort(key=lambda c: (c["rule"] is not None, c["ev"]["score"]), reverse=True)
     # same recall re-announced (e.g. Kids II 2019 and 2023): keep both, they are different evidence
+    return out[:k]
+
+
+# ---------- Brand-first shortlist (used when the photo reader gives a brand) ----------
+GENERIC_BRANDS = {"", "unknown", "none", "n/a", "generic", "unbranded", "baby", "handmade", "custom", "other"}
+TYPE_STOP = {"baby", "infant", "kid", "child", "children", "toddler", "portable", "electric", "adult", "product",
+             "set", "with", "and", "for", "the", "of", "a", "new", "used", "seat", "toy"}
+
+
+def _norm_brand(b: str) -> str:
+    b = re.sub(r"[^a-z0-9 &'\-]", " ", b.lower()).replace("-", " ").replace("'", "")
+    return re.sub(r"\s+", " ", b).strip()
+
+
+def recalls_by_brand(con, brand: str, limit=60) -> list[dict]:
+    """Recalls whose text contains the brand as an exact phrase (e.g. "bright starts", "fisher price")."""
+    b = _norm_brand(brand)
+    if b in GENERIC_BRANDS or len(b) < 3:
+        return []
+    toks = [t for t in re.findall(r"[a-z0-9]+", b)]
+    q = '"' + " ".join(toks) + '"'
+    rows = con.execute("""SELECT r.* FROM recalls_fts JOIN recalls r ON r.recall_id = recalls_fts.rowid
+                          WHERE recalls_fts MATCH ? ORDER BY r.date DESC LIMIT ?""", (q, limit)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def recalls_by_model(con, models: list[str]) -> list[dict]:
+    out = []
+    for m in models:
+        rows = con.execute("""SELECT r.* FROM recalls_fts JOIN recalls r ON r.recall_id = recalls_fts.rowid
+                              WHERE recalls_fts MATCH ? LIMIT 20""", (f'models:"{m}"',)).fetchall()
+        out += [dict(r) for r in rows if m.replace("-", "") in r["models"].replace("-", "").split()]
+    return out
+
+
+def type_words(text: str) -> set[str]:
+    return {stem(w) for w in words(text) if w not in TYPE_STOP and not w.isdigit()}
+
+
+def brand_shortlist(con, title: str, ident: dict, body: str = "", k: int = 3) -> list[dict]:
+    """Brand (from photo or title) + product type overlap, or exact model number. Best first."""
+    brand = (ident or {}).get("brand") or ""
+    ptype = " ".join([(ident or {}).get("product_type") or "", (ident or {}).get("product_line") or ""])
+    lt = type_words(ptype + " " + title)
+    models = listing_model_numbers(" ".join([title, body, " ".join((ident or {}).get("model_numbers") or [])]))
+    out, seen = [], set()
+    for rec in recalls_by_model(con, models):
+        if rec["recall_id"] not in seen:
+            seen.add(rec["recall_id"])
+            out.append({"recall": rec, "why": "model", "type_overlap": [], "score": 100})
+    for rec in recalls_by_brand(con, brand):
+        if rec["recall_id"] in seen:
+            continue
+        rt = type_words(rec["title"].split(" Due to")[0] + " " + rec["products"])
+        overlap = sorted((lt & rt) - type_words(brand))
+        if not overlap:
+            continue
+        seen.add(rec["recall_id"])
+        out.append({"recall": rec, "why": "brand+type", "type_overlap": overlap,
+                    "score": 10 * len(overlap) + (5 if re.search(r"\ball (models|styles)\b", rec["description"], re.I) else 0)})
+    # also offer strong title-word candidates (the photo reader can name the wrong brand)
+    for c in text_stage(con, title, body, k=3):
+        if c["recall"]["recall_id"] not in seen and c["rule"] and c["rule"][0] == "recalled":
+            seen.add(c["recall"]["recall_id"])
+            out.append({"recall": c["recall"], "why": "title", "type_overlap": c["ev"]["product_hit"], "score": 15})
+    out.sort(key=lambda c: -c["score"])
+    for c in out:
+        c["ev"] = evidence(con, title + " " + brand + " " + ptype, body, c["recall"])
+        c["rule"] = rule_verdict(c["recall"], c["ev"])
     return out[:k]

@@ -134,7 +134,7 @@ def _shortlist(con, listings, idents):
     for li in listings:
         ident = idents.get(li["listing_id"])
         cands = pipeline.shortlist(con, li, ident)
-        if cands and (cands[0]["rule"] or cands[0]["ev"]["model_hit"]):
+        if cands and (ident or cands[0]["rule"] or cands[0]["ev"]["model_hit"]):
             short.append(li)
     STATE["shortlisted"] = len(short)
     _event(f"Text stage: {len(short)} of {len(listings)} listings share a brand or model with a recall")

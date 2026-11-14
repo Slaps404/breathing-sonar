@@ -13,8 +13,10 @@ def identity_text(ident: dict | None) -> str:
 
 
 def shortlist(con, listing: dict, ident: dict | None, k=3) -> list[dict]:
-    title = listing["title"] + " " + identity_text(ident)
-    return match.text_stage(con, title, listing.get("description") or "", k=k)
+    """With a photo reading: brand-first shortlist. Without one (no Gemini): word-overlap text stage."""
+    if ident:
+        return match.brand_shortlist(con, listing["title"], ident, listing.get("description") or "", k=k)
+    return match.text_stage(con, listing["title"], listing.get("description") or "", k=k)
 
 
 def model_check(listing: dict, ident: dict | None, rec: dict) -> tuple[str, list, list]:
@@ -72,7 +74,7 @@ async def judge_listing(con, http, listing: dict, ident: dict | None) -> dict:
     out["stage"] = "vision"
     out["candidates"] = [c["recall"]["recall_id"] for c in cands]
     top = cands[0]
-    if (out["verdict"] == "no_match" and top["rule"] and top["ev"]["brand_hit"] and top["ev"]["product_hit"]
+    if (out["verdict"] == "no_match" and top.get("why") in ("brand+type", None) and (top.get("why") or top["rule"])
             and model_check(listing, ident, top["recall"])[0] == "unknown" and top["recall"]["models"]):
         # Rule: same brand + same product type, recall covers only some models, none readable -> closer look
         out.update(verdict="closer_look", recall_id=top["recall"]["recall_id"],
