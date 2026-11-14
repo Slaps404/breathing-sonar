@@ -2,105 +2,139 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4ede3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1917" media="(prefers-color-scheme: dark)">
 <title>Breathing watch</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- Screen 1: setup. Everything needed fits on one screen, no "next" buttons. -->
-<main id="s-setup" class="screen">
-  <h1>If your breathing stops, this laptop calls your friend.</h1>
-  <p class="lede">No account. Nothing is recorded, and nothing leaves this laptop unless that call is made.</p>
+<!-- One thought per screen. Each screen: .top (back), .mid (the thought), .bot (one button). -->
 
-  <form id="form" novalidate>
-    <div class="cards">
-      <section class="card">
-        <h2><span class="num">1</span> Who to call</h2>
-        <label for="friendName">Their name</label>
-        <input id="friendName" type="text" autocomplete="off" maxlength="40" placeholder="Sam">
-        <label for="friendPhone">Their phone number</label>
-        <input id="friendPhone" type="tel" autocomplete="off" maxlength="24" placeholder="619 555 0123">
-        <label for="userName">Your name, so they know it is you</label>
-        <input id="userName" type="text" autocomplete="off" maxlength="40" placeholder="What they call you">
-        <label for="place">Where you are <span class="opt">(optional)</span></label>
-        <input id="place" type="text" autocomplete="off" maxlength="120" placeholder="Address, apartment, door code">
-        <p class="note">Someone who picks up and can get to you. Tell them a call from this means: come check on me.</p>
-        <p class="note">No one to list? Never Use Alone stays on the phone with you instead: 877-696-1996.</p>
-        <p id="formErr" class="err" role="alert" hidden></p>
-      </section>
+<!-- 1. Who to call -->
+<form id="s-who" class="screen" novalidate>
+  <div class="top"></div>
+  <div class="mid">
+    <h1>Who should this <span class="dev">phone</span> call if your breathing stops?</h1>
+    <input id="friendName" type="text" autocomplete="off" autocapitalize="words" enterkeyhint="next" maxlength="40" placeholder="Their name" aria-label="Their name">
+    <input id="friendPhone" type="tel" inputmode="tel" autocomplete="off" enterkeyhint="next" maxlength="24" placeholder="Their phone number" aria-label="Their phone number">
+    <p class="err" id="whoErr" role="alert" hidden></p>
+    <p class="soft">No account. Nothing is recorded. Nothing leaves this <span class="dev">phone</span> unless that call is made.</p>
+    <details>
+      <summary>No one to call?</summary>
+      <p class="soft">Never Use Alone stays on the phone with you instead: <a href="tel:+18776961996">877-696-1996</a></p>
+    </details>
+  </div>
+  <div class="bot">
+    <button type="submit" class="pill">Continue</button>
+    <a href="#" id="forget" class="tiny" hidden>Forget these details</a>
+  </div>
+</form>
 
-      <section class="card">
-        <h2><span class="num">2</span> Where to sit</h2>
-        <svg class="sit" viewBox="0 0 360 170" role="img" aria-label="Person sitting 30 to 40 centimetres from an open laptop, chest facing the screen">
-          <!-- desk -->
-          <line x1="20" y1="132" x2="250" y2="132" class="ln"/>
-          <!-- laptop: base and screen -->
-          <line x1="60" y1="130" x2="130" y2="130" class="ln thick"/>
-          <line x1="60" y1="130" x2="42" y2="74" class="ln thick"/>
-          <!-- sound waves from laptop to chest -->
-          <path d="M150 92 q8 12 0 24" class="wave"/>
-          <path d="M166 86 q12 18 0 36" class="wave"/>
-          <path d="M182 80 q16 24 0 48" class="wave"/>
-          <!-- person: head, torso, lap -->
-          <circle cx="262" cy="52" r="17" class="ln"/>
-          <path d="M262 70 v6 M236 160 v-56 q0 -26 26 -26 q26 0 26 26 v56" class="ln"/>
-          <!-- distance marker -->
-          <line x1="60" y1="150" x2="236" y2="150" class="dim"/>
-          <line x1="60" y1="144" x2="60" y2="156" class="dim"/>
-          <line x1="236" y1="144" x2="236" y2="156" class="dim"/>
-          <text x="148" y="166" text-anchor="middle" class="dimtxt">30-40 cm</text>
-        </svg>
-        <ul class="sitlist">
-          <li>About 30-40 cm from the screen, roughly a forearm.</li>
-          <li>Chest facing the screen.</li>
-          <li>Hands off the laptop once it starts.</li>
-          <li>Sound on, no headphones. Lid open.</li>
-        </ul>
-      </section>
-    </div>
+<!-- 2. Who you are -->
+<form id="s-you" class="screen" novalidate hidden>
+  <div class="top"><button type="button" class="back" data-go="who" aria-label="Back">&#8592;</button></div>
+  <div class="mid">
+    <h1>What does <span class="fname">your friend</span> call you?</h1>
+    <input id="userName" type="text" autocomplete="off" autocapitalize="words" enterkeyhint="next" maxlength="40" placeholder="Your name" aria-label="Your name">
+    <input id="place" type="text" autocomplete="off" enterkeyhint="done" maxlength="120" placeholder="Where you are (optional)" aria-label="Where you are, optional">
+    <p class="err" id="youErr" role="alert" hidden></p>
+    <p class="soft">So they know the call is about you, and where to go.</p>
+  </div>
+  <div class="bot"><button type="submit" class="pill">Continue</button></div>
+</form>
 
-    <div class="startrow">
-      <button id="start" type="submit" class="big"><span class="num">3</span> Start</button>
-      <p class="note">Your browser will ask to use the microphone. Say yes.</p>
-    </div>
-  </form>
+<!-- 3. Where to sit, then start -->
+<form id="s-sit" class="screen" novalidate hidden>
+  <div class="top">
+    <button type="button" class="back" data-go="you" aria-label="Back">&#8592;</button>
+    <a href="#" class="tiny" data-go="who">Calls <span class="fname"></span> · Change</a>
+  </div>
+  <div class="mid center">
+    <h1>Sit like this.</h1>
+    <svg class="sit" viewBox="0 0 300 150" role="img" aria-label="Person sitting 30 to 40 centimetres away, chest facing the screen">
+      <line x1="16" y1="112" x2="196" y2="112" class="ln"/>
+      <!-- laptop (shown on laptops) -->
+      <g class="only-laptop">
+        <line x1="44" y1="110" x2="104" y2="110" class="ln thick"/>
+        <line x1="44" y1="110" x2="28" y2="60" class="ln thick"/>
+      </g>
+      <!-- phone propped up (shown on phones) -->
+      <g class="only-phone">
+        <line x1="50" y1="110" x2="38" y2="62" class="ln thick"/>
+        <line x1="50" y1="110" x2="68" y2="110" class="ln"/>
+      </g>
+      <path d="M120 76 q7 10 0 20" class="wave"/>
+      <path d="M134 70 q11 16 0 32" class="wave"/>
+      <path d="M148 64 q15 22 0 44" class="wave"/>
+      <circle cx="222" cy="40" r="15" class="ln"/>
+      <path d="M222 56 v6 M198 140 v-52 q0 -24 24 -24 q24 0 24 24 v52" class="ln"/>
+      <line x1="44" y1="130" x2="198" y2="130" class="dim"/>
+      <line x1="44" y1="125" x2="44" y2="135" class="dim"/>
+      <line x1="198" y1="125" x2="198" y2="135" class="dim"/>
+      <text x="121" y="146" text-anchor="middle" class="dimtxt">30-40 cm</text>
+    </svg>
+    <ul class="lines">
+      <li class="only-laptop">A forearm away from the screen.</li>
+      <li class="only-phone">Prop the phone up, a forearm away.</li>
+      <li>Chest facing the screen.</li>
+      <li class="only-laptop">Hands off the laptop.</li>
+      <li class="only-phone">Hands off the phone.</li>
+      <li>Sound on, no headphones.</li>
+    </ul>
+    <p class="err" id="sitErr" role="alert" hidden></p>
+  </div>
+  <div class="bot">
+    <button type="submit" class="pill" id="start">Start</button>
+    <p class="tiny">A prototype, not a medical device. It can miss things, and it only works while you stay in front of this <span class="dev">phone</span>.</p>
+  </div>
+</form>
 
-  <p class="limits">A prototype, not a medical device. It can miss things, and it only works while you stay in front of this laptop.</p>
-  <p class="forget"><a href="#" id="forget" hidden>Forget these details</a></p>
-</main>
-
-<!-- Screen 2: watching. -->
+<!-- 4. Watching -->
 <main id="s-watch" class="screen" hidden>
-  <div class="dot" id="dot"></div>
-  <h1 id="watchTitle">Finding your breathing</h1>
-  <p class="lede" id="watchSub">Sit still for a few seconds.</p>
-  <button id="stop" class="quiet">Stop</button>
-  <p class="limits">Leave it running for as long as you are here. It only works while you stay in front of this laptop with the lid open.</p>
-  <p class="stub" id="stubWatch" hidden>Stub controls:
-    <a href="#" data-sim="stopped">breathing stops</a> ·
-    <a href="#" data-sim="lost">signal lost</a> ·
-    <a href="#" data-sim="watching">signal back</a>
-  </p>
+  <div class="top"></div>
+  <div class="mid center">
+    <div class="dot" id="dot"></div>
+    <h1 id="watchTitle">Finding your breathing.</h1>
+    <p class="soft" id="watchSub">Sit still for a few seconds.</p>
+  </div>
+  <div class="bot">
+    <button type="button" class="pill ghost" id="stop">Stop</button>
+    <p class="tiny">Leave this on for as long as you are here. Keep the screen facing you.</p>
+  </div>
 </main>
 
-<!-- Screen 3: breathing stopped. A short window to cancel before the call. -->
-<main id="s-alarm" class="screen alarm" hidden>
-  <h1>Are you okay?</h1>
-  <p class="lede">Calling <b class="fname"></b> in <b id="count">15</b> seconds.</p>
-  <button id="okay" class="big">I'm okay</button>
-  <p class="note">Or press any key.</p>
-  <p class="stub" id="stubAlarm" hidden>Stub controls: <a href="#" data-sim="resumed">breathing resumes</a></p>
+<!-- 5. Breathing stopped: tap anywhere to cancel -->
+<main id="s-alarm" class="screen" hidden>
+  <div class="top"></div>
+  <div class="mid center">
+    <h1 class="huge">Are you okay?</h1>
+    <p class="lead">Calling <span class="fname"></span> in <b id="count">15</b></p>
+  </div>
+  <div class="bot"><p class="lead">Tap anywhere if you are.</p></div>
 </main>
 
-<!-- Screen 4: the call was made (or failed). Also readable by anyone who walks in. -->
-<main id="s-called" class="screen alarm" hidden>
-  <h1 id="calledTitle"></h1>
-  <p class="lede" id="calledSub"></p>
-  <p class="phone" id="calledPhone"></p>
-  <button id="resume" class="quiet">I'm okay, keep watching</button>
-  <button id="stop2" class="quiet">Stop</button>
+<!-- 6. The call was made, or failed -->
+<main id="s-called" class="screen" hidden>
+  <div class="top"></div>
+  <div class="mid center">
+    <h1 id="calledTitle"></h1>
+    <p class="lead" id="calledSub"></p>
+    <a class="dial" id="calledPhone"></a>
+  </div>
+  <div class="bot">
+    <button type="button" class="pill" id="resume">I'm okay, keep watching</button>
+    <button type="button" class="pill ghost" id="stop2">Stop</button>
+  </div>
 </main>
+
+<p class="stub" id="stub" hidden>stub:
+  <a href="#" data-sim="stopped">stops</a>
+  <a href="#" data-sim="resumed">resumes</a>
+  <a href="#" data-sim="lost">lost</a>
+  <a href="#" data-sim="watching">back</a>
+</p>
 
 <script src="hooks.js"></script>
 <script src="app.js"></script>
