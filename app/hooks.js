@@ -18,8 +18,9 @@ window.SonarHooks = {
   //   onBreathingResumed()    breathing came back (cancels a pending call)
   //   onWave(mm, rate)        optional. Chest movement in mm over the last 20 s (rate samples/s),
   //                           the same signal the test page draws (sonar.analyze(...).ch.disp)
+  //   onDebug(snapshot)       optional. Everything the judge view draws, ~5 times a second (see snapshot below)
   // Returns { stop() }. Throws if the mic is refused: the UI shows the message.
-  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave }) {
+  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug }) {
     const LOST_MS = 3000, VOLUME = 0.7;
     // Browsers hide the mic API on plain http pages that are not localhost (e.g. http://192.168.x.x).
     if (!navigator.mediaDevices) {
@@ -47,6 +48,7 @@ window.SonarHooks = {
       if (res && res.event === 'start') onBreathingStopped();
       if (res && res.event === 'end') onBreathingResumed();
       if (res && onWave) onWave(res.ch.disp, sonar.rate);
+      if (onDebug) onDebug(window.SonarHooks.snapshot(sonar, res));
       movingSince = sonar.apnea.moving === true ? (movingSince ?? now) : null;
       if (movingSince !== null && now - movingSince > LOST_MS) setStatus('lost');
       else if (res) setStatus('watching');
@@ -60,6 +62,30 @@ window.SonarHooks = {
         stream.getTracks().forEach(t => t.stop());
         ctx.close();
       },
+    };
+  },
+
+  // What the judge view needs, read from the sonar after analyze(). Reads state only, changes nothing.
+  // Also used by offline tests (node), which replay a recorded take through the same code.
+  //   depth      last 20 s of motion-by-distance columns (each nShow slices of dr metres; the test page's depth view)
+  //   lock       chest slice index (null until found); minR/maxR = search range in metres
+  //   wave       chest movement in mm (null until found), bpm and quality of its rhythm
+  //   hold       breath-hold detector: still = seconds without movement, below = seconds under the alarm
+  //              level, level/base = breathing strength now / normal (dB), ready = has a normal yet
+  //   slow       slow-breathing detector: frac = share of the last 30 s that was slow
+  //   alerting, why ('hold' | 'slow'), event ('start' | 'end' | null)
+  snapshot(sonar, res) {
+    const h = sonar.apnea, log = sonar.slow.log;
+    return {
+      depth: sonar.depth, nShow: sonar.nShow, dr: sonar.dr, rate: sonar.rate,
+      lock: sonar.lock, minR: sonar.minR, maxR: sonar.maxR,
+      wave: res ? res.ch.disp : null, bpm: res ? res.ch.bpm : null, quality: res ? res.ch.quality : 0,
+      hold: { still: h.quiet, below: h.below, moving: h.moving === true, alerting: h.alerting,
+        ready: h.B.length >= 45, level: h.level ?? null, base: h.base ?? null },   // 45: same test as holdStep in dsp.js
+      HOLD: DSP.HOLD,
+      slow: { alerting: sonar.slow.alerting, frac: log.length ? log.filter(x => x[1]).length / log.length : 0 },
+      SLOW: DSP.SLOW,
+      alerting: sonar.alerting, why: sonar.why, event: res ? res.event : null,
     };
   },
 
