@@ -1,0 +1,276 @@
+1
+00:00:00,000 --> 00:00:01,360
+Hi, I'm Zeke.
+
+2
+00:00:01,360 --> 00:00:05,590
+About 70,000 people in the U.S. died of an overdose last year.
+
+3
+00:00:06,200 --> 00:00:08,450
+Three in four of them were alone.
+
+4
+00:00:08,460 --> 00:00:10,160
+An overdose slows your breathing,
+
+5
+00:00:10,160 --> 00:00:11,100
+then it stops.
+
+6
+00:00:11,100 --> 00:00:12,280
+And if nobody's there,
+
+7
+00:00:12,280 --> 00:00:13,220
+no one knows.
+
+8
+00:00:13,220 --> 00:00:16,100
+I built BreathBuddy so somebody does and
+
+9
+00:00:16,100 --> 00:00:17,650
+can come to help.
+
+10
+00:00:18,080 --> 00:00:19,640
+A friend sets it up in just
+
+11
+00:00:19,640 --> 00:00:21,680
+a minute and texts you a link.
+
+12
+00:00:21,680 --> 00:00:22,980
+There's nothing to install,
+
+13
+00:00:22,980 --> 00:00:24,550
+it's just a web app.
+
+14
+00:00:24,840 --> 00:00:25,900
+You open it,
+
+15
+00:00:25,900 --> 00:00:27,850
+press start, and breathe with the cloud.
+
+16
+00:00:28,020 --> 00:00:30,500
+The speaker plays a sound too high
+
+17
+00:00:30,500 --> 00:00:31,360
+for you to hear,
+
+18
+00:00:31,360 --> 00:00:33,500
+and the microphone listens for the echo
+
+19
+00:00:33,500 --> 00:00:34,460
+off your chest.
+
+20
+00:00:34,460 --> 00:00:36,720
+Those slow breaths show it where you
+
+21
+00:00:36,720 --> 00:00:37,560
+are.
+
+22
+00:00:37,560 --> 00:00:40,060
+Now it's locked onto my chest.
+
+23
+00:00:40,060 --> 00:00:41,740
+It knows where my chest is and
+
+24
+00:00:41,740 --> 00:00:42,840
+how much it moves when I breathe
+
+25
+00:00:42,840 --> 00:00:43,890
+normally.
+
+26
+00:00:44,620 --> 00:00:46,330
+Now I hold my breath.
+
+27
+00:00:49,020 --> 00:00:50,990
+And after a few seconds,
+
+28
+00:00:51,020 --> 00:00:53,070
+it asks out loud.
+
+29
+00:00:54,760 --> 00:00:56,600
+And after six seconds,
+
+30
+00:00:56,600 --> 00:00:59,220
+it calls my emergency contact through Twilio.
+
+31
+00:00:59,220 --> 00:01:01,440
+And an ElevenLabs voice agent explains what
+
+32
+00:01:01,440 --> 00:01:02,920
+happened and tells them exactly where I
+
+33
+00:01:02,920 --> 00:01:03,970
+am.
+
+34
+00:01:11,960 --> 00:01:13,370
+When they pick up,
+
+35
+00:01:13,620 --> 00:01:15,370
+they hear my location.
+
+36
+00:01:15,380 --> 00:01:16,260
+If they miss it,
+
+37
+00:01:16,260 --> 00:01:17,460
+they can ask and the agent tells
+
+38
+00:01:17,460 --> 00:01:18,510
+them again.
+
+39
+00:01:18,520 --> 00:01:20,420
+It asks them to call 911 or
+
+40
+00:01:20,420 --> 00:01:21,540
+get to me as fast as they
+
+41
+00:01:21,540 --> 00:01:22,590
+can.
+
+42
+00:01:23,740 --> 00:01:25,460
+Here's what it actually sees.
+
+43
+00:01:25,460 --> 00:01:28,580
+This is my chest moving as I
+
+44
+00:01:28,580 --> 00:01:29,520
+breathe.
+
+45
+00:01:29,520 --> 00:01:31,640
+This morning, it caught 11 out of
+
+46
+00:01:31,640 --> 00:01:33,690
+11 breath holds live.
+
+47
+00:01:33,740 --> 00:01:35,600
+On some hard recordings from yesterday when
+
+48
+00:01:35,600 --> 00:01:36,670
+I was moving around,
+
+49
+00:01:36,680 --> 00:01:38,260
+it caught 23 out of 29.
+
+50
+00:01:38,260 --> 00:01:41,160
+But that was before fully tuning the
+
+51
+00:01:41,160 --> 00:01:43,270
+slow breathing lock-in.
+
+52
+00:01:43,340 --> 00:01:45,960
+That's only results with me with my
+
+53
+00:01:45,960 --> 00:01:46,740
+laptop.
+
+54
+00:01:46,740 --> 00:01:48,080
+So to expand this,
+
+55
+00:01:48,080 --> 00:01:50,020
+I would need to collect much more
+
+56
+00:01:50,020 --> 00:01:52,560
+data from other people breathing and other
+
+57
+00:01:52,560 --> 00:01:54,540
+devices from iPhone,
+
+58
+00:01:54,540 --> 00:01:56,160
+Android, and other things.
+
+59
+00:01:56,160 --> 00:01:57,920
+Next, I want to be able to
+
+60
+00:01:57,920 --> 00:02:01,380
+reliably catch breathing that's slowing down on
+
+61
+00:02:01,380 --> 00:02:03,780
+any device and be able to accurately
+
+62
+00:02:03,780 --> 00:02:05,080
+report the exact rate.
+
+63
+00:02:05,080 --> 00:02:07,220
+And this is an experimental prototype.
+
+64
+00:02:07,220 --> 00:02:09,020
+It's only been tested on me so
+
+65
+00:02:09,020 --> 00:02:12,500
+far with my laptop and my phone.
+
+66
+00:02:12,500 --> 00:02:13,840
+But it runs on the browser,
+
+67
+00:02:13,840 --> 00:02:16,740
+so it takes no setup to install
+
+68
+00:02:16,740 --> 00:02:22,160
+and can instantly call someone to give
+
+69
+00:02:22,160 --> 00:02:24,210
+someone who overdoses another chance.
+

@@ -19,7 +19,7 @@ setup((c, t) => {
   arcs(c, t, LX + 110, +1, P.text, scene * seg(t, 3.0, 3.6));
   arcs(c, t + 0.4, PX - 60, -1, P.warn, scene * seg(t, 5.2, 5.8));
   const cap = (s, a, b) => text(c, s, W / 2, 500, { size: 34, color: P.text, alpha: show(t, a, b), maxW: 1120 });
-  cap('The speaker plays a sound at 20 kHz. Too high for most adults to hear.', 3.0, 5.4);
+  cap('The speaker plays a sound too high to hear.', 3.0, 5.4);
   cap('It bounces off your chest. The mic hears the echo.', 5.4, 7.6);
   cap('Breathing moves the chest a little. The echo shifts with it.', 7.6, 9.6);
   cap('If that movement stops, it asks: are you okay?', 9.6, 11.6);

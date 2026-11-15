@@ -10,13 +10,13 @@ setup((c, t) => {
   c.fillStyle = P.bg; c.fillRect(0, 0, W, H);
   const now = T0 + clamp((t - 1.5) / 11) * (T1 - T0), a = seg(t, 0.3, 1.0);
   text(c, 'A real recording, replayed through the detector', X0, 70, { size: 34, color: P.text, align: 'left', alpha: a });
-  text(c, `one person, one MacBook, watching the echo at ${D.lockCm} cm. Shown 5x faster.`, X0, 112, { size: 20, color: P.soft, align: 'left', alpha: a, font: SANS });
+  text(c, `one person, one laptop, the echo off my chest. Sped up.`, X0, 112, { size: 20, color: P.soft, align: 'left', alpha: a, font: SANS });
   c.globalAlpha = a; c.fillStyle = '#2a2521'; c.fillRect(X(D.hold[0]), Y - AMP - 30, X(D.hold[1]) - X(D.hold[0]), 2 * AMP + 60);   // hold band
   const y0 = Yv({ drop: 0 }), y6 = Yv({ drop: 6 });
   c.strokeStyle = P.line; c.lineWidth = 2; c.beginPath(); c.moveTo(X0, y0); c.lineTo(X1, y0); c.stroke();
   c.setLineDash([4, 6]); c.strokeStyle = P.soft; c.beginPath(); c.moveTo(X0, y6); c.lineTo(X1, y6); c.stroke(); c.setLineDash([]); c.globalAlpha = 1;
   text(c, 'this person\'s normal', X1, y0 - 14, { size: 16, color: P.soft, align: 'right', alpha: a, font: SANS });
-  text(c, 'a quarter of normal', X1, y6 + 16, { size: 16, color: P.soft, align: 'right', alpha: a, font: SANS });
+  text(c, 'alarm line', X1, y6 + 16, { size: 16, color: P.soft, align: 'right', alpha: a, font: SANS });
   text(c, 'movement at breathing speed', X0, Y - AMP - 48, { size: 18, color: P.soft, align: 'left', alpha: a, font: SANS });
   text(c, 'guide says: hold your breath', (X(D.hold[0]) + X(D.hold[1])) / 2, Y - AMP - 48, { size: 18, color: P.soft, alpha: a, font: SANS });
   for (let s = 50; s <= 90; s += 10) text(c, s + ' s', X(s), Y + AMP + 56, { size: 16, color: P.soft, alpha: a, font: SANS });
@@ -25,12 +25,12 @@ setup((c, t) => {
   for (let i = 1; i < D.pts.length; i++) { const p = D.pts[i], q = D.pts[i - 1]; if (p.t > now) break; c.strokeStyle = p.alert ? P.alarm : P.warn; c.beginPath();
     c.moveTo(X(q.t), Yv(q)); c.lineTo(X(p.t), Yv(p)); c.stroke(); }
   if (now >= al) { const k = seg(now, al, al + 1.5); c.save(); c.globalAlpha = k; c.strokeStyle = P.alarm; c.lineWidth = 2; c.setLineDash([6, 6]); c.beginPath(); c.moveTo(X(al), Y - AMP - 30); c.lineTo(X(al), Y + AMP + 30); c.stroke(); c.restore();
-    text(c, `alarm, ${(al - D.hold[0]).toFixed(1)} s into the hold`, X(al) + 12, Y + AMP + 14, { size: 20, color: P.alarm, align: 'left', alpha: k, font: SANS, weight: 600 }); }
+    text(c, 'alarm', X(al) + 12, Y + AMP + 14, { size: 20, color: P.alarm, align: 'left', alpha: k, font: SANS, weight: 600 }); }
   if (now >= en) text(c, 'breathing again: alarm clears', X(en) + 12, Y - AMP + 20, { size: 18, color: P.good, align: 'left', alpha: seg(now, en, en + 1.5), font: SANS });
   // state readout
   const cur = D.pts.filter(p => p.t <= now).pop(), st = !cur ? '' : cur.alert ? 'Are you okay?' : 'Watching your breathing';
   text(c, st, X0, 590, { size: 44, color: cur && cur.alert ? P.alarm : P.text, align: 'left', alpha: a });
   text(c, 'In the app, no tap within 6 seconds places the call.', X0, 645, { size: 22, color: P.soft, align: 'left', alpha: seg(t, 8, 9), font: SANS });
-  text(c, `take ${D.id}`, X1, 645, { size: 16, color: P.soft, align: 'right', alpha: a, font: SANS });
+  text(c, ``, X1, 645, { size: 16, color: P.soft, align: 'right', alpha: a, font: SANS });
 }, 14.5);
 </script>

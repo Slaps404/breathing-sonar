@@ -6,3 +6,11 @@ dist/
 call/state.json
 .DS_Store
 docs/submission/video-prototypes/*.mp4
+
+# Video build: large renders and raw recordings stay local
+docs/submission/video/build/
+docs/submission/video/out/*.mp4
+docs/submission/video/out/*.bak
+docs/submission/video/in/*.mov
+docs/submission/video/*.bak
+docs/submission/video/timeline.before-*.json
