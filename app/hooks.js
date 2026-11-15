@@ -146,7 +146,7 @@ window.SonarHooks = {
   // HOOK 2. Called when the friend should be phoned: breathing stopped and the person
   // did not press "I'm okay" before the countdown ran out.
   //   contact = { friendName, friendPhone (E.164, e.g. "+16195550123"), userName, place }
-  //   place may be an empty string; lat/lng are set only if the browser gave GPS; home only if one was saved.
+  //   place may be an empty string; lat/lng are set only if the browser gave GPS; homeAddress may be empty.
   // Returns a promise. Reject (throw) if the call could not be placed: the UI then
   // shows the friend's number so anyone nearby can dial it.
   // Real: call/server.py (run `python3 call/server.py`) texts the friend the location, then ElevenLabs
@@ -162,7 +162,7 @@ window.SonarHooks = {
         place: contact.place,
         voiceId: contact.voiceId,
         lat: contact.lat, lng: contact.lng,
-        home: contact.home,   // { lat, lng } saved as home, if any
+        homeAddress: contact.homeAddress,   // typed home address, may be empty
       }),
     });
     const body = await res.json().catch(() => ({}));

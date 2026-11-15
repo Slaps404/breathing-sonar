@@ -2,8 +2,8 @@
 both from your Twilio number. The voice says the location the way a friend would: "at home", or "at CVS Pharmacy on Main Street, close to their home".
 
 Run:   python3 call/server.py                      (listens on http://127.0.0.1:8788, the app POSTs /call)
-Test:  python3 call/server.py --test +16195550123 [--name Sam] [--user Alex] [--place "the library"] [--lat 32.88 --lng -117.23]
-       python3 call/server.py --where LAT LNG [HOME_LAT HOME_LNG]     (prints what the voice would say, no call)
+Test:  python3 call/server.py --test +16195550123 [--name Sam] [--user Alex] [--place "the library"] [--lat 32.88 --lng -117.23 --home "home address"]
+       python3 call/server.py --where LAT LNG ["home address"]     (prints what the voice would say, no call)
 
 Keys come from .env in the repo root (never committed). First run sets up ElevenLabs once:
 it imports your Twilio number and creates the voice agent, then saves their ids in call/state.json.
@@ -24,9 +24,9 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parent.parent
 STATE = Path(__file__).with_name("state.json")
 API = "https://api.elevenlabs.io/v1/convai"
-AT_HOME_MILES = 0.06   # about 100 m: a Wi-Fi fix taken at home can land this far from the saved one
+AT_HOME_MILES = 0.06   # about 100 m: a Wi-Fi fix taken at home can land this far from the address on the map
 AT_PLACE_MILES = 0.025  # about 40 m: closer than this to a named shop or building counts as being at it
-GEOCODER = "https://nominatim.openstreetmap.org/reverse"   # OpenStreetMap: free, no key, coordinates in, address out
+GEOCODER = "https://nominatim.openstreetmap.org"   # OpenStreetMap: free, no key. /reverse: fix to address, /search: address to fix
 PORT = 8788
 
 FIRST = ("Hi {{friend_name}}. This is an automated safety alert for {{user_name}}. "
@@ -107,14 +107,28 @@ def where(place, lat, lng):
 
 def osm(lat, lng, layer):
     """One OpenStreetMap lookup of a GPS fix. layer "address" finds the house, "poi" the nearest shop or building."""
-    url = GEOCODER + "?" + urlencode({"format": "jsonv2", "lat": f"{lat:.6f}", "lon": f"{lng:.6f}", "zoom": 18,
-                                      "layer": layer})
+    return ask("/reverse", {"lat": f"{lat:.6f}", "lon": f"{lng:.6f}", "zoom": 18, "layer": layer}) or {}
+
+
+def ask(path, query):
+    """One OpenStreetMap request. None if it fails: the call then goes out with less detail, never later."""
+    url = GEOCODER + path + "?" + urlencode({"format": "jsonv2", **query})
     try:   # short timeout: a slow lookup must not hold up the call
         with urlopen(Request(url, headers={"User-Agent": "sonar-breathing-alert"}), timeout=3) as r:
             return json.load(r)
     except Exception as err:
-        print(f"{layer} lookup failed:", err, flush=True)
-        return {}
+        print(f"{path} lookup failed:", err, flush=True)
+        return None
+
+
+def find_home(home_address):
+    """Where the typed home address is on the map, as (lat, lng). None if it is empty or not found."""
+    hits = ask("/search", {"q": home_address, "limit": 1}) if home_address else None
+    if not hits:
+        if home_address:
+            print("home address not found on the map:", home_address, flush=True)
+        return None
+    return float(hits[0]["lat"]), float(hits[0]["lon"])
 
 
 def lookup(lat, lng):
@@ -138,16 +152,19 @@ def miles(lat1, lng1, lat2, lng2):
     return 3959 * 2 * math.asin(math.sqrt(h))
 
 
-def spoken_place(place, lat, lng, home=None):
+def spoken_place(place, lat, lng, home_address=""):
     """The location as a friend would say it: "at home", "at CVS Pharmacy on Main Street, close to their home".
     Returns (phrase for the alert sentence, street address the agent gives only if asked).
-    place: what the person typed. lat/lng: where they are now. home: (lat, lng) they saved as home, or None."""
+    place: what the person typed. lat/lng: where GPS says they are now. home_address: their typed home address,
+    found on the map and compared with the GPS fix to tell "at home" from "3 miles from home"."""
     if lat is None or lng is None:
         return (f"at {place}" if place else ""), ""
-    name, road, addr = lookup(lat, lng)
+    with ThreadPoolExecutor(2) as pool:   # all map questions at once, so the call waits for one lookup, not three
+        here, home = pool.submit(lookup, lat, lng), pool.submit(find_home, home_address.strip())
+    (name, road, addr), home = here.result(), home.result()
     far = miles(lat, lng, *home) if home else None
-    if far is not None and far <= AT_HOME_MILES:
-        return (f"at home, {place}" if place else "at home"), addr
+    if far is not None and far <= AT_HOME_MILES:   # the typed address beats the one guessed from GPS
+        return (f"at home, {place}" if place else "at home"), home_address.strip()
     if place:
         spot = f"at {place}" + (f", near {addr}" if addr else "")
     elif name:
@@ -181,9 +198,9 @@ def setup(keys):
     return state
 
 
-def call_all(keys, state, friends, user_name, place, voice_id=None, lat=None, lng=None, home=None):
+def call_all(keys, state, friends, user_name, place, voice_id=None, lat=None, lng=None, home_address=""):
     """Text then ring every friend, all friends at the same time. Returns one result per friend."""
-    said, addr = spoken_place(place.strip(), lat, lng, home)   # looked up once, shared by every friend's call
+    said, addr = spoken_place(place.strip(), lat, lng, home_address)   # looked up once, shared by every friend's call
     print("location said on the call:", said or "(none)", "| address if asked:", addr or "(none)", flush=True)
 
     def one(f):
@@ -228,7 +245,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(404, {"error": "POST /call"})
         try:
             data = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
-            # {friends: [{name, phone}], userName, place, lat?, lng?, home?: {lat, lng}}; phone in +1... form
+            # {friends: [{name, phone}], userName, place, lat?, lng?, homeAddress?}; phone in +1... form
             friends = [{"name": f["name"], "phone": f["phone"]} for f in data["friends"]]
             if not friends:
                 raise ValueError("no friends to call")
@@ -239,10 +256,8 @@ class Handler(BaseHTTPRequestHandler):
         lat, lng = data.get("lat"), data.get("lng")
         if not (isinstance(lat, (int, float)) and isinstance(lng, (int, float))):
             lat = lng = None
-        home = data.get("home") if isinstance(data.get("home"), dict) else {}
-        home = (home.get("lat"), home.get("lng"))
-        if not all(isinstance(x, (int, float)) for x in home):
-            home = None
+        home = data.get("homeAddress")
+        home = home[:200] if isinstance(home, str) else ""
         results = call_all(self.keys, self.state, friends, data.get("userName", "your friend"), data.get("place", ""),
                            voice, lat, lng, home)
         print("call:", [(r["name"], r["ok"], r["detail"], r["sms"]) for r in results], flush=True)
@@ -252,14 +267,13 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     args = sys.argv[1:]
     if args and args[0] == "--where":   # no keys needed, nothing is called
-        nums = [float(x) for x in args[1:5]]
-        print(spoken_place("", nums[0], nums[1], tuple(nums[2:4]) if len(nums) == 4 else None)[0] or "(nothing)")
+        print(spoken_place("", float(args[1]), float(args[2]), args[3] if len(args) > 3 else "")[0] or "(nothing)")
         return
     keys = env()
     state = setup(keys)
     if args and args[0] == "--test":
         opt = dict(zip(args[2::2], args[3::2]))
-        gps = [float(opt[k]) if k in opt else None for k in ("--lat", "--lng")]
+        gps = [float(opt[k]) if k in opt else None for k in ("--lat", "--lng")] + [opt.get("--home", "")]
         res = call_all(keys, state, [{"name": opt.get("--name", "friend"), "phone": args[1]}],
                        opt.get("--user", "your friend"), opt.get("--place", ""), None, *gps)
         print(json.dumps(res, indent=1))

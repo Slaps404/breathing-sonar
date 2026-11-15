@@ -7,7 +7,7 @@
   const STORE_KEY = 'breathing-sonar.contact';
   const COUNTDOWN_S = 6;    // time to tap "I'm okay" before the friend is phoned. 15 s gave resumed breathing time to clear the alarm by itself (1.5-4 s), but was too slow for the demo: tap to cancel
 
-  let contact = null;       // { friendName, friendPhone, userName, place }
+  let contact = null;       // { friendName, friendPhone, userName, place, homeAddress }
   let session = null;       // what startMonitoring returned: { stop() }
   let countTimer = null;
   let beeper = null;
@@ -20,9 +20,6 @@
   try { const v = localStorage.getItem(VOICE_KEY); if (v && $('voice').querySelector(`option[value="${v}"]`)) $('voice').value = v; } catch (e) { /* no storage */ }
   $('voice').addEventListener('change', () => { try { localStorage.setItem(VOICE_KEY, $('voice').value); } catch (e) { /* no storage */ } });
   $('hearVoice').addEventListener('click', () => { try { new Audio(`voices/${$('voice').value}.mp3`).play(); } catch (e) { /* no audio */ } });
-  // Home as a GPS fix { lat, lng }, saved when "I'm at home right now" is ticked. The call compares it with where
-  // the person is now, so it can say "at home" or "close to their home".
-  const HOME_KEY = 'breathing-sonar.home';
   let quiet = false;
   try { quiet = localStorage.getItem(QUIET_KEY) === '1'; } catch (e) { /* no storage */ }
   if (new URLSearchParams(location.search).has('quiet')) quiet = true;   // app/?quiet opens with sound off
@@ -102,6 +99,7 @@
       $('friendPhone').value = c.friendPhoneRaw || '';
       $('userName').value = c.userName || '';
       $('place').value = c.place || '';
+      $('homeAddress').value = c.homeAddress || '';
       $('forget').hidden = false;
       return Boolean(c.friendName && toE164(c.friendPhoneRaw || '') && c.userName);
     } catch (e) { return false; /* nothing saved, or storage blocked */ }
@@ -114,8 +112,8 @@
   }
   function forget(e) {
     e.preventDefault();
-    try { localStorage.removeItem(STORE_KEY); localStorage.removeItem(HOME_KEY); } catch (err) { /* ignore */ }
-    for (const id of ['friendName', 'friendPhone', 'userName', 'place']) $(id).value = '';
+    try { localStorage.removeItem(STORE_KEY); } catch (err) { /* ignore */ }
+    for (const id of ['friendName', 'friendPhone', 'userName', 'place', 'homeAddress']) $(id).value = '';
     $('forget').hidden = true;
     setFriendName();
   }
@@ -128,19 +126,13 @@
       userName: $('userName').value.trim(),
       voiceId: $('voice').value,
       place: $('place').value.trim(),
+      homeAddress: $('homeAddress').value.trim(),   // optional; the call compares it with GPS to say "at home"
     };
     save(contact);
-    try { contact.home = JSON.parse(localStorage.getItem(HOME_KEY)) || undefined; } catch (e) { /* no storage */ }
-    const setHome = $('atHome').checked;
     // Ask for GPS now, while the person is here to allow it; the call says where that is (and the text, when on, gets a map link).
     // Not saved with the contact, so it is fresh each session. Fails quietly (the typed place still goes).
     if (navigator.geolocation) navigator.geolocation.getCurrentPosition(
-      pos => {
-        contact.lat = pos.coords.latitude; contact.lng = pos.coords.longitude;
-        if (!setHome) return;
-        contact.home = { lat: contact.lat, lng: contact.lng };
-        try { localStorage.setItem(HOME_KEY, JSON.stringify(contact.home)); $('atHome').checked = false; } catch (e) { /* no storage */ }
-      },
+      pos => { contact.lat = pos.coords.latitude; contact.lng = pos.coords.longitude; },
       () => {}, { enableHighAccuracy: true, timeout: 15000 });
     $('start').disabled = true;
     $('sitErr').hidden = true;
