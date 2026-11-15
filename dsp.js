@@ -278,7 +278,12 @@ function apneaStep(st, disp, rate, nowMs) {
 // Alert when it drops 6 dB (to a quarter) below that level for 2 s, while the person is not
 // moving. Movement (fast echo change 10 dB above the quiet floor) blocks alerts, because a
 // person who is moving is not in a breath hold.
-const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120 };
+// After body movement the zone is stale until the next pick (see pickZone). A level drop there has two
+// causes: the person left (alarm wanted) or only shifted to another distance (alarm wrong). Told apart by
+// whether anything in range still stirs: fast echo change stirDb above that slice's own quiet floor within
+// the last stirSec. Two real move-back takes: stir mostly 14-37 dB at the new distance (gaps up to 7 s);
+// three walk-aways: under 12 dB once the person is out of range. Works for stirDb 12-22 and stirSec 8-15.
+const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120, stirDb: 12, stirSec: 10 };
 function makeHold() { return { alerting: false, holdStart: null, below: 0, quiet: 0, last: null, B: [], M: [], moving: [] }; }
 // IQ = list of channels (each with .I/.Q history) in the zone; fast = channels for movement.
 function holdFeatures(zone, fast, rate) {
@@ -309,7 +314,7 @@ function holdFeatures(zone, fast, rate) {
   return { B: 10 * Math.log10(B + 1e-30), M: 10 * Math.log10(M / c + 1e-30) };
 }
 function pct(xs, q) { const a = [...xs].sort((x, y) => x - y); return a[Math.min(a.length - 1, Math.floor(q * a.length))]; }
-function holdStep(st, feat, nowMs) {
+function holdStep(st, feat, nowMs, blocked = false) {   // blocked: do not start an alert now
   if (!feat) return null;
   const dt = st.last === null ? 0 : (nowMs - st.last) / 1000; st.last = nowMs;
   st.M.push([nowMs, feat.M]); while (st.M[0][0] < nowMs - HOLD.floorSec * 1000) st.M.shift();
@@ -324,7 +329,7 @@ function holdStep(st, feat, nowMs) {
   if (!st.alerting) {
     if (st.quiet >= HOLD.quietSec && feat.B < base - HOLD.dropDb) { st.below += dt; st.holdStart ??= nowMs; }
     else { st.below = 0; st.holdStart = null; }
-    if (st.below >= HOLD.confirmSec) { st.alerting = true; return 'start'; }
+    if (st.below >= HOLD.confirmSec && !blocked) { st.alerting = true; return 'start'; }
   } else if (moving || feat.B > base - HOLD.dropDb / 2) { st.alerting = false; st.below = 0; st.holdStart = null; return 'end'; }
   return null;
 }
@@ -476,6 +481,7 @@ class RangeSonar {
     this.lock = null; this.manual = false; this.lastPick = -1e9;
     this.zone = zone;   // distances (m) the hold detector watches; until the first auto pick, alerts are off
     this.zscore = null; this.zs = null; this.stillLog = [];  // zone picker state (see pickZone)
+    this.stirLog = []; this.lastStir = -Infinity;            // per-slice fast motion history (see stir)
     this.apnea = makeHold(); this.best = null;
     this.slow = makeSlow(); this.alerting = false; this.why = null;   // why = 'hold' | 'slow' while alerting
   }
@@ -506,6 +512,21 @@ class RangeSonar {
     this.zone = [Math.max(0.2, rangeM - ZONE.back), rangeM + ZONE.ahead];   // chest echoes plus their later bounces
     const M = this.apnea.M; this.apnea = makeHold(); this.apnea.M = M;     // new zone = new level; keep movement floor
   }
+  // True while the zone predates the latest body movement and the fresh pick has not happened yet.
+  reacquiring() { return !this.manual && this.lock !== null && (this.lastMove ?? -Infinity) > this.zoneMove; }
+  // Once a second: does any slice in range change fast (2 s) compared with its own quiet floor (20th
+  // percentile of the last HOLD.floorSec)? Remembers when that last happened (see HOLD.stirDb).
+  stir(nowMs) {
+    const k = Math.round(2 * this.rate), r1 = Math.round(this.maxR / this.dr);
+    for (let r = Math.max(1, Math.ceil(this.minR / this.dr)); r <= r1; r++) {
+      const ch = this.chs[this.tap(r)], L = ch.I.length; if (L <= k) return;
+      let m = 0; for (let i = L - k + 1; i < L; i++) m += (ch.I[i] - ch.I[i - 1]) ** 2 + (ch.Q[i] - ch.Q[i - 1]) ** 2;
+      m = 10 * Math.log10(m / (k - 1) + 1e-30);
+      const h = this.stirLog[r] ??= []; h.push(m); if (h.length > HOLD.floorSec) h.shift();
+      const inZone = r >= Math.round(this.zone[0] / this.dr) && r <= Math.round(this.zone[1] / this.dr);
+      if (!inZone && h.length >= 20 && m > pct(h, 0.2) + HOLD.stirDb) this.lastStir = nowMs;
+    }
+  }
   // Score echoes once a second. Once acquired, keep the distance during stillness:
   // changing rhythm scores are not evidence that the person changed position.
   // Body movement permits a new pick after settling. Manual picks stay fixed.
@@ -514,11 +535,12 @@ class RangeSonar {
     log.push([nowMs, this.apnea.moving !== true]);
     while (log[0][0] < nowMs - winMs) log.shift();
     if (this.manual) return;
+    this.stir(nowMs);
     if (this.apnea.moving === true) {
       this.lastMove = nowMs;
       this.zs = null; this.zscore = null; // the previous position is no longer a useful prior
     }
-    const reacquiring = this.lock !== null && (this.lastMove ?? -Infinity) > this.zoneMove;
+    const reacquiring = this.reacquiring();
     // A full fresh rhythm window keeps the movement itself out of the new ranking.
     if (reacquiring && nowMs - this.lastMove < winMs + ZONE.settleSec * 1000) return;
     const r0 = Math.max(1, Math.ceil(this.minR / this.dr)), r1 = Math.round(this.maxR / this.dr);
@@ -548,7 +570,9 @@ class RangeSonar {
     for (let r = r0; r <= r1; r++) zone.push(this.chs[this.tap(r)]);
     for (let r = 1; r <= 12; r++) fast.push(this.chs[this.tap(r)]);
     // runs before the first pick too, so the movement flag is ready to keep movement out of the scores
-    holdStep(this.apnea, holdFeatures(zone, fast, this.rate), nowMs);
+    // moved, zone not re-picked yet, and someone still stirs in range: a drop in the old zone is not a hold
+    const elsewhere = this.reacquiring() && nowMs - this.lastStir < HOLD.stirSec * 1000;
+    holdStep(this.apnea, holdFeatures(zone, fast, this.rate), nowMs, elsewhere);
     if (nowMs - this.lastPick >= 1000) { this.lastPick = nowMs; this.pickZone(nowMs); }
     if (this.lock === null) return null;
     const ch = this.chs[this.tap(this.lock)];
