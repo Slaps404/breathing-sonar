@@ -23,7 +23,7 @@ SMS alerts include a Google Maps link: coordinates when location permission is a
 What to expect: enter a friend's name and number, your name, and where you are. Sit 30-40 cm from the laptop, sound on, no headphones, and press Start. It says "Finding your breathing" for roughly half a minute, then "Watching your breathing". Hold your breath and stay still: after about 7-8 s it shows "Are you okay?" with a countdown and beeps. Tap or press any key to cancel. If not, the screen says the friend is being called and their phone rings with a voice alert. If the call server is not running, the screen shows the friend's number to dial by hand.
 
 ## How it works
-1. The speaker plays sound above 18 kHz, which most adults cannot hear.
+1. The speaker plays sound at 20-22 kHz, which most adults cannot hear.
 2. The sound bounces off your chest and the mic records the echo.
 3. Breathing moves the chest a few millimeters, which shifts the echo's timing (phase).
 4. The page tracks that shift to draw a breathing waveform, count breaths per minute, and speak up when breathing stops.

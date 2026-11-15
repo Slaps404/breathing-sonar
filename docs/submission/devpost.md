@@ -14,7 +14,7 @@ Prior work: a University of Washington team built "Second Chance" (2019), a phon
 
 1. You enter a friend's name and phone number, your name, and where you are. These stay in your browser.
 2. You sit a forearm's length (30-40 cm) in front of the laptop and press Start.
-3. The laptop speaker plays a high-pitched probe sound (18-20 kHz) and the mic listens to the echo.
+3. The laptop speaker plays a high-pitched probe sound (20-22 kHz) and the mic listens to the echo.
 4. The page finds your chest in the echo and watches it move as you breathe. A live line on the screen shows your chest moving.
 5. If your breathing stops, or stays too slow for most of 30 seconds, the screen says "Are you okay?", beeps, and counts down 6 seconds. Tap anywhere or press any key to cancel.
 6. If no one taps, a voice agent phones your friend. It says your breathing seems to have stopped (the same words for a slow-breathing alarm), where you are, and to call 911 if they cannot reach you. The friend can ask it questions.
@@ -25,7 +25,7 @@ If the call fails, the screen shows the friend's number in large text so anyone 
 
 ## How we built it
 
-**Sonar in the browser.** An AudioWorklet (Web Audio code that runs on the audio thread) loops a 42.7 ms probe made of every frequency from 18 to 20 kHz. Speaker and mic share one clock, so each mic frame lines up with the probe. Dividing the echo's spectrum by the probe's spectrum gives the echo at each delay. Delay is distance, so each frame becomes a row of distance slices, about 5.72 cm apart.
+**Sonar in the browser.** An AudioWorklet (Web Audio code that runs on the audio thread) loops a 42.7 ms probe made of every frequency from 20 to 22 kHz. Speaker and mic share one clock, so each mic frame lines up with the probe. Dividing the echo's spectrum by the probe's spectrum gives the echo at each delay. Delay is distance, so each frame becomes a row of distance slices, about 5.72 cm apart.
 
 **Breathing in a slice.** Each slice is a complex number (strength and phase) over time. Breathing moves the chest a few millimeters, which turns the phase back and forth. We measure how much each slice moves at breathing speed (0.15-0.6 Hz, about 9-36 breaths per minute) over the last 8 seconds.
 
@@ -44,7 +44,7 @@ If the call fails, the screen shows the friend's number in large text so anyone 
 ## Challenges we ran into
 
 - **Our first chest picker failed on real data.** It looked for a clean circle in each slice's signal. Real chests never make one, so it locked onto the laptop edge. The periodicity score above replaced it.
-- **The probe was audible.** At full volume 18-20 kHz was uncomfortable to sit next to. The recorder moved to a quieter 20-22 kHz probe, which the MacBook mic still picked up clearly.
+- **The probe was audible.** At full volume 18-20 kHz was uncomfortable to sit next to. We moved the app and the recorder to a quieter 20-22 kHz probe, which the MacBook mic still picks up clearly.
 - **Moving looks like breathing changes.** Shifting in your seat changes the echo a lot. We made movement block alerts, but movement still causes false alarms. That is why there is a countdown before any call.
 - **Audio dropouts.** Some recordings had gaps from a small audio buffer. We made the buffer larger and added a dropout warning.
 - **The speaker drowns out the first 20 cm.** The sound going straight from speaker to mic is far louder than any echo, so we only look at 20 cm and beyond.
@@ -81,7 +81,6 @@ Other things we are proud of:
 
 - **Test the slow-breathing alarm on real slow breathing.** We tested with full breath holds, because holding your breath is a safe stand-in for an overdose. A real overdose often starts with slow, shallow breathing before it stops. The slow-breathing alarm is built, but so far it is checked only on simulated signals, not on real slow-breathing recordings. Our recorder already has a slow-breathing test step. Shallow breathing at a normal rate only sets off the alarm if it drops to the stop level (a quarter of normal).
 - **Fewer false alarms from movement.** Record more takes with people moving, slumping, and walking away, and tune on those. Our recorder already has those test steps.
-- **Quieter probe in the app.** Move the browser app to the 20-22 kHz probe the recorder uses.
 - **More people and laptops.** Every number above is from one person and one laptop. We built a recorder kit so friends can record takes on their own Macs.
 - **Phones.** The page already adjusts its wording for phones. Phone speakers and mics need testing.
 
