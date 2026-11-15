@@ -5,3 +5,4 @@ dist/
 .env
 call/state.json
 .DS_Store
+docs/submission/video-prototypes/*.mp4
