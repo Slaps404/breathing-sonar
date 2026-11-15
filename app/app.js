@@ -11,6 +11,7 @@
   let session = null;       // what startMonitoring returned: { stop() }
   let countTimer = null;
   let beeper = null;
+  let voice = null;         // the alarm voice clip while it plays
   let wakeLock = null;
 
   // Wording and the sit picture follow the device.
@@ -219,12 +220,18 @@
       beeper = { ctx, id: setInterval(beep, 700) };
     } catch (e) { /* no audio: the screen still shows the alarm */ }
     try { if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) { /* no vibration */ }
-    try { speechSynthesis.speak(new SpeechSynthesisUtterance('Are you okay? Tap the screen.')); } catch (e) { /* no speech */ }
+    // Recorded voice (ElevenLabs clip). If it cannot play, the browser's own voice says the line instead.
+    const say = () => { try { speechSynthesis.speak(new SpeechSynthesisUtterance('Are you okay? Tap the screen.')); } catch (e) { /* no speech */ } };
+    try {
+      voice = new Audio('alert.mp3');
+      voice.play().catch(() => { if (voice) say(); });
+    } catch (e) { say(); }
   }
   function stopAlarmNoise() {
     clearInterval(countTimer); countTimer = null;
     if (beeper) { clearInterval(beeper.id); beeper.ctx.close(); beeper = null; }
     try { if (navigator.vibrate) navigator.vibrate(0); } catch (e) { /* no vibration */ }
+    if (voice) { voice.pause(); voice = null; }
     try { speechSynthesis.cancel(); } catch (e) { /* no speech */ }
   }
 
