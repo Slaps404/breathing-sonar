@@ -174,6 +174,12 @@ class SonarApp(rumps.App):
             return
         plan = plan or self.plan
         self.guide = {"plan": plan, "steps": parse_plan(plan), "i": -1, "t0": time.monotonic(), "ends": []}
+        if self.guide["steps"] == [("normal", 90), ("moving", 15), ("normal", 90)]:
+            self.guide["positions"] = [
+                "Chest 1/2 arm from screen (~40 cm). Sit still and breathe normally.",
+                "Move back to 1 arm (~70 cm). Keep the laptop stationary.",
+                "Stay at 1 arm (~70 cm). Sit still and breathe normally.",
+            ]
         self.overlay = self.overlay or Overlay()
         self.guided.title = "Cancel guided take"
         self.guide_timer.start()
@@ -186,7 +192,7 @@ class SonarApp(rumps.App):
         if g["i"] < 0:                  # lead-in: not recording yet
             left = LEAD_IN - (time.monotonic() - g["t0"])
             if left > 0:
-                self.overlay.show(f"GET READY  {left:.0f}", "first: " + CUES[steps[0][0]].lower())
+                self.overlay.show(f"GET READY  {left:.0f}", g["positions"][0] if "positions" in g else "first: " + CUES[steps[0][0]].lower())
                 return
             try:
                 self.rec.plan, self.rec.track = g["plan"], self.track_step
@@ -214,7 +220,8 @@ class SonarApp(rumps.App):
         nxt = "next: " + CUES[steps[i + 1][0]].lower() if i + 1 < len(steps) else "last one"
         if self.back_at is not None:
             nxt = f"marked back at {self.back_at:.0f} s, " + nxt
-        self.overlay.show(f"{CUES[steps[i][0]]}  {g['ends'][i] - now:.0f}", f"{i + 1} of {len(steps)}, {nxt}", steps[i][0])
+        detail = g["positions"][i] if "positions" in g else f"{i + 1} of {len(steps)}, {nxt}"
+        self.overlay.show(f"{CUES[steps[i][0]]}  {g['ends'][i] - now:.0f}", detail, steps[i][0])
 
     def end_guide(self, word):
         self.guide = None
