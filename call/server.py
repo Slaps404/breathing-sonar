@@ -8,10 +8,18 @@ Test:  python3 call/server.py --test +16195550123 [--name Sam] [--user Alex] [--
 Keys come from .env in the repo root (never committed). First run sets up ElevenLabs once:
 it imports your Twilio number and creates the voice agent, then saves their ids in call/state.json.
 Only the Python standard library is used, so no install is needed.
+
+On a hosting service (so a phone can reach it): start command `python3 call/server.py`, and set these as
+environment variables there instead of .env: the four keys, CALL_PASSCODE (any secret word: the app must send it,
+so strangers cannot spend your Twilio credit), and SONAR_STATE (the text of your local call/state.json, so a
+restart reuses the same agent). Hosts set PORT themselves: when it is set the server listens publicly on it,
+and refuses to start without CALL_PASSCODE.
 """
 import base64
+import hmac
 import json
 import math
+import os
 import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -59,14 +67,19 @@ def agent_config():
 
 
 def env():
-    keys = {}
-    for line in (ROOT / ".env").read_text().splitlines():
+    """Keys from .env (laptop), overridden by environment variables (hosting service, which has no .env)."""
+    keys, dotenv = {}, ROOT / ".env"
+    for line in (dotenv.read_text().splitlines() if dotenv.exists() else []):
         if "=" in line and not line.lstrip().startswith("#"):
             k, v = line.split("=", 1)
             keys[k.strip()] = v.strip()
-    missing = [k for k in ("TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_NUMBER", "ELEVENLABS_API_KEY") if not keys.get(k)]
+    needed = ("TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_NUMBER", "ELEVENLABS_API_KEY")
+    for k in needed + ("CALL_PASSCODE",):
+        if os.environ.get(k):
+            keys[k] = os.environ[k].strip()
+    missing = [k for k in needed if not keys.get(k)]
     if missing:
-        sys.exit(f"Missing in .env: {', '.join(missing)}")
+        sys.exit(f"Missing in .env or the environment: {', '.join(missing)}")
     return keys
 
 
@@ -179,7 +192,8 @@ def spoken_place(place, lat, lng, home_address=""):
 
 def setup(keys):
     """Import the Twilio number and create the agent once; reuse their ids after that."""
-    state = json.loads(STATE.read_text()) if STATE.exists() else {}
+    # A hosting service starts from a clean disk each deploy: SONAR_STATE carries the saved ids instead.
+    state = json.loads(STATE.read_text() if STATE.exists() else os.environ.get("SONAR_STATE") or "{}")
     if state.get("number") != keys["TWILIO_NUMBER"]:
         state["phone_number_id"] = post(keys, "/phone-numbers", {
             "phone_number": keys["TWILIO_NUMBER"], "label": "Sonar alerts", "provider": "twilio",
@@ -194,7 +208,10 @@ def setup(keys):
         post(keys, f"/agents/{state['agent_id']}", {"platform_settings": {"overrides": {
             "conversation_config_override": {"tts": {"voice_id": True}}}}}, method="PATCH")
         state["voice_override"] = True
-    STATE.write_text(json.dumps(state, indent=1))
+    try:
+        STATE.write_text(json.dumps(state, indent=1))
+    except OSError as err:   # read-only disk on some hosts: the ids still work for this run
+        print("could not save call/state.json:", err, flush=True)
     return state
 
 
@@ -233,16 +250,23 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.send_header("Access-Control-Allow-Origin", "*")   # the app page may be opened as a file
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Passcode")
         self.end_headers()
         self.wfile.write(json.dumps(body).encode())
 
     def do_OPTIONS(self):
         self.reply(204, {})
 
+    def do_GET(self):   # hosting services load this to see that the server is up
+        self.reply(200, {"ok": True})
+
     def do_POST(self):
         if self.path != "/call":
             return self.reply(404, {"error": "POST /call"})
+        # With a passcode set, only apps that know it can place calls (each call costs Twilio credit).
+        code = self.keys.get("CALL_PASSCODE")
+        if code and not hmac.compare_digest(self.headers.get("X-Passcode", "").encode(), code.encode()):
+            return self.reply(401, {"error": "wrong or missing passcode"})
         try:
             data = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
             # {friends: [{name, phone}], userName, place, lat?, lng?, homeAddress?}; phone in +1... form
@@ -279,8 +303,13 @@ def main():
         print(json.dumps(res, indent=1))
         return
     Handler.keys, Handler.state = keys, state
-    print(f"Ready: POST http://127.0.0.1:{PORT}/call", flush=True)
-    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+    # PORT set = running on a hosting service: listen to the internet, and only with a passcode.
+    hosted = os.environ.get("PORT")
+    if hosted and not keys.get("CALL_PASSCODE"):
+        sys.exit("Set CALL_PASSCODE before hosting this: without it anyone could place calls on your Twilio account.")
+    host, port = ("0.0.0.0", int(hosted)) if hosted else ("127.0.0.1", PORT)
+    print(f"Ready: POST http://{host}:{port}/call", flush=True)
+    ThreadingHTTPServer((host, port), Handler).serve_forever()
 
 
 if __name__ == "__main__":

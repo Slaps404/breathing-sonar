@@ -152,10 +152,19 @@ window.SonarHooks = {
   // Real: call/server.py (run `python3 call/server.py`) texts the friend the location, then ElevenLabs
   // rings them through Twilio.
   // The server takes a list of friends and rings them all at once; the UI has one friend for now.
+  // Where the call server is. On this laptop (localhost) it is call/server.py on port 8788.
+  // On the hosted app (phone) it is HOSTED_CALL_URL, and the server wants a passcode: open the app once as
+  // .../app/?key=<passcode> and it is kept in this browser (see below), so it is never in the public code.
+  HOSTED_CALL_URL: '',   // e.g. 'https://your-server.example.com/call'. Empty: the hosted app shows the number to dial.
   async callFriend(contact) {
-    const res = await fetch('http://127.0.0.1:8788/call', {
+    const local = ['localhost', '127.0.0.1'].includes(location.hostname);
+    const url = local ? 'http://127.0.0.1:8788/call' : this.HOSTED_CALL_URL;
+    if (!url) throw new Error('No call server set up for this site');
+    let key = '';
+    try { key = localStorage.getItem('sonar.callKey') || ''; } catch (e) { /* no storage */ }
+    const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(key ? { 'X-Passcode': key } : {}) },
       body: JSON.stringify({
         friends: [{ name: contact.friendName, phone: contact.friendPhone }],
         userName: contact.userName,
@@ -170,3 +179,13 @@ window.SonarHooks = {
     return body;
   },
 };
+
+// Passcode for the hosted call server: taken once from ?key=... in the link, kept in this browser, then
+// removed from the address bar so it is not shared by accident.
+(() => {
+  const q = new URLSearchParams(location.search), key = q.get('key');
+  if (key === null) return;
+  try { key ? localStorage.setItem('sonar.callKey', key) : localStorage.removeItem('sonar.callKey'); } catch (e) { /* no storage */ }
+  q.delete('key');
+  history.replaceState(null, '', location.pathname + (q.size ? '?' + q : '') + location.hash);
+})();
