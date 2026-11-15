@@ -69,6 +69,8 @@ class Recorder:
                                 latency="high", callback=self._audio)
         self.stream.start()
         self.running = True
+        # keep the screen (and its banner) on: display sleep is 2 min here, shorter than a take
+        self.awake = subprocess.Popen(["caffeinate", "-di"])
 
     def _audio(self, indata, outdata, frames, time, status):
         if status:
@@ -105,6 +107,7 @@ class Recorder:
 
     def stop(self):
         self.running = False
+        self.awake.terminate()
         self.stream.stop(); self.stream.close()
         self.q.put(None); self.writer.join()
         samples = self.wav.getnframes()

@@ -5,11 +5,13 @@ with the exact sample it happened at. Recordings land in data/.
 """
 import signal
 import subprocess
+import threading
 import time
 
 import rumps
 from AppKit import NSAlert, NSAlertFirstButtonReturn, NSApplication, NSFloatingWindowLevel
 
+import notes
 import tracks
 from guide import CUES, DEFAULT_PLAN, LEAD_IN, Overlay, parse_plan
 from recorder import DATA, Recorder
@@ -285,9 +287,22 @@ class SonarApp(rumps.App):
         for item in self.items.values():
             item.state = 0
         self.status.title = f"Saved {meta['seconds']:.0f} s, {len(meta['labels'])} labels, SNR {meta['snrMedianDb']} dB"
+        if notes.available():           # voice notes: transcribe what you said, in the background
+            self.notes_msg = None
+            threading.Thread(target=self._notes, args=(DATA / meta["id"],), daemon=True).start()
+
+    def _notes(self, base):
+        try:
+            n = notes.transcribe(base)
+            self.notes_msg = f"{len(n)} voice note(s) saved" if n else "No voice notes"
+        except Exception as err:        # notes are extra; never lose or block a take over them
+            self.notes_msg = f"Voice notes failed: {err}"
 
     @rumps.timer(1)
     def tick(self, _):
+        if getattr(self, "notes_msg", None):  # set by the notes thread; menu changes belong on this thread
+            self.status.title += f", {self.notes_msg}"
+            self.notes_msg = None
         if self.stop_requested:         # `kill <pid>` saves the take instead of losing it
             self.on_quit(None)
         if self.overlay and not self.guide and time.monotonic() > self.hide_at:
