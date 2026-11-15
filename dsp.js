@@ -295,6 +295,24 @@ function holdStep(st, feat, nowMs) {
   return null;
 }
 
+// ---------- slow-breathing detector ----------
+// Opioid overdose usually slows breathing before it stops, and the hold detector above only sees a near-stop.
+// Each analyze tick while the person is still counts as "slow" if the measured rate is under SLOW.bpm,
+// or if there is no clear rhythm at all (quality <= SLOW.q; below ~5/min the rate cannot be read).
+// Alert when SLOW.on of the last SLOW.winSec is slow; clear when it falls under SLOW.off. Ticks while
+// moving count as not slow. Simulation: true 6/8/10/15 per min reads 6.0/7.8/10.2/15.0.
+const SLOW = { bpm: 8.5, q: 0.25, winSec: 30, on: 0.8, off: 0.5 };
+function makeSlow() { return { alerting: false, log: [] }; }
+function slowStep(st, ch, moving, nowMs) {
+  st.log.push([nowMs, !moving && (ch.quality <= SLOW.q || ch.bpm < SLOW.bpm)]);
+  while (st.log[0][0] < nowMs - SLOW.winSec * 1000) st.log.shift();
+  if (nowMs - st.log[0][0] < (SLOW.winSec - 1) * 1000) return null;   // need a full window first
+  const frac = st.log.filter(x => x[1]).length / st.log.length;
+  if (!st.alerting && frac >= SLOW.on) { st.alerting = true; return 'start'; }
+  if (st.alerting && frac < SLOW.off) { st.alerting = false; return 'end'; }
+  return null;
+}
+
 // ---------- automatic zone: find the slices that breathe ----------
 // Breathing repeats: a chest slice's breathing-band (0.15-0.6 Hz) I/Q signal looks like itself
 // one breath later. Slow drift (far, weak echoes) and fidgeting also put power in that band, but
@@ -415,6 +433,7 @@ class RangeSonar {
     this.zone = zone;   // distances (m) the hold detector watches; until the first auto pick, alerts are off
     this.zscore = null; this.zs = null; this.stillLog = [];  // zone picker state (see pickZone)
     this.apnea = makeHold(); this.best = null;
+    this.slow = makeSlow(); this.alerting = false; this.why = null;   // why = 'hold' | 'slow' while alerting
   }
   tap(rel) { return (this.i0 + rel) % this.p.L; }
   ingestFrame(frame) { const c = cir(this.p, frame); this.ingestCIR(c.re, c.im, c.snr); }
@@ -475,17 +494,22 @@ class RangeSonar {
     for (let r = r0; r <= r1; r++) zone.push(this.chs[this.tap(r)]);
     for (let r = 1; r <= 12; r++) fast.push(this.chs[this.tap(r)]);
     // runs before the first pick too, so the movement flag is ready to keep movement out of the scores
-    const event = holdStep(this.apnea, holdFeatures(zone, fast, this.rate), nowMs);
+    holdStep(this.apnea, holdFeatures(zone, fast, this.rate), nowMs);
     if (nowMs - this.lastPick >= 1000) { this.lastPick = nowMs; this.pickZone(nowMs); }
     if (this.lock === null) return null;
     const ch = this.chs[this.tap(this.lock)];
     if (!analyzeChannel(ch)) return null;
     this.best = ch;
-    return { ch, event };
+    slowStep(this.slow, ch, this.apnea.moving === true, nowMs);
+    // one alarm for both detectors: 'start' when the first one fires, 'end' when both have cleared
+    const was = this.alerting;
+    this.alerting = this.apnea.alerting || this.slow.alerting;
+    if (this.alerting) this.why ??= this.apnea.alerting ? 'hold' : 'slow'; else this.why = null;
+    return { ch, event: !was && this.alerting ? 'start' : was && !this.alerting ? 'end' : null, why: this.why };
   }
 }
 
 const api = { C, SR, TONE_WORKLET, PROBE_WORKLET, APNEA, std, fft, fitCircle, breathingSpectrum,
-  makeChannel, pushIQ, analyzeChannel, makeApnea, apneaStep, HOLD, makeHold, holdFeatures, holdStep, ZONE, periodicity, makeProbe, cir, ToneSonar, RangeSonar };
+  makeChannel, pushIQ, analyzeChannel, makeApnea, apneaStep, HOLD, makeHold, holdFeatures, holdStep, SLOW, makeSlow, slowStep, ZONE, periodicity, makeProbe, cir, ToneSonar, RangeSonar };
 if (typeof module !== 'undefined') module.exports = api; else window.DSP = api;
 })();

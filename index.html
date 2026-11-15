@@ -185,7 +185,7 @@ function tick() {
     renderTable();
   }
   if (rec) rec.snaps.push({ t: +dataTime().toFixed(2), bpm: ch ? ch.bpm : null, quality: ch ? ch.quality : 0,
-    alerting: sonar.apnea.alerting, lock: sonar.mode === 'range' ? sonar.lock : undefined });
+    alerting: (sonar.alerting ?? sonar.apnea.alerting), lock: sonar.mode === 'range' ? sonar.lock : undefined });
   drawWave(ch);
 }
 
@@ -210,7 +210,7 @@ function drawWave(ch) {
   if (!ch || ch.disp.length < 2) { g.fillText('collecting data...', 8, 18); return; }
   const d = ch.disp, W = Math.round(20 * sonar.rate);
   const scale = Math.max(3, 1.1 * Math.max(...d.map(Math.abs)));
-  g.strokeStyle = sonar.apnea.alerting ? '#f85149' : '#58a6ff';
+  g.strokeStyle = (sonar.alerting ?? sonar.apnea.alerting) ? '#f85149' : '#58a6ff';
   g.lineWidth = 2; g.beginPath();
   d.forEach((v, i) => {
     const x = ((W - d.length + i) / (W - 1)) * c.width, y = c.height / 2 - (v / scale) * (c.height * 0.45);
@@ -248,7 +248,7 @@ function drawDepth() {
   g.setLineDash([]);
   if (sonar.lock !== null) {
     const y = yOf((sonar.lock + 0.5) * sonar.dr), h = c.height / nR;
-    g.strokeStyle = sonar.apnea.alerting ? '#f85149' : '#3fb950'; g.lineWidth = 2;
+    g.strokeStyle = (sonar.alerting ?? sonar.apnea.alerting) ? '#f85149' : '#3fb950'; g.lineWidth = 2;
     g.strokeRect(40, y, c.width - 40, h);
     g.fillStyle = g.strokeStyle; g.fillText('chest', c.width - 40, y - 3);
   }
