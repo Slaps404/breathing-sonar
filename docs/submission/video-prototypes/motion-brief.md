@@ -12,7 +12,7 @@ Make a 30 second animated explainer, 1920x1080, 30 fps, no voice. Export MP4.
 
 | Time | On screen | Motion |
 |---|---|---|
-| 0-6 s | "75.5%" huge, then below: "of overdose deaths with a known setting happened with no one else present." Small source line: "CDC SUDORS, 2022-2024" | Number counts up from 0. Text fades in line by line. |
+| 0-6 s | "75.5%" huge, then below: "of overdose deaths happened when the person was alone." Small source line: "CDC SUDORS, 2022-2024" | Number counts up from 0. Text fades in line by line. |
 | 6-10 s | "If no one is there, no one knows." | Previous text fades out, this line fades in alone, holds. |
 | 10-18 s | Side view line drawing: a laptop on a desk, a seated person facing it. Curved arcs travel from the laptop to the person's chest and back. Label: "A sound you cannot hear, bounced off your chest." | Arcs pulse outward every second. The chest outline moves in and out slowly (one breath every 4 s). A wavy line under the drawing follows the chest. |
 | 18-24 s | Same drawing. The chest stops. The wavy line goes flat and turns red. Label: "Breathing stops. The line goes flat." | After 3 s flat, a red ring pulses around the laptop with the text "Are you okay?" |
