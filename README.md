@@ -5,6 +5,8 @@ SanD Hacks (Nov 14-15, 2026) project. Turns a laptop's built-in speaker and mic 
 ## Run the demo
 The app watches your breathing and, if it stops and you do not tap "I'm okay", phones a friend.
 
+**Quick start:** double-click `Start Demo.command`. It starts both servers (steps 1-2) and opens the app in Chrome (step 3). Close its window to stop them.
+
 1. **Call server.** Make a `.env` file in the repo root (it is gitignored):
    ```
    TWILIO_ACCOUNT_SID=...
