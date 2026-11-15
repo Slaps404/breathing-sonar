@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8"><title>Take cues</title>
+<!-- Silent on-screen cues for a scripted take. cue.html?lead=30&plan=deep:30,normal:40,hold:20  (started by collect/cued.py) -->
+<style>body{margin:0;color:#fff;font:600 84px system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:28px;text-align:center;transition:background .3s}
+#n{font:400 40px system-ui;opacity:.85}#c{width:110px;height:110px;border-radius:50%;background:#fff;opacity:.9}</style>
+<div id="s"></div><div id="c"></div><div id="n"></div>
+<script>
+const q = new URLSearchParams(location.search), lead = +q.get('lead') || 30;
+const steps = (q.get('plan') || 'normal:30').split(',').map(x => { const [k, v] = x.split(':'); return { k, sec: +v }; });
+const SHOW = { deep: ['DEEP SLOW BREATHS', '#2a6fb0'], normal: ['BREATHE NORMALLY', '#2a9d8f'], hold: ['HOLD YOUR BREATH', '#26444f'], ready: ['SIT STILL, HANDS IN LAP', '#333'], done: ['DONE', '#333'] };
+const t0 = performance.now();
+(function tick() {
+  let t = (performance.now() - t0) / 1000 - lead, k = 'ready', left = -t, tin = 0;
+  if (t >= 0) { k = 'done'; left = 0; for (const st of steps) { if (t < st.sec) { k = st.k; left = st.sec - t; tin = t; break; } t -= st.sec; } }
+  s.textContent = SHOW[k][0]; document.body.style.background = SHOW[k][1]; n.textContent = k === 'done' ? '' : Math.ceil(left) + ' s';
+  // deep: circle grows 3 s, shrinks 3 s (10 breaths per minute). Other cues: no circle.
+  c.style.visibility = k === 'deep' ? 'visible' : 'hidden'; c.style.transform = `scale(${0.6 + 0.7 * (1 - Math.cos(2 * Math.PI * tin / 6)) / 2})`;
+  if (k !== 'done') requestAnimationFrame(tick);
+})();
+</script>
