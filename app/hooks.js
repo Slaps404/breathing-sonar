@@ -19,8 +19,9 @@ window.SonarHooks = {
   //   onWave(mm, rate)        optional. Chest movement in mm over the last 20 s (rate samples/s),
   //                           the same signal the test page draws (sonar.analyze(...).ch.disp)
   //   onDebug(snapshot)       optional. Everything the judge view draws, ~5 times a second (see snapshot below)
-  // Returns { stop(), mark(label) }. Throws if the mic is refused: the UI shows the message.
-  // Records the run: every mic frame plus labels (detector events and mark() calls). stop() downloads
+  // Returns { stop(), mark(event), label(name) }. Throws if the mic is refused: the UI shows the message.
+  // Records the run: every mic frame, labels (what the person says they are doing: 'normal' / 'hold', set with
+  // label(); starts 'normal') and events (status, detector, alarm, taps; set with mark()). stop() downloads
   // take-<time>.wav + .json in the collectors' format, so `node tools/replay-take.js <path>` replays it.
   async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug }) {
     const LOST_MS = 3000, VOLUME = 0.7;
@@ -60,6 +61,7 @@ window.SonarHooks = {
 
     return {
       mark: take.mark,
+      label: take.label,
       stop() {
         clearInterval(timer);
         node.disconnect();
@@ -73,7 +75,7 @@ window.SonarHooks = {
   // Recording of one run. Frames arrive one probe period (P samples) at a time, starting at probe[0],
   // so WAV sample n lines up with probe[n % P], as in collect/recorder.py.
   makeTake(p, amp) {
-    const SR = DSP.SR, P = p.P, started = new Date(), frames = [], labels = [];
+    const SR = DSP.SR, P = p.P, started = new Date(), frames = [], labels = [{ label: 'normal', sample: 0, t: 0 }], events = [];
     const id = 'take-' + started.toISOString().replace(/[:.]/g, '-');
     let peak = 0;
     const samples = () => frames.length * P;
@@ -83,7 +85,9 @@ window.SonarHooks = {
         for (let i = 0; i < P; i++) { const v = f[i]; if (Math.abs(v) > peak) peak = Math.abs(v); q[i] = Math.max(-1, Math.min(1, v)) * 32767; }
         frames.push(q);
       },
-      mark(label) { labels.push({ label, sample: samples(), t: +(samples() / SR).toFixed(3) }); },
+      mark(event) { events.push({ event, sample: samples(), t: +(samples() / SR).toFixed(3) }); },
+      // Ground truth for tools/replay-take.js, which scores each 'hold' stretch (until the next label).
+      label(label) { labels.push({ label, sample: samples(), t: +(samples() / SR).toFixed(3) }); },
       download() {
         const n = samples(), wav = new DataView(new ArrayBuffer(44));
         const str = (o, t) => { for (let i = 0; i < t.length; i++) wav.setUint8(o + i, t.charCodeAt(i)); };
@@ -92,7 +96,7 @@ window.SonarHooks = {
         wav.setUint32(24, SR, true); wav.setUint32(28, 2 * SR, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true);
         str(36, 'data'); wav.setUint32(40, 2 * n, true);
         const meta = { id, source: 'app', started: started.toISOString(), sampleRate: SR, P, f0: p.f0, f1: p.f1, amp,
-          samples: n, seconds: +(n / SR).toFixed(2), labels, peak: +peak.toFixed(4), userAgent: navigator.userAgent };
+          samples: n, seconds: +(n / SR).toFixed(2), labels, events, peak: +peak.toFixed(4), userAgent: navigator.userAgent };
         const save = (blob, name) => {
           const a = document.createElement('a');
           a.href = URL.createObjectURL(blob); a.download = name; a.click();

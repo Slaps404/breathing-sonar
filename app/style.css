@@ -119,6 +119,8 @@ body.alarming .pill.ghost { background: transparent; color: #fff4ec; border-colo
 /* Judge view: a large panel beside the screens on a laptop, below them on a narrow screen.
    It keeps its own colours so it stays readable while the page turns red for the alarm. */
 #judgeBtn { text-decoration: underline; padding: 4px 0; }
+#holdBtn { text-decoration: underline; padding: 8px 0; margin-top: 8px; }
+#holdBtn[aria-pressed="true"] { color: #d29922; font-weight: 600; }
 .judge {
   background: var(--bg); color: var(--text); border: 2px solid var(--line); border-radius: 22px;
   padding: 18px 22px 14px; margin: 14px; transition: border-color 0.3s;

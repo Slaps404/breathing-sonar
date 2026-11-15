@@ -192,6 +192,7 @@
 
   function stopAll() {
     stopAlarmNoise();
+    setHolding(false);
     if (session) session.stop();
     session = null;
     if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
@@ -214,9 +215,20 @@
     }, 1000);
   }
 
+  // Recording ground truth: the person marks when they hold their breath, so the saved take can be scored.
+  let holding = false;
+  function setHolding(on) {
+    if (on === holding) return;
+    holding = on;
+    if (session) session.label(on ? 'hold' : 'normal');
+    $('holdBtn').setAttribute('aria-pressed', on);
+    $('holdBtn').textContent = on ? "Holding. Mark: I'm breathing again (h)" : "Mark: I'm holding my breath (h)";
+  }
+
   function cancelAlarm(e) {
     if (!countTimer) return;
     if (session) session.mark(e ? "user: I'm okay" : 'alarm cleared');
+    if (e) setHolding(false);                 // answering the alarm means breathing again
     stopAlarmNoise();
     show('watch');
   }
@@ -285,9 +297,11 @@
   // During the countdown any key means "I'm okay", so "s" must not also toggle the judge view there.
   document.addEventListener('keydown', e => {
     if (countTimer) { cancelAlarm(e); return; }
+    if (e.key === 'h' && !e.metaKey && !e.ctrlKey && !e.altKey && !$('s-watch').hidden) setHolding(!holding);
     if (e.key === 's' && !e.metaKey && !e.ctrlKey && !e.altKey && !$('s-watch').hidden) toggleJudge();
   });
   $('judgeBtn').addEventListener('click', toggleJudge);
+  $('holdBtn').addEventListener('click', () => setHolding(!holding));
   $('resume').addEventListener('click', () => show('watch'));
   for (const el of document.querySelectorAll('[data-go]')) {
     el.addEventListener('click', e => { e.preventDefault(); show(el.dataset.go); });
