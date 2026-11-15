@@ -4,6 +4,8 @@ A web page that uses your laptop's speaker and mic to listen for your breathing,
 
 **Live app: https://breathbuddy.us/app/** (works in Chrome on a laptop; nothing to install)
 
+<img src="docs/img/screen-1-welcome.png" width="200" alt="Welcome screen: a cloud says Hi, I'm here with you. I'll breathe along with you and keep a quiet watch. If your breathing stops, I'll call your friend.">
+
 Built by one student at SanD Hacks 2026 (UC San Diego, Nov 14-15 2026). A prototype, not a medical device.
 
 ## Why
@@ -117,7 +119,7 @@ app on GitHub Pages --POST /call + passcode--> Vultr machine: Caddy (https) --> 
 - `call/`: `server.py`, the call server (Twilio + ElevenLabs).
 - `collect/`: the recorders for labelled takes (Mac menu bar, guided and paced takes, phone page).
 - `tools/`: replay, test and experiment scripts (`fit/` simulator and loader, `rate/` rate and lock-on experiments).
-- `docs/`: `img/` README pictures, `sim/` simulator write-up and charts, `submission/` Devpost text and video.
+- `docs/`: `img/` README pictures, `sim/` simulator write-up and charts, `diagnostics/` and `departure-check.md` detector backtests, `submission/` Devpost text and video.
 - `index.html`: the first test page; on breathbuddy.us it forwards to `/app/`.
 - `kit/`: launcher and instructions for the recorder kit built by `tools/make-kit.sh`.
 - `Start Demo.command`: starts the call server and web server and opens the app.
