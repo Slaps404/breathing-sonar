@@ -215,35 +215,30 @@
     </div>
     <div class="mid center">
       <p class="kicker rise" style="--i:0" id="welcomeBack">Last step</p>
-      <h1 class="rise" style="--i:1">Sit like this.</h1>
-      <svg class="sit rise" style="--i:2" viewBox="0 0 300 150" role="img" aria-label="Person sitting 30 to 40 centimetres away, chest facing the screen">
-        <line x1="16" y1="112" x2="196" y2="112" class="ln"/>
-        <g class="only-laptop">
-          <line x1="44" y1="110" x2="104" y2="110" class="ln thick"/>
-          <line x1="44" y1="110" x2="28" y2="60" class="ln thick"/>
-        </g>
-        <g class="only-phone">
-          <line x1="50" y1="110" x2="38" y2="62" class="ln thick"/>
-          <line x1="50" y1="110" x2="68" y2="110" class="ln"/>
-        </g>
-        <path d="M120 76 q7 10 0 20" class="wave w1"/>
-        <path d="M134 70 q11 16 0 32" class="wave w2"/>
-        <path d="M148 64 q15 22 0 44" class="wave w3"/>
-        <circle cx="222" cy="40" r="15" class="ln"/>
-        <path d="M222 56 v6" class="ln"/>
-        <path d="M198 140 v-52 q0 -24 24 -24 q24 0 24 24 v52" class="ln body"/>
-        <line x1="44" y1="130" x2="198" y2="130" class="dim"/>
-        <line x1="44" y1="125" x2="44" y2="135" class="dim"/>
-        <line x1="198" y1="125" x2="198" y2="135" class="dim"/>
-        <text x="121" y="146" text-anchor="middle" class="dimtxt">30-40 cm</text>
-      </svg>
+      <h1 class="rise" style="--i:1">Get comfy, facing me.</h1>
+      <div class="echo mini rise" style="--i:2" aria-hidden="true">
+        <div class="sky"></div>
+        <div class="float"><div class="cloud hello-cloud">
+          <svg class="cloudsvg" viewBox="0 0 220 166" aria-hidden="true">
+            <use href="#cloudShape" class="puff"/>
+            <ellipse cx="88" cy="48" rx="17" ry="8" transform="rotate(-22 88 48)" class="shine"/>
+            <circle cx="112" cy="38" r="3.5" class="shine"/>
+            <g class="face">
+              <ellipse cx="68" cy="112" rx="11" ry="6.5" class="cheek"/><ellipse cx="152" cy="112" rx="11" ry="6.5" class="cheek"/>
+              <g class="eyes"><circle cx="84" cy="96" r="7.5"/><circle cx="136" cy="96" r="7.5"/><circle cx="86.5" cy="93" r="2.3" class="spark"/><circle cx="138.5" cy="93" r="2.3" class="spark"/></g>
+              <path d="M100 111 q10 9 20 0" class="mouth smile"/>
+              <ellipse cx="110" cy="113" rx="4.5" ry="5.5" class="mouth oh"/>
+            </g>
+          </svg>
+        </div></div>
+      </div>
       <ul class="checks rise" style="--i:3">
-        <li class="only-laptop">A forearm away from the screen</li>
-        <li class="only-phone">Prop the phone up, a forearm away</li>
-        <li>Chest facing the screen</li>
-        <li class="only-laptop">Hands off the laptop</li>
+        <li class="only-laptop">Sit about a forearm away from me</li>
+        <li class="only-phone">Prop me up, about a forearm away</li>
+        <li>Chest facing me</li>
+        <li class="only-laptop">Hands off the keyboard</li>
         <li class="only-phone">Hands off the phone</li>
-        <li>Sound on, no headphones</li>
+        <li>Sound on, no headphones, so I can hear</li>
       </ul>
       <p class="err" id="sitErr" role="alert" hidden></p>
     </div>
