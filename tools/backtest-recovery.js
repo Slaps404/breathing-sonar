@@ -16,8 +16,12 @@ const shipped = { q: D.HOLD.sustainQ, db: D.HOLD.sustainDb };
 function replayAll() {
   const rows = [];
   for (const file of fs.readdirSync('data').filter(f => /^take-.*\.wav$/.test(f)).sort()) {
-    const base = 'data/' + file.slice(0, -4), wav = fs.readFileSync(base + '.wav'), meta = JSON.parse(fs.readFileSync(base + '.json'));
-    const pcm = new Int16Array(wav.buffer, wav.byteOffset + 44, wav.readUInt32LE(40) / 2);
+    const base = 'data/' + file.slice(0, -4), wav = fs.readFileSync(base + '.wav'), bytes = wav.readUInt32LE(40), at = 44 + bytes + (bytes % 2);
+    let meta;   // labels: base.json (collectors) or the json chunk after the audio (app takes); neither = unfinished take
+    try { meta = fs.existsSync(base + '.json') ? JSON.parse(fs.readFileSync(base + '.json')) : JSON.parse(wav.toString('utf8', at + 8, at + 8 + wav.readUInt32LE(at + 4))); }
+    catch { console.error('skipped (no labels): ' + file); continue; }
+    meta.id ??= file.slice(0, -4);
+    const pcm = new Int16Array(wav.buffer, wav.byteOffset + 44, bytes >> 1);
     const s = new D.RangeSonar(); s.p = D.makeProbe({ P: meta.P, f0: meta.f0, f1: meta.f1 }); s.chs.forEach(c => c.lambda = s.p.lambda);
     const labels = meta.labels.map((l, i) => ({ label: l.label, a: l.t, b: meta.labels[i + 1]?.t ?? meta.seconds }));
     const frame = new Float64Array(meta.P), events = [], on = {}, dt = 5 / s.rate;
@@ -46,7 +50,7 @@ function replayAll() {
   return rows;
 }
 const settings = [{ q: shipped.q, db: Infinity, name: 'old rule (test off)' }, { ...shipped, name: 'shipped' }];
-for (const q of [0.15, 0.25, 0.33]) for (const db of [2, 3, 4, 5, 6]) if (q !== shipped.q || db !== shipped.db) settings.push({ q, db, name: '' });
+for (const q of [0.15, 0.25, 0.33]) for (const db of [2, 3, 4, 6]) if (q !== shipped.q || db !== shipped.db) settings.push({ q, db, name: '' });
 const out = [];
 console.log('sustainQ sustainDb  hits early cover normal other false  recovery (s)');
 for (const set of settings) {

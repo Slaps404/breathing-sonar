@@ -456,12 +456,169 @@
       "label": "normal"
      }
     ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153,
+     204.6
+    ],
+    "cover": 13.86666666666665,
+    "normal": 58.23999999999981,
+    "other": 14.933333333333314,
+    "falseStarts": 3,
+    "recovery": [
+     3.5,
+     3.9
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 99,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 104.8,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 111.4,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 168.6,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 204.6,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 208.9,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     86.2
+    ],
+    "cover": 1.0666666666666667,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 86.2,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     57.4
+    ],
+    "cover": 6.613333333333329,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 57.4,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
    }
   ]
  },
  {
   "q": 0.25,
-  "db": 4,
+  "db": 3,
   "name": "shipped",
   "takes": [
    {
@@ -484,7 +641,7 @@
      252
     ],
     "cover": 5.759999999999997,
-    "normal": 5.759999999999997,
+    "normal": 6.186666666666663,
     "other": 0.21333333333333335,
     "falseStarts": 3,
     "recovery": [],
@@ -520,7 +677,7 @@
       "label": "normal"
      },
      {
-      "t": 274.2,
+      "t": 274.6,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -539,12 +696,12 @@
     "hits": 3,
     "early": [],
     "cover": 39.89333333333333,
-    "normal": 8.959999999999992,
+    "normal": 10.23999999999999,
     "other": 0,
     "falseStarts": 0,
     "recovery": [
-     5,
-     4.1
+     6.1,
+     4.3
     ],
     "events": [
      {
@@ -554,7 +711,7 @@
       "label": "hold"
      },
      {
-      "t": 155.1,
+      "t": 156.2,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -566,7 +723,7 @@
       "label": "hold"
      },
      {
-      "t": 204.2,
+      "t": 204.4,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -636,11 +793,11 @@
     "hits": 1,
     "early": [],
     "cover": 4.053333333333334,
-    "normal": 2.56,
+    "normal": 3.2,
     "other": 0,
     "falseStarts": 0,
     "recovery": [
-     2.6
+     3.2
     ],
     "events": [
      {
@@ -650,7 +807,7 @@
       "label": "hold"
      },
      {
-      "t": 102.7,
+      "t": 103.3,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -664,7 +821,7 @@
     "early": [],
     "cover": 0,
     "normal": 0,
-    "other": 6.826666666666667,
+    "other": 7.466666666666666,
     "falseStarts": 1,
     "recovery": [],
     "events": [
@@ -675,7 +832,7 @@
       "label": "empty room"
      },
      {
-      "t": 53.2,
+      "t": 53.8,
       "type": "end",
       "why": null,
       "label": "returned"
@@ -787,12 +944,12 @@
     "hits": 3,
     "early": [],
     "cover": 24.106666666666698,
-    "normal": 4.906666666666665,
+    "normal": 5.333333333333331,
     "other": 0,
     "falseStarts": 0,
     "recovery": [
      3.7,
-     1.4
+     1.8
     ],
     "events": [
      {
@@ -814,7 +971,7 @@
       "label": "hold"
      },
      {
-      "t": 151.5,
+      "t": 151.9,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -857,12 +1014,12 @@
     "hits": 3,
     "early": [],
     "cover": 29.013333333333396,
-    "normal": 20.480000000000008,
+    "normal": 20.906666666666677,
     "other": 0,
     "falseStarts": 0,
     "recovery": [
-     5.8,
-     7.7,
+     6,
+     7.9,
      7.1
     ],
     "events": [
@@ -873,7 +1030,7 @@
       "label": "hold"
      },
      {
-      "t": 80.9,
+      "t": 81.1,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -885,7 +1042,7 @@
       "label": "hold"
      },
      {
-      "t": 127.8,
+      "t": 128,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -901,6 +1058,138 @@
       "type": "end",
       "why": null,
       "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 67.6266666666665,
+    "other": 14.933333333333314,
+    "falseStarts": 2,
+    "recovery": [
+     7.1,
+     3.9
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 111.4,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 172.2,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     89.4
+    ],
+    "cover": 4.266666666666667,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 89.4,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     58.9
+    ],
+    "cover": 8.10666666666666,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 58.9,
+      "type": "end",
+      "why": null,
+      "label": "hold"
      }
     ]
    }
@@ -1350,6 +1639,138 @@
       "label": "normal"
      }
     ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 76.37333333333336,
+    "other": 14.933333333333314,
+    "falseStarts": 2,
+    "recovery": [
+     7.5,
+     4.1
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 119.5,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 172.6,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214.2,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     90.3
+    ],
+    "cover": 5.119999999999998,
+    "normal": 3.8400000000000003,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.5,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 90.3,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     59.3
+    ],
+    "cover": 8.533333333333326,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 59.3,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
    }
   ]
  },
@@ -1795,6 +2216,138 @@
       "type": "end",
       "why": null,
       "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 73.17333333333329,
+    "other": 14.933333333333314,
+    "falseStarts": 2,
+    "recovery": [
+     7.5,
+     3.9
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 116.5,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 172.6,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     89.2
+    ],
+    "cover": 4.053333333333334,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 89.2,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     57.4
+    ],
+    "cover": 6.613333333333329,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 57.4,
+      "type": "end",
+      "why": null,
+      "label": "hold"
      }
     ]
    }
@@ -2244,174 +2797,79 @@
       "label": "normal"
      }
     ]
-   }
-  ]
- },
- {
-  "q": 0.15,
-  "db": 5,
-  "name": "",
-  "takes": [
-   {
-    "take": "take-2026-11-14T22-13-48-094Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
    },
    {
-    "take": "take-2026-11-14T22-17-05-779Z",
-    "holds": 3,
-    "hits": 1,
-    "early": [
-     252
-    ],
-    "cover": 5.759999999999997,
-    "normal": 5.759999999999997,
-    "other": 0.21333333333333335,
-    "falseStarts": 3,
-    "recovery": [],
-    "events": [
-     {
-      "t": 147,
-      "type": "start",
-      "why": "hold",
-      "label": "moving"
-     },
-     {
-      "t": 147.2,
-      "type": "end",
-      "why": null,
-      "label": "moving"
-     },
-     {
-      "t": 246.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 252,
-      "type": "end",
-      "why": null,
-      "label": "hold"
-     },
-     {
-      "t": 270.8,
-      "type": "start",
-      "why": "hold",
-      "label": "normal"
-     },
-     {
-      "t": 274.2,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 711.1,
-      "type": "start",
-      "why": "hold",
-      "label": "normal"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-14T22-41-04-642Z",
-    "holds": 5,
-    "hits": 3,
-    "early": [],
-    "cover": 39.89333333333333,
-    "normal": 8.10666666666666,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     4.6,
-     3.7
-    ],
-    "events": [
-     {
-      "t": 137,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 154.7,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 186.9,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 203.8,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 236.8,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-14T23-20-21-608Z",
-    "holds": 5,
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
     "hits": 2,
     "early": [
-     275.5
+     153
     ],
-    "cover": 15.35999999999998,
-    "normal": 5.759999999999997,
-    "other": 1.28,
-    "falseStarts": 1,
-    "recovery": [],
+    "cover": 18.133333333333326,
+    "normal": 63.99999999999975,
+    "other": 14.933333333333314,
+    "falseStarts": 3,
+    "recovery": [
+     7.3,
+     3.9
+    ],
     "events": [
      {
-      "t": 204.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 211.5,
-      "type": "end",
-      "why": null,
-      "label": "moving"
-     },
-     {
-      "t": 266.1,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 275.5,
-      "type": "end",
-      "why": null,
-      "label": "hold"
-     },
-     {
-      "t": 312.4,
+      "t": 55.9,
       "type": "start",
       "why": "hold",
       "label": "normal"
      },
      {
-      "t": 318.1,
+      "t": 100.9,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 104.8,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 111.4,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 172.4,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -2419,276 +2877,68 @@
     ]
    },
    {
-    "take": "take-2026-11-15T00-15-23-440Z",
-    "holds": 3,
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
     "hits": 1,
-    "early": [],
-    "cover": 4.053333333333334,
-    "normal": 2.56,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     2.6
+    "early": [
+     87.1
     ],
-    "events": [
-     {
-      "t": 96,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 102.7,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T00-21-03-758Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 6.826666666666667,
+    "cover": 1.9200000000000002,
+    "normal": 3.626666666666667,
+    "other": 0,
     "falseStarts": 1,
     "recovery": [],
     "events": [
      {
-      "t": 46.3,
+      "t": 54.7,
       "type": "start",
       "why": "hold",
-      "label": "empty room"
+      "label": "normal"
      },
      {
-      "t": 53.2,
+      "t": 58.3,
       "type": "end",
       "why": null,
-      "label": "returned"
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 87.1,
+      "type": "end",
+      "why": null,
+      "label": "hold"
      }
     ]
    },
    {
-    "take": "take-2026-11-15T02-29-17-848Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 18.77333333333333,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 84.9,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 103.7,
-      "type": "end",
-      "why": null,
-      "label": "empty room"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-33-46-365Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 17.706666666666656,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 84.9,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 102.7,
-      "type": "end",
-      "why": null,
-      "label": "empty room"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-37-55-422Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 22.400000000000002,
-    "falseStarts": 2,
-    "recovery": [],
-    "events": [
-     {
-      "t": 60.2,
-      "type": "start",
-      "why": "hold",
-      "label": "moving"
-     },
-     {
-      "t": 62.8,
-      "type": "end",
-      "why": null,
-      "label": "moving"
-     },
-     {
-      "t": 83.9,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 103.7,
-      "type": "end",
-      "why": null,
-      "label": "empty room"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-49-27-995Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T02-54-00-030Z",
-    "holds": 3,
-    "hits": 3,
-    "early": [],
-    "cover": 24.106666666666698,
-    "normal": 4.906666666666665,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     3.7,
-     1.4
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     57.4
     ],
-    "events": [
-     {
-      "t": 66.8,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 78.8,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 145.3,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 151.5,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 214.4,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T03-05-22-789Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
+    "cover": 6.613333333333329,
     "normal": 0,
     "other": 0,
     "falseStarts": 0,
     "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T03-06-03-072Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T03-09-51-923Z",
-    "holds": 3,
-    "hits": 3,
-    "early": [],
-    "cover": 29.013333333333396,
-    "normal": 21.333333333333346,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     6,
-     7.7,
-     7.7
-    ],
     "events": [
      {
-      "t": 72.4,
+      "t": 50.8,
       "type": "start",
       "why": "hold",
       "label": "hold"
      },
      {
-      "t": 81.1,
+      "t": 57.4,
       "type": "end",
       "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 108.8,
-      "type": "start",
-      "why": "hold",
       "label": "hold"
-     },
-     {
-      "t": 127.8,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 150.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 172.8,
-      "type": "end",
-      "why": null,
-      "label": "normal"
      }
     ]
    }
@@ -3138,6 +3388,150 @@
       "label": "normal"
      }
     ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 59.94666666666646,
+    "other": 14.933333333333314,
+    "falseStarts": 3,
+    "recovery": [
+     3.5,
+     3.9
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 100.7,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 104.8,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 111.4,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 168.6,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     86.2
+    ],
+    "cover": 1.0666666666666667,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 86.2,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     57.4
+    ],
+    "cover": 6.613333333333329,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 57.4,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
    }
   ]
  },
@@ -3585,12 +3979,144 @@
       "label": "normal"
      }
     ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 69.54666666666654,
+    "other": 14.933333333333314,
+    "falseStarts": 2,
+    "recovery": [
+     7.1,
+     5.2
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 112,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 172.2,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 215.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     89.9
+    ],
+    "cover": 4.6933333333333325,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 89.9,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     60.6
+    ],
+    "cover": 9.813333333333324,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 60.6,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
    }
   ]
  },
  {
   "q": 0.25,
-  "db": 3,
+  "db": 4,
   "name": "",
   "takes": [
    {
@@ -3613,7 +4139,7 @@
      252
     ],
     "cover": 5.759999999999997,
-    "normal": 6.186666666666663,
+    "normal": 5.759999999999997,
     "other": 0.21333333333333335,
     "falseStarts": 3,
     "recovery": [],
@@ -3649,7 +4175,7 @@
       "label": "normal"
      },
      {
-      "t": 274.6,
+      "t": 274.2,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -3668,12 +4194,12 @@
     "hits": 3,
     "early": [],
     "cover": 39.89333333333333,
-    "normal": 10.23999999999999,
+    "normal": 8.959999999999992,
     "other": 0,
     "falseStarts": 0,
     "recovery": [
-     6.1,
-     4.3
+     5,
+     4.1
     ],
     "events": [
      {
@@ -3683,7 +4209,7 @@
       "label": "hold"
      },
      {
-      "t": 156.2,
+      "t": 155.1,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -3695,7 +4221,7 @@
       "label": "hold"
      },
      {
-      "t": 204.4,
+      "t": 204.2,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -3765,11 +4291,11 @@
     "hits": 1,
     "early": [],
     "cover": 4.053333333333334,
-    "normal": 3.2,
+    "normal": 2.56,
     "other": 0,
     "falseStarts": 0,
     "recovery": [
-     3.2
+     2.6
     ],
     "events": [
      {
@@ -3779,7 +4305,7 @@
       "label": "hold"
      },
      {
-      "t": 103.3,
+      "t": 102.7,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -3793,7 +4319,7 @@
     "early": [],
     "cover": 0,
     "normal": 0,
-    "other": 7.466666666666666,
+    "other": 6.826666666666667,
     "falseStarts": 1,
     "recovery": [],
     "events": [
@@ -3804,7 +4330,7 @@
       "label": "empty room"
      },
      {
-      "t": 53.8,
+      "t": 53.2,
       "type": "end",
       "why": null,
       "label": "returned"
@@ -3916,453 +4442,6 @@
     "hits": 3,
     "early": [],
     "cover": 24.106666666666698,
-    "normal": 5.333333333333331,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     3.7,
-     1.8
-    ],
-    "events": [
-     {
-      "t": 66.8,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 78.8,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 145.3,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 151.9,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 214.4,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T03-05-22-789Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T03-06-03-072Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T03-09-51-923Z",
-    "holds": 3,
-    "hits": 3,
-    "early": [],
-    "cover": 29.013333333333396,
-    "normal": 20.906666666666677,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     6,
-     7.9,
-     7.1
-    ],
-    "events": [
-     {
-      "t": 72.4,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 81.1,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 108.8,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 128,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 150.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 172.2,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     }
-    ]
-   }
-  ]
- },
- {
-  "q": 0.25,
-  "db": 5,
-  "name": "",
-  "takes": [
-   {
-    "take": "take-2026-11-14T22-13-48-094Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-14T22-17-05-779Z",
-    "holds": 3,
-    "hits": 1,
-    "early": [
-     252
-    ],
-    "cover": 5.759999999999997,
-    "normal": 5.759999999999997,
-    "other": 0.21333333333333335,
-    "falseStarts": 3,
-    "recovery": [],
-    "events": [
-     {
-      "t": 147,
-      "type": "start",
-      "why": "hold",
-      "label": "moving"
-     },
-     {
-      "t": 147.2,
-      "type": "end",
-      "why": null,
-      "label": "moving"
-     },
-     {
-      "t": 246.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 252,
-      "type": "end",
-      "why": null,
-      "label": "hold"
-     },
-     {
-      "t": 270.8,
-      "type": "start",
-      "why": "hold",
-      "label": "normal"
-     },
-     {
-      "t": 274.2,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 711.1,
-      "type": "start",
-      "why": "hold",
-      "label": "normal"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-14T22-41-04-642Z",
-    "holds": 5,
-    "hits": 3,
-    "early": [],
-    "cover": 39.89333333333333,
-    "normal": 8.533333333333326,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     4.8,
-     3.9
-    ],
-    "events": [
-     {
-      "t": 137,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 154.9,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 186.9,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 204,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 236.8,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-14T23-20-21-608Z",
-    "holds": 5,
-    "hits": 2,
-    "early": [
-     275.5
-    ],
-    "cover": 15.35999999999998,
-    "normal": 5.759999999999997,
-    "other": 1.28,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 204.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 211.5,
-      "type": "end",
-      "why": null,
-      "label": "moving"
-     },
-     {
-      "t": 266.1,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 275.5,
-      "type": "end",
-      "why": null,
-      "label": "hold"
-     },
-     {
-      "t": 312.4,
-      "type": "start",
-      "why": "hold",
-      "label": "normal"
-     },
-     {
-      "t": 318.1,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T00-15-23-440Z",
-    "holds": 3,
-    "hits": 1,
-    "early": [],
-    "cover": 4.053333333333334,
-    "normal": 1.4933333333333334,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     1.5
-    ],
-    "events": [
-     {
-      "t": 96,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 101.6,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T00-21-03-758Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 6.4,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 46.3,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 52.7,
-      "type": "end",
-      "why": null,
-      "label": "returned"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-29-17-848Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 18.77333333333333,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 84.9,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 103.7,
-      "type": "end",
-      "why": null,
-      "label": "empty room"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-33-46-365Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 17.706666666666656,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 84.9,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 102.7,
-      "type": "end",
-      "why": null,
-      "label": "empty room"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-37-55-422Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 21.973333333333336,
-    "falseStarts": 2,
-    "recovery": [],
-    "events": [
-     {
-      "t": 60.2,
-      "type": "start",
-      "why": "hold",
-      "label": "moving"
-     },
-     {
-      "t": 62.3,
-      "type": "end",
-      "why": null,
-      "label": "moving"
-     },
-     {
-      "t": 83.9,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 103.7,
-      "type": "end",
-      "why": null,
-      "label": "empty room"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-49-27-995Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T02-54-00-030Z",
-    "holds": 3,
-    "hits": 3,
-    "early": [],
-    "cover": 24.106666666666698,
     "normal": 4.906666666666665,
     "other": 0,
     "falseStarts": 0,
@@ -4433,12 +4512,12 @@
     "hits": 3,
     "early": [],
     "cover": 29.013333333333396,
-    "normal": 19.62666666666667,
+    "normal": 20.480000000000008,
     "other": 0,
     "falseStarts": 0,
     "recovery": [
-     5.2,
-     7.5,
+     5.8,
+     7.7,
      7.1
     ],
     "events": [
@@ -4449,7 +4528,7 @@
       "label": "hold"
      },
      {
-      "t": 80.3,
+      "t": 80.9,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -4461,7 +4540,7 @@
       "label": "hold"
      },
      {
-      "t": 127.6,
+      "t": 127.8,
       "type": "end",
       "why": null,
       "label": "normal"
@@ -4477,6 +4556,138 @@
       "type": "end",
       "why": null,
       "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 66.98666666666648,
+    "other": 14.933333333333314,
+    "falseStarts": 2,
+    "recovery": [
+     6.5,
+     3.9
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 111.4,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 171.6,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     89
+    ],
+    "cover": 3.8400000000000003,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 89,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     57.4
+    ],
+    "cover": 6.613333333333329,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 57.4,
+      "type": "end",
+      "why": null,
+      "label": "hold"
      }
     ]
    }
@@ -4926,6 +5137,150 @@
       "label": "normal"
      }
     ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 61.013333333333115,
+    "other": 14.933333333333314,
+    "falseStarts": 3,
+    "recovery": [
+     5,
+     3.9
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 100.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 104.8,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 111.4,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 170.1,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     86.2
+    ],
+    "cover": 1.0666666666666667,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 86.2,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     57.4
+    ],
+    "cover": 6.613333333333329,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 57.4,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
    }
   ]
  },
@@ -5371,6 +5726,138 @@
       "type": "end",
       "why": null,
       "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 73.8133333333333,
+    "other": 14.933333333333314,
+    "falseStarts": 2,
+    "recovery": [
+     6.7,
+     5.4
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 116.5,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 171.8,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 215.5,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     89.4
+    ],
+    "cover": 4.266666666666667,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 89.4,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     59.6
+    ],
+    "cover": 8.746666666666659,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 59.6,
+      "type": "end",
+      "why": null,
+      "label": "hold"
      }
     ]
    }
@@ -5820,6 +6307,138 @@
       "label": "normal"
      }
     ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 67.6266666666665,
+    "other": 14.933333333333314,
+    "falseStarts": 2,
+    "recovery": [
+     6.5,
+     3.9
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 112,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 171.6,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     89.2
+    ],
+    "cover": 4.053333333333334,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 89.2,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     59.3
+    ],
+    "cover": 8.533333333333326,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 59.3,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
    }
   ]
  },
@@ -6267,451 +6886,136 @@
       "label": "normal"
      }
     ]
-   }
-  ]
- },
- {
-  "q": 0.33,
-  "db": 5,
-  "name": "",
-  "takes": [
-   {
-    "take": "take-2026-11-14T22-13-48-094Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
    },
    {
-    "take": "take-2026-11-14T22-17-05-779Z",
-    "holds": 3,
-    "hits": 1,
-    "early": [
-     252
-    ],
-    "cover": 5.759999999999997,
-    "normal": 5.759999999999997,
-    "other": 0.21333333333333335,
-    "falseStarts": 3,
-    "recovery": [],
-    "events": [
-     {
-      "t": 147,
-      "type": "start",
-      "why": "hold",
-      "label": "moving"
-     },
-     {
-      "t": 147.2,
-      "type": "end",
-      "why": null,
-      "label": "moving"
-     },
-     {
-      "t": 246.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 252,
-      "type": "end",
-      "why": null,
-      "label": "hold"
-     },
-     {
-      "t": 270.8,
-      "type": "start",
-      "why": "hold",
-      "label": "normal"
-     },
-     {
-      "t": 274.2,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 711.1,
-      "type": "start",
-      "why": "hold",
-      "label": "normal"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-14T22-41-04-642Z",
-    "holds": 5,
-    "hits": 3,
-    "early": [],
-    "cover": 39.89333333333333,
-    "normal": 7.893333333333326,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     4.6,
-     3.5
-    ],
-    "events": [
-     {
-      "t": 137,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 154.7,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 186.9,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 203.6,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 236.8,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-14T23-20-21-608Z",
-    "holds": 5,
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
     "hits": 2,
     "early": [
-     275.5
+     153
     ],
-    "cover": 15.35999999999998,
-    "normal": 5.759999999999997,
-    "other": 1.28,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 204.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 211.5,
-      "type": "end",
-      "why": null,
-      "label": "moving"
-     },
-     {
-      "t": 266.1,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 275.5,
-      "type": "end",
-      "why": null,
-      "label": "hold"
-     },
-     {
-      "t": 312.4,
-      "type": "start",
-      "why": "hold",
-      "label": "normal"
-     },
-     {
-      "t": 318.1,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T00-15-23-440Z",
-    "holds": 3,
-    "hits": 1,
-    "early": [],
-    "cover": 4.053333333333334,
-    "normal": 1.4933333333333334,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     1.5
-    ],
-    "events": [
-     {
-      "t": 96,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 101.6,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T00-21-03-758Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 6.4,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 46.3,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 52.7,
-      "type": "end",
-      "why": null,
-      "label": "returned"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-29-17-848Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 18.77333333333333,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 84.9,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 103.7,
-      "type": "end",
-      "why": null,
-      "label": "empty room"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-33-46-365Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 17.706666666666656,
-    "falseStarts": 1,
-    "recovery": [],
-    "events": [
-     {
-      "t": 84.9,
-      "type": "start",
-      "why": "hold",
-      "label": "empty room"
-     },
-     {
-      "t": 102.7,
-      "type": "end",
-      "why": null,
-      "label": "empty room"
-     }
-    ]
-   },
-   {
-    "take": "take-2026-11-15T02-37-55-422Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 21.973333333333336,
+    "cover": 18.133333333333326,
+    "normal": 66.77333333333314,
+    "other": 14.933333333333314,
     "falseStarts": 2,
-    "recovery": [],
+    "recovery": [
+     6.2,
+     3.9
+    ],
     "events": [
      {
-      "t": 60.2,
+      "t": 55.9,
       "type": "start",
       "why": "hold",
-      "label": "moving"
+      "label": "normal"
      },
      {
-      "t": 62.3,
+      "t": 111.4,
       "type": "end",
       "why": null,
-      "label": "moving"
+      "label": "normal"
      },
      {
-      "t": 83.9,
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
       "type": "start",
       "why": "hold",
-      "label": "empty room"
+      "label": "hold"
      },
      {
-      "t": 103.7,
+      "t": 171.3,
       "type": "end",
       "why": null,
-      "label": "empty room"
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
      }
     ]
    },
    {
-    "take": "take-2026-11-15T02-49-27-995Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T02-54-00-030Z",
-    "holds": 3,
-    "hits": 3,
-    "early": [],
-    "cover": 24.106666666666698,
-    "normal": 4.906666666666665,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     3.7,
-     1.4
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     89
     ],
+    "cover": 3.8400000000000003,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
     "events": [
      {
-      "t": 66.8,
+      "t": 54.7,
       "type": "start",
       "why": "hold",
-      "label": "hold"
+      "label": "normal"
      },
      {
-      "t": 78.8,
+      "t": 58.3,
       "type": "end",
       "why": null,
       "label": "normal"
      },
      {
-      "t": 145.3,
+      "t": 85.2,
       "type": "start",
       "why": "hold",
       "label": "hold"
      },
      {
-      "t": 151.5,
+      "t": 89,
       "type": "end",
       "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 214.4,
-      "type": "start",
-      "why": "hold",
       "label": "hold"
      }
     ]
    },
    {
-    "take": "take-2026-11-15T03-05-22-789Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T03-06-03-072Z",
-    "holds": 0,
-    "hits": 0,
-    "early": [],
-    "cover": 0,
-    "normal": 0,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [],
-    "events": []
-   },
-   {
-    "take": "take-2026-11-15T03-09-51-923Z",
-    "holds": 3,
-    "hits": 3,
-    "early": [],
-    "cover": 29.013333333333396,
-    "normal": 17.706666666666656,
-    "other": 0,
-    "falseStarts": 0,
-    "recovery": [
-     4.3,
-     7.1,
-     6.5
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     58.9
     ],
+    "cover": 8.10666666666666,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
     "events": [
      {
-      "t": 72.4,
+      "t": 50.8,
       "type": "start",
       "why": "hold",
       "label": "hold"
      },
      {
-      "t": 79.4,
+      "t": 58.9,
       "type": "end",
       "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 108.8,
-      "type": "start",
-      "why": "hold",
       "label": "hold"
-     },
-     {
-      "t": 127.2,
-      "type": "end",
-      "why": null,
-      "label": "normal"
-     },
-     {
-      "t": 150.2,
-      "type": "start",
-      "why": "hold",
-      "label": "hold"
-     },
-     {
-      "t": 171.6,
-      "type": "end",
-      "why": null,
-      "label": "normal"
      }
     ]
    }
@@ -7159,6 +7463,150 @@
       "type": "end",
       "why": null,
       "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-40-26-237Z",
+    "holds": 2,
+    "hits": 2,
+    "early": [
+     153
+    ],
+    "cover": 18.133333333333326,
+    "normal": 59.306666666666466,
+    "other": 14.933333333333314,
+    "falseStarts": 3,
+    "recovery": [
+     4.5,
+     3.9
+    ],
+    "events": [
+     {
+      "t": 55.9,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 99,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 104.8,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 111.4,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 134,
+      "type": "start",
+      "why": "slow",
+      "label": "normal"
+     },
+     {
+      "t": 153,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     },
+     {
+      "t": 157.7,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 169.6,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 202.3,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 214,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T03-48-33-705Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     87.1
+    ],
+    "cover": 1.9200000000000002,
+    "normal": 3.626666666666667,
+    "other": 0,
+    "falseStarts": 1,
+    "recovery": [],
+    "events": [
+     {
+      "t": 54.7,
+      "type": "start",
+      "why": "hold",
+      "label": "normal"
+     },
+     {
+      "t": 58.3,
+      "type": "end",
+      "why": null,
+      "label": "normal"
+     },
+     {
+      "t": 85.2,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 87.1,
+      "type": "end",
+      "why": null,
+      "label": "hold"
+     }
+    ]
+   },
+   {
+    "take": "take-2026-11-15T04-01-44-353Z",
+    "holds": 1,
+    "hits": 1,
+    "early": [
+     57.4
+    ],
+    "cover": 6.613333333333329,
+    "normal": 0,
+    "other": 0,
+    "falseStarts": 0,
+    "recovery": [],
+    "events": [
+     {
+      "t": 50.8,
+      "type": "start",
+      "why": "hold",
+      "label": "hold"
+     },
+     {
+      "t": 57.4,
+      "type": "end",
+      "why": null,
+      "label": "hold"
      }
     ]
    }

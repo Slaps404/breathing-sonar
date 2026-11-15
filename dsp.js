@@ -288,9 +288,10 @@ function apneaStep(st, disp, rate, nowMs) {
 // 8 s spectrum as breathing does and cleared the alarm mid-hold (take 03-09-51, 115.9 s). Sustained motion
 // S = how far the echoes move per second (stepSec, each end averaged over smoothSec), taken at the quietest
 // quarter (sustainQ) of the last 8 s, so it is high only if about 6 of the 8 s had motion. It must be within
-// sustainDb of its own normal. Chosen by replaying 14 takes (docs/diagnostics/sustained-recovery.md).
+// sustainDb (3 dB, like the level) of its own normal. Chosen by replaying all takes, then checked on a take
+// recorded afterwards, simulated twitches and transplanted bursts (docs/diagnostics/sustained-recovery.md).
 const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120, stirDb: 12, stirSec: 10,
-  stepSec: 1, smoothSec: 0.5, sustainQ: 0.25, sustainDb: 4 };
+  stepSec: 1, smoothSec: 0.5, sustainQ: 0.25, sustainDb: 3 };
 function makeHold() { return { alerting: false, holdStart: null, below: 0, quiet: 0, last: null, B: [], S: [], M: [], moving: [] }; }
 // IQ = list of channels (each with .I/.Q history) in the zone; fast = channels for movement.
 function holdFeatures(zone, fast, rate) {

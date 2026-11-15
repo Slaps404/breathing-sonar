@@ -12,7 +12,7 @@ if(!source.includes(line)) throw new Error('dsp.js clearing line changed: update
 if(seconds>=0) code=code.replace(line, `} else { st.recovery = !moving && ${back} ? (st.recovery || 0) + dt : 0; if (st.recovery >= ${seconds} && !moving && ${back}) { st.alerting = false; st.recovery = 0; st.below = 0; st.holdStart = null; return 'end'; } }`);
 const mod=new Module(path.join(root,'dsp.js'));mod._compile(code,path.join(root,'dsp.js'));const D=mod.exports;
 const out=[];
-for(const file of fs.readdirSync('data').filter(f=>/^take-.*\.wav$/.test(f))) {
+for(const file of fs.readdirSync('data').filter(f=>/^take-.*\.wav$/.test(f)&&fs.existsSync('data/'+f.slice(0,-4)+'.json'))) { // app takes (labels inside the wav) are not read here
 const base='data/'+file.slice(0,-4), wav=fs.readFileSync(base+'.wav');
 const meta=JSON.parse(fs.readFileSync(base+'.json'));
 const pcm=new Int16Array(wav.buffer,wav.byteOffset+44,wav.readUInt32LE(40)/2);
