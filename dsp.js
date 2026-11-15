@@ -3,7 +3,7 @@
 //
 // Two sonar modes share one "channel" pipeline:
 //   ToneSonar : 3 steady tones. Each tone gives one I/Q channel holding ALL echoes mixed together.
-//   RangeSonar: a repeating 18-20 kHz probe. Each frame is turned into ~6 cm range slices
+//   RangeSonar: a repeating 20-22 kHz probe. Each frame is turned into ~6 cm range slices
 //               ("taps"); each tap is its own I/Q channel, so we can watch only the chest's slice.
 // Channel pipeline: I/Q history -> fit circle -> angle around center -> displacement in mm
 //                   -> breathing rate (DFT 3-42/min, 30 s) + breath-hold detector.
@@ -418,12 +418,12 @@ class ToneSonar {
 }
 
 // ---------- Mode 2: range-resolved probe ----------
-// The probe is one 2048-sample period (42.7 ms) made of every FFT bin from 18 to 20 kHz,
+// The probe is one 2048-sample period (42.7 ms) made of every FFT bin from 20 to 22 kHz,
 // with phases chosen (Schroeder) so the sum stays smooth. It repeats exactly, so it has no
-// clicks and nothing below 18 kHz. Dividing each received frame's spectrum by the probe's
+// clicks and nothing below 20 kHz (above most adults' hearing; 18-20 kHz was audible and hurt). Dividing each received frame's spectrum by the probe's
 // spectrum gives the channel; an inverse FFT turns that into echo strength vs delay.
 // 2 kHz of bandwidth -> ~9 cm resolution; 42.7 ms period -> echoes up to 7.3 m before wrap-around.
-function makeProbe({ P = 2048, f0 = 18000, f1 = 20000, L = 128, sr = SR, rms = 0.408 } = {}) {
+function makeProbe({ P = 2048, f0 = 20000, f1 = 22000, L = 128, sr = SR, rms = 0.408 } = {}) {
   const k0 = Math.ceil(f0 * P / sr), k1 = Math.floor(f1 * P / sr), K = k1 - k0 + 1;
   const phi = new Float64Array(K), cosP = new Float64Array(K), sinP = new Float64Array(K), win = new Float64Array(K);
   for (let q = 0; q < K; q++) {
