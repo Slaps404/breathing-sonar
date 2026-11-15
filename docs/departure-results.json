@@ -1,0 +1,535 @@
+{
+  "revision": "da29d088a6e18998641ec56f0b69a5a48bc482fd",
+  "candidate": "Seconds marked moving in the 20 s before each alarm",
+  "results": [
+    {
+      "file": "take-2026-11-14T22-13-48-094Z.json",
+      "track": "take-2026-11-14T22-13-48-094Z",
+      "recordedSeconds": 100.44,
+      "labels": [
+        {
+          "label": "normal",
+          "sample": 0,
+          "t": 0
+        }
+      ],
+      "events": [
+        {
+          "t": 80.47,
+          "label": "normal",
+          "movingSec": 0
+        }
+      ]
+    },
+    {
+      "file": "take-2026-11-14T22-17-05-779Z.json",
+      "track": "take-2026-11-14T22-17-05-779Z",
+      "recordedSeconds": 713.39,
+      "labels": [
+        {
+          "label": "normal",
+          "sample": 0,
+          "t": 0
+        },
+        {
+          "label": "moving",
+          "sample": 3862528,
+          "t": 80.469
+        },
+        {
+          "label": "hold",
+          "sample": 11628544,
+          "t": 242.261
+        },
+        {
+          "label": "normal",
+          "sample": 12605440,
+          "t": 262.613
+        },
+        {
+          "label": "moving",
+          "sample": 14010368,
+          "t": 291.883
+        },
+        {
+          "label": "hold",
+          "sample": 20623360,
+          "t": 429.653
+        },
+        {
+          "label": "normal",
+          "sample": 21846016,
+          "t": 455.125
+        },
+        {
+          "label": "moving",
+          "sample": 23670784,
+          "t": 493.141
+        },
+        {
+          "label": "hold",
+          "sample": 32829440,
+          "t": 683.947
+        },
+        {
+          "label": "normal",
+          "sample": 33712128,
+          "t": 702.336
+        }
+      ],
+      "events": [
+        {
+          "t": 65.54,
+          "label": "normal",
+          "movingSec": 10.67
+        },
+        {
+          "t": 147.03,
+          "label": "moving",
+          "movingSec": 0
+        },
+        {
+          "t": 165.59,
+          "label": "moving",
+          "movingSec": 11.73
+        },
+        {
+          "t": 186.07,
+          "label": "moving",
+          "movingSec": 7.04
+        },
+        {
+          "t": 236.63,
+          "label": "moving",
+          "movingSec": 4.27
+        },
+        {
+          "t": 270.76,
+          "label": "normal",
+          "movingSec": 0
+        },
+        {
+          "t": 387.46,
+          "label": "moving",
+          "movingSec": 10.88
+        },
+        {
+          "t": 396.84,
+          "label": "moving",
+          "movingSec": 6.83
+        },
+        {
+          "t": 438.23,
+          "label": "hold",
+          "movingSec": 8.53
+        },
+        {
+          "t": 471.94,
+          "label": "normal",
+          "movingSec": 0
+        },
+        {
+          "t": 559.4,
+          "label": "moving",
+          "movingSec": 6.19
+        },
+        {
+          "t": 635.14,
+          "label": "moving",
+          "movingSec": 0
+        }
+      ]
+    },
+    {
+      "file": "take-2026-11-14T22-41-04-642Z.json",
+      "track": "normal 30, hold 20, x5",
+      "recordedSeconds": 250.15,
+      "labels": [
+        {
+          "label": "normal",
+          "sample": 0,
+          "t": 0
+        },
+        {
+          "label": "hold",
+          "sample": 1443840,
+          "t": 30.08
+        },
+        {
+          "label": "normal",
+          "sample": 2402304,
+          "t": 50.048
+        },
+        {
+          "label": "hold",
+          "sample": 3842048,
+          "t": 80.043
+        },
+        {
+          "label": "normal",
+          "sample": 4802560,
+          "t": 100.053
+        },
+        {
+          "label": "hold",
+          "sample": 6242304,
+          "t": 130.048
+        },
+        {
+          "label": "normal",
+          "sample": 7202816,
+          "t": 150.059
+        },
+        {
+          "label": "hold",
+          "sample": 8642560,
+          "t": 180.053
+        },
+        {
+          "label": "normal",
+          "sample": 9603072,
+          "t": 200.064
+        },
+        {
+          "label": "hold",
+          "sample": 11042816,
+          "t": 230.059
+        }
+      ],
+      "events": [
+        {
+          "t": 37.8,
+          "label": "hold",
+          "movingSec": 0
+        },
+        {
+          "t": 138.28,
+          "label": "hold",
+          "movingSec": 0
+        },
+        {
+          "t": 186.92,
+          "label": "hold",
+          "movingSec": 0
+        },
+        {
+          "t": 236.84,
+          "label": "hold",
+          "movingSec": 0
+        }
+      ]
+    },
+    {
+      "file": "take-2026-11-14T23-20-21-608Z.json",
+      "track": "moving 20, normal 30, hold 20, x5",
+      "recordedSeconds": 350.29,
+      "labels": [
+        {
+          "label": "moving",
+          "sample": 0,
+          "t": 0
+        },
+        {
+          "label": "normal",
+          "sample": 966656,
+          "t": 20.139
+        },
+        {
+          "label": "hold",
+          "sample": 2408448,
+          "t": 50.176
+        },
+        {
+          "label": "moving",
+          "sample": 3362816,
+          "t": 70.059
+        },
+        {
+          "label": "normal",
+          "sample": 4325376,
+          "t": 90.112
+        },
+        {
+          "label": "hold",
+          "sample": 5767168,
+          "t": 120.149
+        },
+        {
+          "label": "moving",
+          "sample": 6725632,
+          "t": 140.117
+        },
+        {
+          "label": "normal",
+          "sample": 7684096,
+          "t": 160.085
+        },
+        {
+          "label": "hold",
+          "sample": 9127936,
+          "t": 190.165
+        },
+        {
+          "label": "moving",
+          "sample": 10088448,
+          "t": 210.176
+        },
+        {
+          "label": "normal",
+          "sample": 11048960,
+          "t": 230.187
+        },
+        {
+          "label": "hold",
+          "sample": 12488704,
+          "t": 260.181
+        },
+        {
+          "label": "moving",
+          "sample": 13447168,
+          "t": 280.149
+        },
+        {
+          "label": "normal",
+          "sample": 14407680,
+          "t": 300.16
+        },
+        {
+          "label": "hold",
+          "sample": 15847424,
+          "t": 330.155
+        }
+      ],
+      "events": [
+        {
+          "t": 64.26,
+          "label": "hold",
+          "movingSec": 3.84
+        },
+        {
+          "t": 158.76,
+          "label": "moving",
+          "movingSec": 7.89
+        },
+        {
+          "t": 196.74,
+          "label": "hold",
+          "movingSec": 3.84
+        },
+        {
+          "t": 266.07,
+          "label": "hold",
+          "movingSec": 0
+        },
+        {
+          "t": 277.59,
+          "label": "hold",
+          "movingSec": 0
+        },
+        {
+          "t": 312.58,
+          "label": "normal",
+          "movingSec": 0
+        },
+        {
+          "t": 337.54,
+          "label": "hold",
+          "movingSec": 0
+        }
+      ]
+    },
+    {
+      "file": "take-2026-11-15T00-15-23-440Z.json",
+      "track": "seated",
+      "recordedSeconds": 150.19,
+      "labels": [
+        {
+          "label": "normal",
+          "sample": 0,
+          "t": 0
+        },
+        {
+          "label": "hold",
+          "sample": 1441792,
+          "t": 30.037
+        },
+        {
+          "label": "normal",
+          "sample": 2402304,
+          "t": 50.048
+        },
+        {
+          "label": "hold",
+          "sample": 3842048,
+          "t": 80.043
+        },
+        {
+          "label": "normal",
+          "sample": 4802560,
+          "t": 100.053
+        },
+        {
+          "label": "hold",
+          "sample": 6242304,
+          "t": 130.048
+        }
+      ],
+      "events": [
+        {
+          "t": 96.04,
+          "label": "hold",
+          "movingSec": 0
+        }
+      ]
+    },
+    {
+      "file": "take-2026-11-15T00-21-03-758Z.json",
+      "track": "empty",
+      "recordedSeconds": 70.19,
+      "labels": [
+        {
+          "label": "moving",
+          "sample": 0,
+          "t": 0
+        },
+        {
+          "label": "empty room",
+          "sample": 483328,
+          "t": 10.069
+        },
+        {
+          "label": "returned",
+          "sample": 2352000,
+          "t": 49
+        }
+      ],
+      "events": [
+        {
+          "t": 46.34,
+          "label": "empty room",
+          "movingSec": 0
+        }
+      ]
+    },
+    {
+      "file": "take-2026-11-15T02-29-17-848Z.json",
+      "track": "walkside1",
+      "recordedSeconds": 128.13,
+      "labels": [
+        {
+          "label": "normal",
+          "sample": 0,
+          "t": 0
+        },
+        {
+          "label": "moving",
+          "sample": 2881536,
+          "t": 60.032
+        },
+        {
+          "label": "empty room",
+          "sample": 3264512,
+          "t": 68.011
+        }
+      ],
+      "events": [
+        {
+          "t": 77.7,
+          "label": "empty room",
+          "movingSec": 10.88
+        }
+      ]
+    },
+    {
+      "file": "take-2026-11-15T02-33-46-365Z.json",
+      "track": "walkside2",
+      "recordedSeconds": 128.17,
+      "labels": [
+        {
+          "label": "normal",
+          "sample": 0,
+          "t": 0
+        },
+        {
+          "label": "moving",
+          "sample": 2883584,
+          "t": 60.075
+        },
+        {
+          "label": "empty room",
+          "sample": 3266560,
+          "t": 68.053
+        }
+      ],
+      "events": [
+        {
+          "t": 77.27,
+          "label": "empty room",
+          "movingSec": 8.96
+        }
+      ]
+    },
+    {
+      "file": "take-2026-11-15T02-37-55-422Z.json",
+      "track": "walkaway1",
+      "recordedSeconds": 114.82,
+      "labels": [
+        {
+          "label": "normal",
+          "sample": 0,
+          "t": 0
+        },
+        {
+          "label": "moving",
+          "sample": 2883584,
+          "t": 60.075
+        },
+        {
+          "label": "empty room",
+          "sample": 3268608,
+          "t": 68.096
+        }
+      ],
+      "events": [
+        {
+          "t": 77.7,
+          "label": "empty room",
+          "movingSec": 9.17
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "walkAlarms": 3,
+    "holdAlarms": 11,
+    "minimumWalkMovement": 8.96,
+    "maximumHoldMovement": 8.53,
+    "cutoffSweep": [
+      {
+        "threshold": 4,
+        "walkAlarmsSuppressed": 3,
+        "holdAlarmsSuppressed": 1
+      },
+      {
+        "threshold": 6,
+        "walkAlarmsSuppressed": 3,
+        "holdAlarmsSuppressed": 1
+      },
+      {
+        "threshold": 8,
+        "walkAlarmsSuppressed": 3,
+        "holdAlarmsSuppressed": 1
+      },
+      {
+        "threshold": 8.96,
+        "walkAlarmsSuppressed": 3,
+        "holdAlarmsSuppressed": 0
+      },
+      {
+        "threshold": 10,
+        "walkAlarmsSuppressed": 1,
+        "holdAlarmsSuppressed": 0
+      }
+    ]
+  }
+}
