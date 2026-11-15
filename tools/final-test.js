@@ -4,7 +4,7 @@
 //   Detector: dsp.js frozen at commit FROZEN, whatever the working copy is by then.
 // Usage: node tools/final-test.js
 const { execSync } = require('child_process'), fs = require('fs'), os = require('os'), path = require('path');
-const PLAN = 'normal 50, hold 20, normal 30, hold 20, normal 30, hold 20, normal 20', CUTOFF = '2026-11-15T14-50', FROZEN = '9ac6d15';
+const PLAN = 'normal 50, hold 20, normal 30, hold 20, normal 30, hold 20, normal 20', CUTOFF = '2026-11-15T14-50', FROZEN = '4da096a';
 const frozen = path.join(os.tmpdir(), `dsp-${FROZEN}.js`);
 fs.writeFileSync(frozen, execSync(`git show ${FROZEN}:dsp.js`, { cwd: path.join(__dirname, '..') }));
 process.env.DSP = frozen;
