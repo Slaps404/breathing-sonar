@@ -493,7 +493,10 @@ function cir(p, frame) {
 }
 
 class RangeSonar {
-  constructor({ minR = 0.2, maxR = 1.2, showR = 3, zone = [0.29, 0.57], probe = {} } = {}) {
+  // maxR 0.8 m: the person sits 30-50 cm away. Searching to 1.2 m let it lock onto a dog breathing at 114 cm
+  // (app take 15-46-24); to 0.8 m the same take locks at 40 cm, where the breath hold shows most, and the first
+  // lock of the 10 older labelled takes does not change (caught 21/29 vs 20/29, false alarms 12 vs 10).
+  constructor({ minR = 0.2, maxR = 0.8, showR = 3, zone = [0.29, 0.57], probe = {} } = {}) {
     this.mode = 'range';
     this.p = makeProbe(probe); this.rate = this.p.rate; this.dr = this.p.dr;   // probe: e.g. { f0: 18000, f1: 20000 } for phones that cut sound above 20 kHz
     this.chs = Array.from({ length: this.p.L }, () => makeChannel(this.p.lambda, this.rate));
