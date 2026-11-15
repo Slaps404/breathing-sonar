@@ -165,7 +165,7 @@
     searching: ['Finding your breathing.', 'Sit still for a few seconds.', ''],
     watching: ['Watching your breathing.', () => `${contact.friendName} gets a call only if it stops.`, 'on'],
     lost: ["Can't find you.", 'Sit back in front of the screen, chest facing it.', 'lost'],
-    deaf: ["Can't hear my own sound.", 'Not watching. Turn the volume up, unplug headphones, and set Mic Mode to Standard.', 'lost'],
+    deaf: ["Can't hear my own sound.", 'Not watching. Unmute the speaker and turn it up. No headphones. Mic Mode: Standard.', 'lost'],
   };
   function setStatus(s) {
     const [title, sub, dot] = STATUS[s] || STATUS.searching;

@@ -26,7 +26,13 @@ window.SonarHooks = {
   // label(); starts 'normal') and events (status, detector, alarm, taps; set with mark()). stop() downloads
   // take-<time>.wav + .json in the collectors' format, so `node tools/replay-take.js <path>` replays it.
   async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug, onWarmup }) {
-    const LOST_MS = 3000, VOLUME = 0.7, DEAF_DB = 20;
+    const LOST_MS = 3000, DEAF_DB = 20;
+    // Probe loudness sets itself, like screen brightness: start quiet and step up only until the mic hears the
+    // probe TARGET_DB above the noise next to its band, then stay put (a level change later would look like a
+    // change in breathing). A quiet room settles low, a loud room goes higher. Why not always loud: app takes
+    // at 0.7 had 17 dB more sound just under 20 kHz (audible, irritating) than recorder takes at 0.15, with
+    // the same probe level in the mic. 60 dB is inside what the recorded takes had (62-72 dB).
+    const LEVELS = [0.1, 0.2, 0.4, 0.7], TARGET_DB = 60, STEP_MS = 1500, VOLUME = LEVELS[0];
     // Browsers hide the mic API on plain http pages that are not localhost (e.g. http://192.168.x.x).
     if (!navigator.mediaDevices) {
       throw new Error('this browser blocks the mic on ' + location.origin +
@@ -45,11 +51,15 @@ window.SonarHooks = {
     ctx.createMediaStreamSource(stream).connect(node);
     node.connect(ctx.destination);
 
-    let status = null, movingSince = null;
+    let status = null, movingSince = null, level = 0, levelAt = performance.now(), tuned = false;
     const setStatus = s => { if (s !== status) { status = s; take.mark('status: ' + s); onStatus(s); } };
     setStatus('searching');
     const timer = setInterval(() => {
       const now = performance.now();
+      if (!tuned && now - levelAt > STEP_MS) {
+        if (sonar.snr >= TARGET_DB || level === LEVELS.length - 1) { tuned = true; take.mark(`volume: ${LEVELS[level]} (probe ${sonar.snr.toFixed(0)} dB)`); }
+        else { level++; levelAt = now; node.port.postMessage({ amp: LEVELS[level] }); }
+      }
       const res = sonar.analyze(now);
       if (res && res.event === 'start') { take.mark('detector: stopped (' + res.why + ')'); onBreathingStopped(); }
       if (res && res.event === 'end') { take.mark('detector: resumed'); onBreathingResumed(); }
