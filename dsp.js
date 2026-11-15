@@ -502,15 +502,13 @@ class RangeSonar {
   setLock(rangeM) { this.manual = true; this.setZone(rangeM); }   // user picked the distance: no auto moves
   setZone(rangeM) {
     this.lock = Math.round(rangeM / this.dr);
+    this.zoneMove = this.lastMove ?? -Infinity;
     this.zone = [Math.max(0.2, rangeM - ZONE.back), rangeM + ZONE.ahead];   // chest echoes plus their later bounces
     const M = this.apnea.M; this.apnea = makeHold(); this.apnea.M = M;     // new zone = new level; keep movement floor
   }
-  // Once a second: score every slice in minR..maxR and keep a slow (30 s) average. Each window
-  // counts in proportion to how much of it the person was still, so movement barely counts but
-  // never starves the picker. The zone goes on the strongest slice among those whose score is
-  // within ZONE.near of the best (strongest = best snr). It moves only when the current slice falls
-  // out of that group and no hold is suspected. During a hold every slice looks like noise, so the
-  // scores sink evenly and the zone stays put.
+  // Score echoes once a second. Once acquired, keep the distance during stillness:
+  // changing rhythm scores are not evidence that the person changed position.
+  // Body movement permits a new pick after settling. Manual picks stay fixed.
   pickZone(nowMs) {
     const winMs = ZONE.n / this.rate * 1000, log = this.stillLog;
     log.push([nowMs, this.apnea.moving !== true]);
@@ -530,7 +528,11 @@ class RangeSonar {
     let b = null;
     for (let r = r0; r <= r1; r++) if (S(r) >= top - ZONE.near && (b === null || z.snr[r] > z.snr[b])) b = r;
     this.zscore = Array.from({ length: r1 + 1 }, (_, r) => (r < r0 ? null : S(r)));   // for display / debugging
-    if (this.lock === null) return this.setZone(b * this.dr);
+    if (this.lock === null) {
+      if (nowMs < winMs + ZONE.settleSec * 1000) return; // let the initial echo ranking settle before locking
+      return this.setZone(b * this.dr);
+    }
+    if ((this.lastMove ?? -Infinity) <= this.zoneMove) return;
     if (S(this.lock) < top - ZONE.near && !this.apnea.alerting && this.apnea.holdStart === null) this.setZone(b * this.dr);
   }
   analyze(nowMs) {
