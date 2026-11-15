@@ -5,7 +5,7 @@
 (function () {
   const $ = id => document.getElementById(id);
   const STORE_KEY = 'breathing-sonar.contact';
-  const COUNTDOWN_S = 15;   // time to tap "I'm okay" (or be seen breathing again) before the friend is phoned
+  const COUNTDOWN_S = 6;    // time to tap "I'm okay" before the friend is phoned. 15 s gave resumed breathing time to clear the alarm by itself (1.5-4 s), but was too slow for the demo: tap to cancel
 
   let contact = null;       // { friendName, friendPhone, userName, place }
   let session = null;       // what startMonitoring returned: { stop() }
