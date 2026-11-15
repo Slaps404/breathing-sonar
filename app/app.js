@@ -15,6 +15,11 @@
   let wakeLock = null;
   // Quiet mode: the alarm only shows on screen (no beep, no voice), so a demo room is not disturbed.
   const QUIET_KEY = 'breathing-sonar.quiet';
+  // ElevenLabs voice for both the alarm on this screen and the phone call. One clip per voice in voices/<id>.mp3.
+  const VOICE_KEY = 'breathing-sonar.voice';
+  try { const v = localStorage.getItem(VOICE_KEY); if (v && $('voice').querySelector(`option[value="${v}"]`)) $('voice').value = v; } catch (e) { /* no storage */ }
+  $('voice').addEventListener('change', () => { try { localStorage.setItem(VOICE_KEY, $('voice').value); } catch (e) { /* no storage */ } });
+  $('hearVoice').addEventListener('click', () => { try { new Audio(`voices/${$('voice').value}.mp3`).play(); } catch (e) { /* no audio */ } });
   let quiet = false;
   try { quiet = localStorage.getItem(QUIET_KEY) === '1'; } catch (e) { /* no storage */ }
   if (new URLSearchParams(location.search).has('quiet')) quiet = true;   // app/?quiet opens with sound off
@@ -118,6 +123,7 @@
       friendName: $('friendName').value.trim(),
       friendPhone: toE164($('friendPhone').value),
       userName: $('userName').value.trim(),
+      voiceId: $('voice').value,
       place: $('place').value.trim(),
     };
     save(contact);
@@ -263,7 +269,7 @@
     // Recorded voice (ElevenLabs clip). If it cannot play, the browser's own voice says the line instead.
     const say = () => { try { speechSynthesis.speak(new SpeechSynthesisUtterance('Are you okay? Tap the screen.')); } catch (e) { /* no speech */ } };
     try {
-      voice = new Audio('alert.mp3');
+      voice = new Audio(`voices/${$('voice').value}.mp3`);
       voice.play().catch(() => { if (voice) say(); });
     } catch (e) { say(); }
   }

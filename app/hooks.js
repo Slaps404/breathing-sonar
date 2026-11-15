@@ -149,6 +149,7 @@ window.SonarHooks = {
         friends: [{ name: contact.friendName, phone: contact.friendPhone }],
         userName: contact.userName,
         place: contact.place,
+        voiceId: contact.voiceId,
       }),
     });
     const body = await res.json().catch(() => ({}));

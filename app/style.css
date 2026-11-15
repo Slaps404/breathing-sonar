@@ -175,3 +175,6 @@ body.alarming .pill.ghost { background: transparent; color: #fff4ec; border-colo
   .jtop { flex-direction: column; }
   #jDepth { height: 220px; }
 }
+.voicerow { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 12px; }
+.voicerow select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); }
+#hearVoice { text-decoration: underline; padding: 4px 0; }

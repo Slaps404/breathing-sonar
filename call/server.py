@@ -45,8 +45,8 @@ def env():
     return keys
 
 
-def post(keys, path, body):
-    req = Request(API + path, json.dumps(body).encode(), method="POST",
+def post(keys, path, body, method="POST"):
+    req = Request(API + path, json.dumps(body).encode(), method=method,
                   headers={"xi-api-key": keys["ELEVENLABS_API_KEY"], "Content-Type": "application/json"})
     try:
         with urlopen(req, timeout=30) as r:
@@ -66,11 +66,15 @@ def setup(keys):
     if "agent_id" not in state:
         state["agent_id"] = post(keys, "/agents/create", {"name": "Sonar breathing alert", "conversation_config": {
             "agent": {"first_message": FIRST, "language": "en", "prompt": {"prompt": PROMPT}}}})["agent_id"]
+    if not state.get("voice_override"):   # let each call pick its voice (the app's voice setting)
+        post(keys, f"/agents/{state['agent_id']}", {"platform_settings": {"overrides": {
+            "conversation_config_override": {"tts": {"voice_id": True}}}}}, method="PATCH")
+        state["voice_override"] = True
     STATE.write_text(json.dumps(state, indent=1))
     return state
 
 
-def call_all(keys, state, friends, user_name, place):
+def call_all(keys, state, friends, user_name, place, voice_id=None):
     """Ring every friend at the same time. Returns one result per friend."""
     def one(f):
         others = [g["name"] for g in friends if g is not f]
@@ -80,7 +84,8 @@ def call_all(keys, state, friends, user_name, place):
                 "agent_id": state["agent_id"], "agent_phone_number_id": state["phone_number_id"], "to_number": f["phone"],
                 "conversation_initiation_client_data": {"dynamic_variables": {
                     "friend_name": f["name"], "user_name": user_name, "place": place,
-                    "place_phrase": f" at {place}" if place else "", "others_phrase": others_phrase}}})
+                    "place_phrase": f" at {place}" if place else "", "others_phrase": others_phrase},
+                    **({"conversation_config_override": {"tts": {"voice_id": voice_id}}} if voice_id else {})}})
             return {"name": f["name"], "phone": f["phone"], "ok": bool(r.get("success")), "detail": r.get("message")}
         except Exception as err:
             return {"name": f["name"], "phone": f["phone"], "ok": False, "detail": str(err)}
@@ -114,7 +119,9 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError("no friends to call")
         except (ValueError, KeyError, TypeError) as err:
             return self.reply(400, {"error": f"bad request: {err}"})
-        results = call_all(self.keys, self.state, friends, data.get("userName", "your friend"), data.get("place", ""))
+        voice = data.get("voiceId")
+        voice = voice if isinstance(voice, str) and voice.isalnum() and len(voice) <= 40 else None
+        results = call_all(self.keys, self.state, friends, data.get("userName", "your friend"), data.get("place", ""), voice)
         print("call:", [(r["name"], r["ok"], r["detail"]) for r in results], flush=True)
         self.reply(200 if any(r["ok"] for r in results) else 502, {"results": results})
 
