@@ -26,7 +26,8 @@ PORT = 8788
 
 FIRST = ("Hi {{friend_name}}. This is an automated safety alert for {{user_name}}. "
          "Their breathing appears to have stopped{{place_phrase}}, and they did not answer a check on their laptop. "
-         "Please check on them right now. {{text_phrase}}If you cannot reach them, call 911. {{others_phrase}}")
+         "Please check on them right now. {{text_phrase}}If you cannot reach them, call 911. {{others_phrase}}"
+         "Will you check on {{user_name}} now? Please say yes so I know you heard.")
 PROMPT = """You are an automated safety alert calling on behalf of {{user_name}}.
 A laptop breathing monitor saw their breathing stop{{place_phrase}}, and they did not press "I'm okay" on screen.
 You already told {{friend_name}} this. Your only job: make sure they understood and will check on {{user_name}} now.
@@ -36,6 +37,9 @@ cause, no other location). If asked, say you are an automated alert and they sho
 {{user_name}}. Once they say they will check, say thank you and use the end_call tool.
 If you reach voicemail, a call screener, or get no answer after asking twice, repeat the alert once and use end_call.
 Never say goodbye without using end_call in the same turn."""
+# Off: US carriers block texts from a number without A2P 10DLC registration (Twilio error 30034),
+# and Twilio only reports that after the call has started, so the agent would say "I'm texting you" falsely.
+SEND_SMS = False
 SMS = ("Sonar safety alert: {user}'s breathing appears to have stopped and they did not respond. "
        "Check on them now. If you cannot reach them, call 911.\nLocation: {where}")
 
@@ -120,7 +124,8 @@ def call_all(keys, state, friends, user_name, place, voice_id=None, lat=None, ln
     def one(f):
         others = [g["name"] for g in friends if g is not f]
         others_phrase = ("I am also calling " + " and ".join(others) + ".") if others else ""
-        sms_err = send_sms(keys, f["phone"], SMS.format(user=user_name, where=where(place, lat, lng)))
+        sms_err = (send_sms(keys, f["phone"], SMS.format(user=user_name, where=where(place, lat, lng)))
+                   if SEND_SMS else "off (SEND_SMS = False)")
         text_phrase = "" if sms_err else "I'm texting you their location now. "
         try:
             r = post(keys, "/twilio/outbound-call", {
