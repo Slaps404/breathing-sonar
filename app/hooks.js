@@ -18,7 +18,8 @@ window.SonarHooks = {
   //   onBreathingStopped()    breathing was there and has now stopped
   //   onBreathingResumed()    breathing came back (cancels a pending call)
   //   onWave(mm, rate)        optional. Chest movement in mm over the last 20 s (rate samples/s),
-  //                           the same signal the test page draws (sonar.analyze(...).ch.disp)
+  //                           the same signal the test page draws (sonar.analyze(...).ch.disp).
+  //                           While searching it is a rough preview instead (sonar.preview()), from second 1.
   //   onDebug(snapshot)       optional. Everything the judge view draws, ~5 times a second (see snapshot below)
   // Returns { stop(), mark(event), label(name) }. Throws if the mic is refused: the UI shows the message.
   // Records the run: every mic frame, labels (what the person says they are doing: 'normal' / 'hold', set with
@@ -52,7 +53,8 @@ window.SonarHooks = {
       const res = sonar.analyze(now);
       if (res && res.event === 'start') { take.mark('detector: stopped (' + res.why + ')'); onBreathingStopped(); }
       if (res && res.event === 'end') { take.mark('detector: resumed'); onBreathingResumed(); }
-      if (res && onWave) onWave(res.ch.disp, sonar.rate);
+      // Before the chest slice is found, draw a rough line from the slice that moves most (sonar.preview).
+      if (onWave) onWave(res ? res.ch.disp : sonar.preview(), sonar.rate);
       if (onDebug) onDebug(window.SonarHooks.snapshot(sonar, res));
       // Warm-up: analyze() returns nothing until it has 15 s of echoes (dsp.js), so report how far along that is.
       if (onWarmup) onWarmup(Math.min(1, sonar.frames / (15 * sonar.rate)));

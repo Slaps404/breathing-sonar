@@ -582,6 +582,30 @@ class RangeSonar {
     // Commit one fresh pick, even if it chooses the same distance, then freeze again.
     if (reacquiring) this.setZone(b * this.dr);
   }
+  // Rough movement line (mm, up to the last 20 s) for the screen before the chest slice is locked, so the
+  // graph moves from the first second. Not used by any detector, and changes no detector state.
+  // Slice = the one in range that moved most over the last 5 s (motion-by-range, this.depth). It only
+  // switches when another slice moves 1.5x more, so the line does not jump between neighbours.
+  // Same straight-line projection as analyzeChannel uses before it has a clean ring.
+  preview(winSec = 20) {
+    if (this.i0 === null || this.depth.length < 2) return [];
+    const r0 = Math.max(1, Math.ceil(this.minR / this.dr)), r1 = Math.round(this.maxR / this.dr);
+    const k = Math.min(this.depth.length, Math.round(5 * this.rate)), mot = [];
+    let b = r0;
+    for (let r = r0; r <= r1; r++) {
+      mot[r] = 0; for (let i = this.depth.length - k; i < this.depth.length; i++) mot[r] += this.depth[i][r];
+      if (mot[r] > mot[b]) b = r;
+    }
+    if (this.pre == null || mot[b] > 1.5 * mot[this.pre]) this.pre = b;
+    const ch = this.chs[this.tap(this.pre)], n = Math.min(ch.I.length, Math.round(winSec * this.rate)), a0 = ch.I.length - n;
+    let mx = 0, my = 0; for (let i = a0; i < a0 + n; i++) { mx += ch.I[i]; my += ch.Q[i]; } mx /= n; my /= n;
+    let cxx = 0, cxy = 0, cyy = 0;
+    for (let i = a0; i < a0 + n; i++) { const dx = ch.I[i] - mx, dy = ch.Q[i] - my; cxx += dx * dx; cxy += dx * dy; cyy += dy * dy; }
+    const th = 0.5 * Math.atan2(2 * cxy, cxx - cyy), R = Math.hypot(mx, my) || 1, mm = -ch.lambda / (4 * Math.PI) * 1000;
+    const disp = new Array(n);
+    for (let i = 0; i < n; i++) disp[i] = ((ch.I[a0 + i] - mx) * Math.cos(th) + (ch.Q[a0 + i] - my) * Math.sin(th)) / R * mm;
+    return detrend(movingAvg(disp, Math.max(1, Math.round(this.rate / 4))));
+  }
   analyze(nowMs) {
     if (this.i0 === null || this.frames < 15 * this.rate) return null;
     const r0 = Math.round(this.zone[0] / this.dr), r1 = Math.round(this.zone[1] / this.dr);
