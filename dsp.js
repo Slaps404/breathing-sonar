@@ -301,7 +301,10 @@ function holdStep(st, feat, nowMs) {
 // or if there is no clear rhythm at all (quality <= SLOW.q; below ~5/min the rate cannot be read).
 // Alert when SLOW.on of the last SLOW.winSec is slow; clear when it falls under SLOW.off. Ticks while
 // moving count as not slow. Simulation: true 6/8/10/15 per min reads 6.0/7.8/10.2/15.0.
-const SLOW = { bpm: 8.5, q: 0.25, winSec: 30, on: 0.8, off: 0.5 };
+// enabled: false = still measured (judge view, takes) but never raises the alarm. Off until the rate is
+// trustworthy: on real takes it read 6-9/min during normal breathing (drift wins the spectrum at its 6/min
+// edge), and 'no clear rhythm' while fidgeting counted as slow (false alarm on take 2026-11-15T01-56).
+const SLOW = { enabled: false, bpm: 8.5, q: 0.25, winSec: 30, on: 0.8, off: 0.5 };
 function makeSlow() { return { alerting: false, log: [] }; }
 function slowStep(st, ch, moving, nowMs) {
   st.log.push([nowMs, !moving && (ch.quality <= SLOW.q || ch.bpm < SLOW.bpm)]);
@@ -503,7 +506,7 @@ class RangeSonar {
     slowStep(this.slow, ch, this.apnea.moving === true, nowMs);
     // one alarm for both detectors: 'start' when the first one fires, 'end' when both have cleared
     const was = this.alerting;
-    this.alerting = this.apnea.alerting || this.slow.alerting;
+    this.alerting = this.apnea.alerting || (SLOW.enabled && this.slow.alerting);
     if (this.alerting) this.why ??= this.apnea.alerting ? 'hold' : 'slow'; else this.why = null;
     return { ch, event: !was && this.alerting ? 'start' : was && !this.alerting ? 'end' : null, why: this.why };
   }
