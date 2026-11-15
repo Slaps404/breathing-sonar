@@ -60,6 +60,10 @@ class SonarApp(rumps.App):
         signal.signal(signal.SIGTERM, lambda *_: setattr(self, "stop_requested", True))
         self.toggle = rumps.MenuItem("Start recording", callback=self.on_toggle)
         self.items = {text: rumps.MenuItem(text, callback=self.on_label) for text in LABELS}
+        # Came back before the take ended (break, early return from Step away): mark the moment,
+        # so the time after it is not counted as an empty room.
+        self.back_item = rumps.MenuItem("I'm back (mark it)", callback=self.on_back)
+        self.back_at = None
         self.status = rumps.MenuItem("Not recording")
         self.distance = rumps.MenuItem("Distance: not set")
         for text in DISTANCES:
@@ -79,7 +83,7 @@ class SonarApp(rumps.App):
             self.tier_menu.add(rumps.MenuItem(tracks.label(n), callback=self.on_tier))
         self.refresh_track()
         self.menu = [self.next_item, self.tier_menu, None, self.toggle, self.status, None, self.guided, self.plan_item, None,
-                     *self.items.values(), None, self.distance, None,
+                     *self.items.values(), self.back_item, None, self.distance, None,
                      rumps.MenuItem("Open data folder", callback=self.on_open),
                      rumps.MenuItem("Quit", callback=self.on_quit)]
 
@@ -185,6 +189,8 @@ class SonarApp(rumps.App):
             g["i"] = i
             self.set_label(MENU_TEXT[steps[i][0]])
         nxt = "next: " + CUES[steps[i + 1][0]].lower() if i + 1 < len(steps) else "last one"
+        if self.back_at is not None:
+            nxt = f"marked back at {self.back_at:.0f} s, " + nxt
         self.overlay.show(f"{CUES[steps[i][0]]}  {g['ends'][i] - now:.0f}", f"{i + 1} of {len(steps)}, {nxt}", steps[i][0])
 
     def end_guide(self, word):
@@ -229,6 +235,13 @@ class SonarApp(rumps.App):
         if self.rec.running:
             self.set_label(sender.title)
 
+    def on_back(self, _):
+        if not self.rec.running:
+            alert("Not recording", "I'm back marks the moment you returned during a take.")
+            return
+        self.rec.label("returned")
+        self.back_at = self.rec.seconds()
+
     def on_distance(self, sender):
         # Logged with its sample count, so you can change distance in the middle of a take.
         self.rec.set_distance(DISTANCES[sender.title])
@@ -243,6 +256,7 @@ class SonarApp(rumps.App):
             item.state = int(name == text)
 
     def save(self):
+        self.back_at = None
         meta = self.rec.stop()
         self.toggle.title = "Start recording"
         self.title = IDLE
