@@ -1,0 +1,21 @@
+<!doctype html><meta charset="utf-8"><title>B: why</title><script src="lib.js"></script><script>
+// Prototype B: the problem in one number, big type on cream. Number: 75.5% of US overdose deaths 2022-2024 happened
+// with the person alone (CDC SUDORS, n = 191,577; sandhacks/research/reports/08_vitals_need.md line 31).
+const P = LIGHT;
+setup((c, t) => {
+  c.fillStyle = P.bg; c.fillRect(0, 0, W, H);
+  const n = 75.5 * ease(clamp((t - 0.4) / 2.2)), a1 = show(t, 0.2, 6.6);
+  text(c, n.toFixed(1) + '%', W / 2, 235, { size: 190, color: P.text, alpha: a1, weight: 500 });
+  text(c, 'of overdose deaths happen when the person is alone.', W / 2, 400, { size: 40, color: P.text, alpha: a1 * seg(t, 2.2, 3.0), maxW: 900 });
+  // 40 dots, about 3 in 4 turn amber
+  for (let i = 0; i < 40; i++) { const x = W / 2 - 19.5 * 26 + i * 26, on = i < 30, k = seg(t, 3.2 + i * 0.03, 3.6 + i * 0.03); c.globalAlpha = a1 * seg(t, 2.8, 3.4); c.fillStyle = on && k > 0.5 ? P.warn : P.line; c.beginPath(); c.arc(x, 500, 8, 0, 7); c.fill(); }
+  c.globalAlpha = 1;
+  text(c, 'CDC SUDORS, United States, 2022-2024, 191,577 deaths', W / 2, 560, { size: 20, color: P.soft, alpha: a1 * seg(t, 3.4, 4.2), font: SANS });
+  text(c, 'An overdose slows breathing, then stops it.', W / 2, 310, { size: 52, color: P.text, alpha: show(t, 6.8, 9.6), maxW: 1000 });
+  text(c, 'If no one is there, no one knows.', W / 2, 400, { size: 52, color: P.alarm, alpha: show(t, 7.8, 9.6), maxW: 1000 });
+  text(c, 'What if the laptop noticed?', W / 2, H / 2, { size: 68, color: P.text, alpha: show(t, 9.8, 12.2) });
+  text(c, 'BreathBuddy', W / 2, 300, { size: 92, color: P.text, alpha: seg(t, 12.4, 13.0), weight: 500 });
+  text(c, 'Listens for your breathing with sound. Phones a friend if it stops.', W / 2, 410, { size: 32, color: P.text, alpha: seg(t, 12.9, 13.5), maxW: 900 });
+  text(c, 'Prototype. Not a medical device.', W / 2, 500, { size: 22, color: P.soft, alpha: seg(t, 13.3, 13.9), font: SANS });
+}, 15.5);
+</script>
