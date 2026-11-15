@@ -5,7 +5,7 @@
 (function () {
   const $ = id => document.getElementById(id);
   const STORE_KEY = 'breathing-sonar.contact';
-  const COUNTDOWN_S = 15;   // time to tap "I'm okay" before the friend is phoned
+  const COUNTDOWN_S = 6;    // time to tap "I'm okay" before the friend is phoned
 
   let contact = null;       // { friendName, friendPhone, userName, place }
   let session = null;       // what startMonitoring returned: { stop() }
