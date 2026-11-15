@@ -20,6 +20,9 @@ LABELS = {
     "Holding breath": "hold",
     "Moving around": "moving",
     "Away from laptop": "empty room",
+    "Falling": "fall",
+    "Slumping": "slump",
+    "Breathing slowly": "slow",
 }
 # rough chest-to-laptop distance, menu text -> centimetres
 DISTANCES = {"About 20 cm": 20, "About 30 cm": 30, "About 40 cm": 40, "About 50 cm": 50, "About 60 cm": 60,
@@ -78,11 +81,12 @@ class SonarApp(rumps.App):
         # Friend track: a list of set-up takes (tracks.py). The tier picks how many.
         self.track_step = None          # step id of the guided take running now, if it came from the track
         self.next_item = rumps.MenuItem("Next take", callback=self.on_next)
+        self.event_item = rumps.MenuItem("Next test event", callback=self.on_next_event)
         self.tier_menu = rumps.MenuItem("How much to help")
         for n in tracks.NAMES:
             self.tier_menu.add(rumps.MenuItem(tracks.label(n), callback=self.on_tier))
         self.refresh_track()
-        self.menu = [self.next_item, self.tier_menu, None, self.toggle, self.status, None, self.guided, self.plan_item, None,
+        self.menu = [self.next_item, self.tier_menu, self.event_item, None, self.toggle, self.status, None, self.guided, self.plan_item, None,
                      *self.items.values(), self.back_item, None, self.distance, None,
                      rumps.MenuItem("Open data folder", callback=self.on_open),
                      rumps.MenuItem("Quit", callback=self.on_quit)]
@@ -112,6 +116,9 @@ class SonarApp(rumps.App):
         left, total = len(tracks.todo(n)), tracks.count(n)
         self.next_item.title = (f"Next take ({total - left + 1} of {total})" if left
                                 else f"All {total} takes done, thank you! Quit to save")
+        ev_left, ev_total = len(tracks.events_todo()), len(tracks.EVENTS)
+        self.event_item.title = (f"Next test event ({ev_total - ev_left + 1} of {ev_total})" if ev_left
+                                 else f"All {ev_total} test events done")
 
     def on_tier(self, sender):
         tracks.set_tier(next(k for k in tracks.NAMES if tracks.label(k) == sender.title))
@@ -127,9 +134,23 @@ class SonarApp(rumps.App):
             alert("All done", "Thank you! Choose Quit to pack the takes into a zip on your Desktop.\n"
                         "Want to help more? Pick a bigger option under How much to help.")
             return
-        step_id, _, cm, plan, setup = todo[0]
         k = tracks.count(n) - len(todo) + 1
-        if not alert(f"Take {k} of {tracks.count(n)}", setup + "\n\nAfter you click Start: hands off the laptop, "
+        self.start_step(todo[0], f"Take {k} of {tracks.count(n)}")
+
+    def on_next_event(self, _):
+        if self.guide or self.rec.running:
+            alert("Finish the current take first")
+            return
+        todo = tracks.events_todo()
+        if not todo:
+            alert("All test events done", "Thank you!")
+            return
+        k = len(tracks.EVENTS) - len(todo) + 1
+        self.start_step(todo[0], f"Test event {k} of {len(tracks.EVENTS)}: {todo[0][0]}")
+
+    def start_step(self, step, title):
+        step_id, _, cm, plan, setup = step
+        if not alert(title, setup + "\n\nAfter you click Start: hands off the laptop, "
                            "and follow the banner at the top of the screen.", ok="Start", cancel="Not now"):
             return
         if cm:

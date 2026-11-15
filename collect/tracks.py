@@ -31,6 +31,26 @@ STEPS = [
      "Lie down (couch or bed) with the laptop on a table about 1 m away, facing you."),
 ]
 
+# Test events: one continuous take each, you breathing first and then the event, so a detector can be
+# checked on the before and after. Separate from the friend tiers; progress shares track-done.txt.
+SIT = "Sit upright about 40 cm from the screen. "
+EVENTS = [
+    *[(f"walkaway{i}", 0, 40, "normal 60, moving 8, away 60",
+       SIT + f"When the banner says MOVE AROUND, get up and walk out of the room{via}. "
+       "Stay away until it says SAVED. If you come back early, click I'm back in the menu.")
+      for i, via in [(1, ""), (2, " a different way"), (3, " a third way, or just to the far side of the room")]],
+    *[(f"fall{i}", 0, 40, "normal 60, fall 5, hold 25, slow 30",
+       SIT + "Put a cushion or mattress on the floor first. Do NOT really fall. When the banner says SLIDE TO "
+       "THE FLOOR, slide out of the chair onto it and go limp. Then hold your breath, then breathe slowly "
+       "(about one breath every 10-15 s), lying still.") for i in (1, 2, 3)],
+    *[(f"slump{i}", 0, 40, "normal 60, slump 5, hold 25, slow 30",
+       SIT + "When the banner says SLUMP IN CHAIR, slump like you are nodding off and stay slumped. "
+       "Then hold your breath, then breathe slowly (about one breath every 10-15 s).") for i in (1, 2, 3)],
+    *[(f"slow{i}", 0, 40, "slow 90",
+       SIT + "Breathe slowly the whole time: about 4-6 breaths a minute, one breath every 10-15 s.")
+      for i in (1, 2)],
+]
+
 TIER_FILE, DONE_FILE = DATA / "track.txt", DATA / "track-done.txt"
 
 
@@ -59,6 +79,11 @@ def todo(n):
     """Steps in tier n (and below) not done yet, in order."""
     d = done()
     return [s for s in STEPS if s[1] <= n and s[0] not in d]
+
+
+def events_todo():
+    d = done()
+    return [s for s in EVENTS if s[0] not in d]
 
 
 def count(n):
