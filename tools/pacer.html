@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><title>Breathing pacer</title>
+<!-- Silent visual pacer for a known-rate take: 100 s at 15 breaths/min, then 95 s at 6 breaths/min. Click to start. -->
+<style>body{margin:0;background:#111;color:#eee;font:28px system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:24px}
+#c{width:120px;height:120px;border-radius:50%;background:#3a9;transform:scale(.5)}#s{font-size:64px}</style>
+<div id="s">Click to start</div><div id="c"></div><div id="i"></div>
+<script>
+const PARTS = [{ sec: 100, cycle: 4, name: '15 per minute (2 s in, 2 s out)' }, { sec: 95, cycle: 10, name: '6 per minute (5 s in, 5 s out)' }];
+let t0 = null;
+onclick = () => { if (t0 === null) { t0 = performance.now(); requestAnimationFrame(tick); } };
+function tick() {
+  let t = (performance.now() - t0) / 1000, part = PARTS[0];
+  if (t >= PARTS[0].sec) { t -= PARTS[0].sec; part = PARTS[1]; }
+  if (part === PARTS[1] && t >= part.sec) { s.textContent = 'Done'; i.textContent = ''; c.style.transform = 'scale(.5)'; return; }
+  const ph = (t % part.cycle) / part.cycle, breatheIn = ph < 0.5;
+  c.style.transform = `scale(${0.5 + 0.5 * (1 - Math.cos(2 * Math.PI * ph))})`;   // biggest at the top of the breath
+  s.textContent = breatheIn ? 'IN' : 'OUT';
+  i.textContent = `${part.name}   ${Math.ceil(part.sec - t)} s left`;
+  requestAnimationFrame(tick);
+}
+</script>
