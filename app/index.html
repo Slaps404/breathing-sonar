@@ -98,7 +98,7 @@
 
 <!-- 4. Watching -->
 <main id="s-watch" class="screen" hidden>
-  <div class="top"></div>
+  <div class="top"><span></span><button type="button" class="tiny" id="judgeBtn" aria-expanded="false">Show the sonar</button></div>
   <div class="mid center">
     <div class="dot" id="dot"></div>
     <h1 id="watchTitle">Finding your breathing.</h1>
@@ -135,6 +135,39 @@
   </div>
 </main>
 
+<!-- Judge view: what the sonar sees, live. Opened from the watch screen (button or "s"). Stays up during the alarm. -->
+<aside id="judge" class="judge" hidden aria-label="What the sonar sees">
+  <h2>What the sonar sees</h2>
+  <div class="jtop">
+    <figure class="jdepth">
+      <canvas id="jDepth" role="img" aria-label="Motion by distance, last 20 seconds"></canvas>
+      <figcaption>Echo motion by distance from the laptop, last 20 s. Bright = moving. Right: how much each distance repeats like breathing. The box is the slice it picked as your chest.</figcaption>
+    </figure>
+    <div class="jstate" id="jState">
+      <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="60" r="50" class="track"/>
+        <circle cx="60" cy="60" r="50" class="arc" id="jArc" pathLength="100" stroke-dasharray="0 100"/>
+      </svg>
+      <div class="jlabel" id="jLabel">Starting</div>
+      <div class="jsub" id="jSub"></div>
+      <div class="jmeter">
+        <div class="jcap">Breathing strength vs your normal</div>
+        <div class="bar"><span id="jLevel"></span><i id="jMark"></i></div>
+        <div class="jcap" id="jLevelTxt"></div>
+      </div>
+      <div class="jmeter">
+        <div class="jcap" id="jRate"></div>
+        <div class="bar"><span id="jSlow"></span><i id="jSlowMark"></i></div>
+        <div class="jcap" id="jSlowTxt"></div>
+      </div>
+    </div>
+  </div>
+  <figure class="jwave">
+    <canvas id="jWave" role="img" aria-label="Chest movement, last 20 seconds"></canvas>
+    <figcaption id="jWaveCap">Chest movement, last 20 s</figcaption>
+  </figure>
+</aside>
+
 <p class="stub" id="stub" hidden>stub:
   <a href="#" data-sim="stopped">stops</a>
   <a href="#" data-sim="resumed">resumes</a>
@@ -144,6 +177,7 @@
 
 <script src="../dsp.js"></script>
 <script src="hooks.js"></script>
+<script src="judge.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

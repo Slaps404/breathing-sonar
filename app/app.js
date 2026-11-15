@@ -13,6 +13,7 @@
   let beeper = null;
   let voice = null;         // the alarm voice clip while it plays
   let wakeLock = null;
+  let judgeOpen = false;    // judge view (judge.js) toggled on from the watch screen
 
   // Wording and the sit picture follow the device.
   const DEVICE = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) ? 'phone' : 'laptop';
@@ -22,6 +23,7 @@
   function show(name) {
     for (const el of document.querySelectorAll('.screen')) el.hidden = el.id !== 's-' + name;
     document.body.classList.toggle('alarming', name === 'alarm' || name === 'called');
+    showJudge(name);
     const firstEmpty = [...$('s-' + name).querySelectorAll('input')].find(i => !i.value);
     if (firstEmpty && DEVICE === 'laptop') firstEmpty.focus(); // on phones this would pop the keyboard over the question
     window.scrollTo(0, 0);
@@ -116,6 +118,7 @@
         onBreathingStopped: startAlarm,
         onBreathingResumed: cancelAlarm,
         onWave: drawWave,
+        onDebug: JudgeView.update,
       });
     } catch (err) {
       $('sitErr').textContent = 'Could not start: ' + (err && err.message ? err.message : 'microphone not available') +
@@ -167,6 +170,17 @@
     });
     g.stroke();
   }
+
+  // Judge view: what the sonar sees (judge.js). It stays up through the alarm and call screens,
+  // so the moment of detection shows next to "Are you okay?".
+  function showJudge(name = [...document.querySelectorAll('.screen')].find(el => !el.hidden).id.slice(2)) {
+    const on = judgeOpen && ['watch', 'alarm', 'called'].includes(name);
+    $('judge').hidden = !on;
+    document.body.classList.toggle('judge-open', on);
+    $('judgeBtn').textContent = judgeOpen ? 'Hide the sonar' : 'Show the sonar';
+    $('judgeBtn').setAttribute('aria-expanded', String(judgeOpen));
+  }
+  function toggleJudge() { judgeOpen = !judgeOpen; showJudge(); }
 
   // A sleeping device cannot watch anything, so ask the browser to keep the screen on.
   async function keepAwake() {
@@ -265,7 +279,12 @@
   $('stop').addEventListener('click', stopAll);
   $('stop2').addEventListener('click', stopAll);
   $('s-alarm').addEventListener('click', cancelAlarm);          // tap anywhere
-  document.addEventListener('keydown', () => { if (countTimer) cancelAlarm(); });
+  // During the countdown any key means "I'm okay", so "s" must not also toggle the judge view there.
+  document.addEventListener('keydown', e => {
+    if (countTimer) { cancelAlarm(); return; }
+    if (e.key === 's' && !e.metaKey && !e.ctrlKey && !e.altKey && !$('s-watch').hidden) toggleJudge();
+  });
+  $('judgeBtn').addEventListener('click', toggleJudge);
   $('resume').addEventListener('click', () => show('watch'));
   for (const el of document.querySelectorAll('[data-go]')) {
     el.addEventListener('click', e => { e.preventDefault(); show(el.dataset.go); });
