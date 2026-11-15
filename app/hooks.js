@@ -43,7 +43,10 @@ window.SonarHooks = {
     });
     const ctx = new AudioContext({ sampleRate: DSP.SR, latencyHint: 'interactive' });
     await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([DSP.PROBE_WORKLET], { type: 'application/javascript' })));
-    const sonar = new DSP.RangeSonar();
+    // app/?band=18 plays 18-20 kHz instead of 20-22. An iPhone take at 20-22 kHz heard the probe ~74 dB weaker
+    // than the Mac (speaker or mic cuts above 20 kHz). 18-19 kHz can be faintly audible to young listeners.
+    const band = +new URLSearchParams(location.search).get('band');
+    const sonar = new DSP.RangeSonar(band ? { probe: { f0: band * 1000, f1: band * 1000 + 2000 } } : {});
     const node = new AudioWorkletNode(ctx, 'probe', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
       processorOptions: { signal: sonar.p.sig, amp: VOLUME } });
     const take = window.SonarHooks.makeTake(sonar.p, VOLUME, stream.getAudioTracks()[0]?.label || '');
