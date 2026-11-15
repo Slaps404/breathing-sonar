@@ -1,0 +1,450 @@
+[
+  {
+    "confirmationSeconds": -1,
+    "file": "take-2026-11-15T03-09-51-923Z.wav",
+    "holds": 3,
+    "hits": 3,
+    "premature": 1,
+    "falseSeconds": 10.879999999999988,
+    "holdSeconds": 24.7466666666667,
+    "recoveries": [
+      3.498333333333335,
+      6.698666666666668,
+      3.9256666666666717
+    ],
+    "events": [
+      {
+        "t": 72.36266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 78.54933333333334,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 108.84266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 115.88266666666667,
+        "type": "end",
+        "label": "hold"
+      },
+      {
+        "t": 123.136,
+        "type": "start",
+        "label": "normal"
+      },
+      {
+        "t": 126.76266666666666,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 150.22933333333333,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 169.00266666666667,
+        "type": "end",
+        "label": "normal"
+      }
+    ]
+  },
+  {
+    "confirmationSeconds": 0,
+    "file": "take-2026-11-15T03-09-51-923Z.wav",
+    "holds": 3,
+    "hits": 3,
+    "premature": 1,
+    "falseSeconds": 10.879999999999988,
+    "holdSeconds": 24.7466666666667,
+    "recoveries": [
+      3.498333333333335,
+      6.698666666666668,
+      3.9256666666666717
+    ],
+    "events": [
+      {
+        "t": 72.36266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 78.54933333333334,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 108.84266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 115.88266666666667,
+        "type": "end",
+        "label": "hold"
+      },
+      {
+        "t": 123.136,
+        "type": "start",
+        "label": "normal"
+      },
+      {
+        "t": 126.76266666666666,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 150.22933333333333,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 169.00266666666667,
+        "type": "end",
+        "label": "normal"
+      }
+    ]
+  },
+  {
+    "confirmationSeconds": 0.4,
+    "file": "take-2026-11-15T03-09-51-923Z.wav",
+    "holds": 3,
+    "hits": 3,
+    "premature": 1,
+    "falseSeconds": 11.519999999999987,
+    "holdSeconds": 24.960000000000036,
+    "recoveries": [
+      3.711666666666659,
+      6.912000000000006,
+      4.13900000000001
+    ],
+    "events": [
+      {
+        "t": 72.36266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 78.76266666666666,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 108.84266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 116.096,
+        "type": "end",
+        "label": "hold"
+      },
+      {
+        "t": 123.136,
+        "type": "start",
+        "label": "normal"
+      },
+      {
+        "t": 126.976,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 150.22933333333333,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 169.216,
+        "type": "end",
+        "label": "normal"
+      }
+    ]
+  },
+  {
+    "confirmationSeconds": 0.8,
+    "file": "take-2026-11-15T03-09-51-923Z.wav",
+    "holds": 3,
+    "hits": 3,
+    "premature": 1,
+    "falseSeconds": 12.799999999999985,
+    "holdSeconds": 25.386666666666706,
+    "recoveries": [
+      4.138333333333335,
+      7.3386666666666684,
+      4.565666666666658
+    ],
+    "events": [
+      {
+        "t": 72.36266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 79.18933333333334,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 108.84266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 116.52266666666667,
+        "type": "end",
+        "label": "hold"
+      },
+      {
+        "t": 123.136,
+        "type": "start",
+        "label": "normal"
+      },
+      {
+        "t": 127.40266666666666,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 150.22933333333333,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 169.64266666666666,
+        "type": "end",
+        "label": "normal"
+      }
+    ]
+  },
+  {
+    "confirmationSeconds": 1,
+    "file": "take-2026-11-15T03-09-51-923Z.wav",
+    "holds": 3,
+    "hits": 3,
+    "premature": 1,
+    "falseSeconds": 13.439999999999984,
+    "holdSeconds": 25.60000000000004,
+    "recoveries": [
+      4.3516666666666595,
+      7.552000000000007,
+      4.778999999999996
+    ],
+    "events": [
+      {
+        "t": 72.36266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 79.40266666666666,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 108.84266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 116.736,
+        "type": "end",
+        "label": "hold"
+      },
+      {
+        "t": 123.136,
+        "type": "start",
+        "label": "normal"
+      },
+      {
+        "t": 127.616,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 150.22933333333333,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 169.856,
+        "type": "end",
+        "label": "normal"
+      }
+    ]
+  },
+  {
+    "confirmationSeconds": 1.5,
+    "file": "take-2026-11-15T03-09-51-923Z.wav",
+    "holds": 3,
+    "hits": 3,
+    "premature": 1,
+    "falseSeconds": 15.35999999999998,
+    "holdSeconds": 26.240000000000045,
+    "recoveries": [
+      4.99166666666666,
+      8.192000000000007,
+      5.419000000000011
+    ],
+    "events": [
+      {
+        "t": 72.36266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 80.04266666666666,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 108.84266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 117.376,
+        "type": "end",
+        "label": "hold"
+      },
+      {
+        "t": 123.136,
+        "type": "start",
+        "label": "normal"
+      },
+      {
+        "t": 128.256,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 150.22933333333333,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 170.496,
+        "type": "end",
+        "label": "normal"
+      }
+    ]
+  },
+  {
+    "confirmationSeconds": 2,
+    "file": "take-2026-11-15T03-09-51-923Z.wav",
+    "holds": 3,
+    "hits": 3,
+    "premature": 1,
+    "falseSeconds": 16.639999999999983,
+    "holdSeconds": 26.666666666666714,
+    "recoveries": [
+      5.4183333333333366,
+      8.618666666666684,
+      5.845666666666659
+    ],
+    "events": [
+      {
+        "t": 72.36266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 80.46933333333334,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 108.84266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 117.80266666666667,
+        "type": "end",
+        "label": "hold"
+      },
+      {
+        "t": 123.136,
+        "type": "start",
+        "label": "normal"
+      },
+      {
+        "t": 128.68266666666668,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 150.22933333333333,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 170.92266666666666,
+        "type": "end",
+        "label": "normal"
+      }
+    ]
+  },
+  {
+    "confirmationSeconds": 3,
+    "file": "take-2026-11-15T03-09-51-923Z.wav",
+    "holds": 3,
+    "hits": 3,
+    "premature": 1,
+    "falseSeconds": 19.840000000000003,
+    "holdSeconds": 27.733333333333388,
+    "recoveries": [
+      6.484999999999999,
+      9.685333333333347,
+      6.912333333333322
+    ],
+    "events": [
+      {
+        "t": 72.36266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 81.536,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 108.84266666666667,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 118.86933333333333,
+        "type": "end",
+        "label": "hold"
+      },
+      {
+        "t": 123.136,
+        "type": "start",
+        "label": "normal"
+      },
+      {
+        "t": 129.74933333333334,
+        "type": "end",
+        "label": "normal"
+      },
+      {
+        "t": 150.22933333333333,
+        "type": "start",
+        "label": "hold"
+      },
+      {
+        "t": 171.98933333333332,
+        "type": "end",
+        "label": "normal"
+      }
+    ]
+  }
+]
