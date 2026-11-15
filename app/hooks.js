@@ -69,6 +69,7 @@ window.SonarHooks = {
   // Also used by offline tests (node), which replay a recorded take through the same code.
   //   depth      last 20 s of motion-by-distance columns (each nShow slices of dr metres; the test page's depth view)
   //   lock       chest slice index (null until found); minR/maxR = search range in metres
+  //   zscore     breathing-rhythm score per slice (about 0.5 = noise, 0.6-0.8 = a breathing chest); how the chest was picked
   //   wave       chest movement in mm (null until found), bpm and quality of its rhythm
   //   hold       breath-hold detector: still = seconds without movement, below = seconds under the alarm
   //              level, level/base = breathing strength now / normal (dB), ready = has a normal yet
@@ -78,7 +79,7 @@ window.SonarHooks = {
     const h = sonar.apnea, log = sonar.slow.log;
     return {
       depth: sonar.depth, nShow: sonar.nShow, dr: sonar.dr, rate: sonar.rate,
-      lock: sonar.lock, minR: sonar.minR, maxR: sonar.maxR,
+      lock: sonar.lock, minR: sonar.minR, maxR: sonar.maxR, zscore: sonar.zscore,
       wave: res ? res.ch.disp : null, bpm: res ? res.ch.bpm : null, quality: res ? res.ch.quality : 0,
       hold: { still: h.quiet, below: h.below, moving: h.moving === true, alerting: h.alerting,
         ready: h.B.length >= 45, level: h.level ?? null, base: h.base ?? null },   // 45: same test as holdStep in dsp.js
