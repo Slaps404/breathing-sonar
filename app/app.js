@@ -21,7 +21,7 @@
   const DEBUG = store.get(DEBUG_KEY) === '1';
   document.body.classList.toggle('debug', DEBUG);
 
-  // Dev options (set from the dashboard). Off the dashboard, every run is recorded and the call is real.
+  // Dev options (set from the dashboard). Off the dashboard, nothing is recorded and the call is real.
   const dev = { fake: false, record: true, realCall: true };
 
   let contact = null;       // { friendName, friendPhone, userName, place, homeAddress, voiceId }
@@ -288,7 +288,7 @@
         onWarmup: setWarmup,
         onDebug: DEBUG ? JudgeView.update : null,      // the sonar view lives in the dev dashboard
         onMark: ev => emit('mark', ev),
-        record: !DEBUG || dev.record,                    // every run is kept and downloads on Stop (demo day: each run gets checked); in dev mode the Record switch decides
+        record: DEBUG && dev.record,                     // keep the raw audio only for dev runs (visitors should not get a file download on Stop)
         fake: DEBUG && dev.fake,
       });
     } catch (err) {
