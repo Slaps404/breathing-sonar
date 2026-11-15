@@ -93,6 +93,13 @@ body.is-phone .only-laptop, body.is-laptop .only-phone { display: none; }
 @keyframes glow { 0%, 100% { box-shadow: 0 0 0 6px rgba(111, 174, 146, 0.18); } 50% { box-shadow: 0 0 0 14px rgba(111, 174, 146, 0.08); } }
 @media (prefers-reduced-motion: reduce) { .dot.on { animation: none; } }
 #s-watch h1, #s-called h1 { margin-bottom: 4px; }
+/* Warm-up bar: fills over the sonar's first 15 s, then pulses while it still looks for breathing */
+.warm { width: 100%; max-width: 240px; height: 6px; margin-top: 20px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.warm[hidden] { display: none; }
+.warm > div { height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width 0.2s linear; }
+.warm.full > div { animation: warmPulse 1.6s ease-in-out infinite; }
+@keyframes warmPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .warm.full > div { animation: none; } }
 canvas.wave { display: block; width: 100%; max-width: 320px; height: 56px; margin-top: 22px; color: var(--soft); opacity: 0.8; }
 
 /* Alarm and called: same layout, the whole page changes colour */

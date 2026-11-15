@@ -141,6 +141,7 @@
         onBreathingResumed: cancelAlarm,
         onWave: drawWave,
         onDebug: JudgeView.update,
+        onWarmup: setWarmup,
       });
     } catch (err) {
       $('sitErr').textContent = 'Could not start: ' + (err && err.message ? err.message : 'microphone not available') +
@@ -150,6 +151,7 @@
       return;
     }
     $('start').disabled = false;
+    setWarmup(0);
     drawWave([], 1);
     keepAwake();
     show('watch');
@@ -167,6 +169,21 @@
     $('watchTitle').textContent = title;
     $('watchSub').textContent = typeof sub === 'function' ? sub() : sub;
     $('dot').className = 'dot ' + dot;
+    status = s;
+    $('warm').hidden = s !== 'searching';
+    if (s === 'searching') setWarmup(warm);
+  }
+
+  // Warm-up bar while searching. The first 15 s are a fixed wait (the sonar needs that much data), so
+  // show seconds left. After that it still needs a still moment to lock on, which has no fixed length.
+  let status = 'searching', warm = 0;
+  function setWarmup(f) {
+    warm = f;
+    if (status !== 'searching') return;
+    $('warmFill').style.width = Math.round(f * 100) + '%';
+    $('warm').setAttribute('aria-valuenow', Math.round(f * 100));
+    $('warm').classList.toggle('full', f >= 1);
+    $('watchSub').textContent = f < 1 ? `Sit still. About ${Math.ceil(15 * (1 - f))} s left.` : 'Almost there. Keep still.';
   }
 
   // Breathing line: chest movement over the last 20 s, newest on the right. Like the test page,

@@ -14,6 +14,7 @@ window.SonarHooks = {
   //   onStatus('searching')   no steady breathing found yet (the sonar needs ~15 s of data first)
   //   onStatus('watching')    breathing found and being tracked
   //   onStatus('lost')        moving for more than LOST_MS, so breathing cannot be judged
+  //   onWarmup(f)             0..1, share of the 15 s of data the sonar needs before it can find breathing
   //   onBreathingStopped()    breathing was there and has now stopped
   //   onBreathingResumed()    breathing came back (cancels a pending call)
   //   onWave(mm, rate)        optional. Chest movement in mm over the last 20 s (rate samples/s),
@@ -23,7 +24,7 @@ window.SonarHooks = {
   // Records the run: every mic frame, labels (what the person says they are doing: 'normal' / 'hold', set with
   // label(); starts 'normal') and events (status, detector, alarm, taps; set with mark()). stop() downloads
   // take-<time>.wav + .json in the collectors' format, so `node tools/replay-take.js <path>` replays it.
-  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug }) {
+  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug, onWarmup }) {
     const LOST_MS = 3000, VOLUME = 0.7;
     // Browsers hide the mic API on plain http pages that are not localhost (e.g. http://192.168.x.x).
     if (!navigator.mediaDevices) {
@@ -53,6 +54,8 @@ window.SonarHooks = {
       if (res && res.event === 'end') { take.mark('detector: resumed'); onBreathingResumed(); }
       if (res && onWave) onWave(res.ch.disp, sonar.rate);
       if (onDebug) onDebug(window.SonarHooks.snapshot(sonar, res));
+      // Warm-up: analyze() returns nothing until it has 15 s of echoes (dsp.js), so report how far along that is.
+      if (onWarmup) onWarmup(Math.min(1, sonar.frames / (15 * sonar.rate)));
       movingSince = sonar.apnea.moving === true ? (movingSince ?? now) : null;
       if (movingSince !== null && now - movingSince > LOST_MS) setStatus('lost');
       else if (res) setStatus('watching');
