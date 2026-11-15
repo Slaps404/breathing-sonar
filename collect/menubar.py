@@ -174,12 +174,16 @@ class SonarApp(rumps.App):
             return
         plan = plan or self.plan
         self.guide = {"plan": plan, "steps": parse_plan(plan), "i": -1, "t0": time.monotonic(), "ends": []}
+        near = "Chest 1/2 arm from screen (~40 cm). Sit still and breathe normally."
+        back = "Move back to 1 arm (~70 cm). Keep the laptop stationary."
+        far = "Stay at 1 arm (~70 cm). Sit still and breathe normally."
+        far_hold = "Stay at 1 arm (~70 cm). Hold your breath and stay still."
         if self.guide["steps"] == [("normal", 90), ("moving", 15), ("normal", 90)]:
-            self.guide["positions"] = [
-                "Chest 1/2 arm from screen (~40 cm). Sit still and breathe normally.",
-                "Move back to 1 arm (~70 cm). Keep the laptop stationary.",
-                "Stay at 1 arm (~70 cm). Sit still and breathe normally.",
-            ]
+            self.guide["positions"] = [near, back, far]
+        # far-distance hold test: does the alarm catch a breath hold after moving back?
+        # 75 s at the new distance first: the zone is re-picked ~32 s after movement, then needs ~10 s of level history
+        elif self.guide["steps"] == [("normal", 60), ("moving", 15), ("normal", 75), ("hold", 15), ("normal", 30), ("hold", 15), ("normal", 20)]:
+            self.guide["positions"] = [near, back, far, far_hold, far, far_hold, far]
         self.overlay = self.overlay or Overlay()
         self.guided.title = "Cancel guided take"
         self.guide_timer.start()
