@@ -54,7 +54,7 @@ window.SonarHooks = {
     ctx.createMediaStreamSource(stream).connect(node);
     node.connect(ctx.destination);
 
-    let status = null, movingSince = null, level = 0, levelAt = performance.now(), tuned = false;
+    let status = null, movingSince = null, level = 0, levelAt = performance.now(), tuned = false, deaf = false, alarmUp = false;
     const setStatus = s => { if (s !== status) { status = s; take.mark('status: ' + s); onStatus(s); } };
     setStatus('searching');
     const timer = setInterval(() => {
@@ -63,18 +63,25 @@ window.SonarHooks = {
         if (sonar.snr >= TARGET_DB || level === LEVELS.length - 1) { tuned = true; take.mark(`volume: ${LEVELS[level]} (probe ${sonar.snr.toFixed(0)} dB)`); }
         else { level++; levelAt = now; node.port.postMessage({ amp: LEVELS[level] }); }
       }
+      // The mic must hear the speaker's own probe, or nothing below means anything. Working takes read 32-72 dB;
+      // a run with no probe in the mic read -2 dB and still said "watching" (take 05-44-51). Deaf below DEAF_DB,
+      // hearing again 10 dB above it (so the status does not flicker at the edge).
+      if (sonar.frames > 2 * sonar.rate) deaf = sonar.snr < DEAF_DB + (deaf ? 10 : 0);
       const res = sonar.analyze(now);
-      if (res && res.event === 'start') { take.mark('detector: stopped (' + res.why + ')'); onBreathingStopped(); }
-      if (res && res.event === 'end') { take.mark('detector: resumed'); onBreathingResumed(); }
+      // Losing the probe (speaker muted mid-run) looks exactly like breathing stopping: replays alarmed 8-11 s
+      // after a mute. That is not a person in trouble, so no alarm and no call while deaf; the screen says why.
+      if (res && res.event === 'start') {
+        if (deaf) take.mark('detector: stopped (' + res.why + '), ignored: probe not heard');
+        else { alarmUp = true; take.mark('detector: stopped (' + res.why + ')'); onBreathingStopped(); }
+      }
+      if (res && res.event === 'end') { take.mark('detector: resumed'); if (alarmUp) { alarmUp = false; onBreathingResumed(); } }
       // Before the chest slice is found, draw a rough line from the slice that moves most (sonar.preview).
       if (onWave) onWave(res ? res.ch.disp : sonar.preview(), sonar.rate);
       if (onDebug) onDebug(window.SonarHooks.snapshot(sonar, res));
       // Warm-up: analyze() returns nothing until it has 15 s of echoes (dsp.js), so report how far along that is.
       if (onWarmup) onWarmup(Math.min(1, sonar.frames / (15 * sonar.rate)));
       movingSince = sonar.apnea.moving === true ? (movingSince ?? now) : null;
-      // The mic must hear the speaker's own 20-22 kHz sound, or nothing below means anything. Working takes
-      // read 43-72 dB; a run with no probe in the mic read -2 dB and still said "watching" (take 05-44-51).
-      if (sonar.frames > 2 * sonar.rate && sonar.snr < DEAF_DB) setStatus('deaf');
+      if (deaf) setStatus('deaf');
       else if (movingSince !== null && now - movingSince > LOST_MS) setStatus('lost');
       else if (res) setStatus('watching');
       else if (status !== 'watching') setStatus('searching');
