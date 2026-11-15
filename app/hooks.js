@@ -16,8 +16,10 @@ window.SonarHooks = {
   //   onStatus('lost')        moving for more than LOST_MS, so breathing cannot be judged
   //   onBreathingStopped()    breathing was there and has now stopped
   //   onBreathingResumed()    breathing came back (cancels a pending call)
+  //   onWave(mm, rate)        optional. Chest movement in mm over the last 20 s (rate samples/s),
+  //                           the same signal the test page draws (sonar.analyze(...).ch.disp)
   // Returns { stop() }. Throws if the mic is refused: the UI shows the message.
-  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed }) {
+  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave }) {
     const LOST_MS = 3000, VOLUME = 0.7;
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
@@ -39,6 +41,7 @@ window.SonarHooks = {
       const res = sonar.analyze(now);
       if (res && res.event === 'start') onBreathingStopped();
       if (res && res.event === 'end') onBreathingResumed();
+      if (res && onWave) onWave(res.ch.disp, sonar.rate);
       movingSince = sonar.apnea.moving === true ? (movingSince ?? now) : null;
       if (movingSince !== null && now - movingSince > LOST_MS) setStatus('lost');
       else if (res) setStatus('watching');
