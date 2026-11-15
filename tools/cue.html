@@ -12,8 +12,8 @@ const t0 = performance.now();
   let t = (performance.now() - t0) / 1000 - lead, k = 'ready', left = -t, tin = 0;
   if (t >= 0) { k = 'done'; left = 0; for (const st of steps) { if (t < st.sec) { k = st.k; left = st.sec - t; tin = t; break; } t -= st.sec; } }
   s.textContent = SHOW[k][0]; document.body.style.background = SHOW[k][1]; n.textContent = k === 'done' ? '' : Math.ceil(left) + ' s';
-  // deep: circle grows 3 s, shrinks 3 s (10 breaths per minute). Other cues: no circle.
-  c.style.visibility = k === 'deep' ? 'visible' : 'hidden'; c.style.transform = `scale(${0.6 + 0.7 * (1 - Math.cos(2 * Math.PI * tin / 6)) / 2})`;
+  // deep: circle grows 4 s, shrinks 6 s, the same pace as the app's cloud. Other cues: no circle.
+  c.style.visibility = k === 'deep' ? 'visible' : 'hidden'; { const ph = tin % 10, g = ph < 4 ? ph / 4 : 1 - (ph - 4) / 6; c.style.transform = `scale(${0.6 + 0.7 * (1 - Math.cos(Math.PI * g)) / 2})`; }
   if (k !== 'done') requestAnimationFrame(tick);
 })();
 </script>
