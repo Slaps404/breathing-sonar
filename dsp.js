@@ -295,6 +295,45 @@ function holdStep(st, feat, nowMs) {
   return null;
 }
 
+// ---------- automatic zone: find the slices that breathe ----------
+// Breathing repeats: a chest slice's breathing-band (0.15-0.6 Hz) I/Q signal looks like itself
+// one breath later. Slow drift (far, weak echoes) and fidgeting also put power in that band, but
+// they do not repeat, so a power ratio cannot tell them apart and this can.
+// Score = best normalised autocorrelation at lags of 1.6-6.7 s (9-37 breaths/min), over the last
+// 512 frames (~22 s). Plain noise scores about 0.5, a breathing chest 0.6-0.8.
+// Also returns snr = breathing-band power over the slice's own 1-5 Hz power (dB, per Hz). Weak copies
+// of the chest's echo can repeat just as well, so ties go to the slice with the best snr. Raw power
+// would favour slices next to the direct path, where the speaker's own sound leaks in.
+// Offline evidence (2 takes): a breathing-band vs fast-band power ratio picked 91-142 cm on the still
+// take (chest at 28-40 cm); this score picked 28-40 cm.
+const ZONE = { n: 512, lagMin: 1.6, lagMax: 6.7, tauSec: 30, near: 0.05, back: 0.05, ahead: 0.23 };
+function periodicity(ch, rate, n = ZONE.n) {
+  if (ch.I.length < n) return null;
+  const re = new Float64Array(n), im = new Float64Array(n), a0 = ch.I.length - n;
+  for (let i = 0; i < n; i++) { re[i] = ch.I[a0 + i]; im[i] = ch.Q[a0 + i]; }
+  fft(re, im);                                   // keep only the breathing band (both signs)
+  let pb = 0, nb = 0, pf = 0, nf = 0;
+  for (let k = 0; k < n; k++) {
+    const f = Math.min(k, n - k) * rate / n, e = re[k] * re[k] + im[k] * im[k];
+    if (f >= 1 && f <= 5) { pf += e; nf++; }
+    if (f < 0.15 || f > 0.6) re[k] = im[k] = 0; else { pb += e; nb++; }
+  }
+  for (let k = 0; k < n; k++) im[k] = -im[k];    // inverse FFT = conj(fft(conj)); scale cancels below
+  fft(re, im);
+  for (let k = 0; k < n; k++) im[k] = -im[k];
+  let best = 0;
+  for (let L = Math.floor(ZONE.lagMin * rate); L < Math.floor(ZONE.lagMax * rate); L++) {
+    let cr = 0, ci = 0, e1 = 0, e2 = 0;
+    for (let i = 0; i + L < n; i++) {
+      const ar = re[i], ai = im[i], br = re[i + L], bi = im[i + L];
+      cr += ar * br + ai * bi; ci += ai * br - ar * bi;      // x[i] * conj(x[i+L])
+      e1 += ar * ar + ai * ai; e2 += br * br + bi * bi;
+    }
+    if (e1 > 0 && e2 > 0) best = Math.max(best, Math.hypot(cr, ci) / Math.sqrt(e1 * e2));
+  }
+  return { p: best, snr: 10 * Math.log10((pb / nb) / (pf / nf || 1e-30) + 1e-30) };
+}
+
 // ---------- Mode 1: steady tones ----------
 class ToneSonar {
   constructor(freqs, rate = 100) {
@@ -372,9 +411,10 @@ class RangeSonar {
     this.depth = [];          // last 20 s of motion-by-range columns, for the depth view
     this.i0 = null; this.frames = 0; this.snr = 0;
     this.minR = minR; this.maxR = maxR;
-    this.lock = null; this.manual = false; this.lastPick = -1e9; this.lowSince = null;
-    this.zone = zone;   // distances (m) the hold detector watches; setLock moves it
-    this.apnea = makeHold(); this.best = null; this.scores = [];
+    this.lock = null; this.manual = false; this.lastPick = -1e9;
+    this.zone = zone;   // distances (m) the hold detector watches; until the first auto pick, alerts are off
+    this.zscore = null; this.zs = null; this.stillLog = [];  // zone picker state (see pickZone)
+    this.apnea = makeHold(); this.best = null;
   }
   tap(rel) { return (this.i0 + rel) % this.p.L; }
   ingestFrame(frame) { const c = cir(this.p, frame); this.ingestCIR(c.re, c.im, c.snr); }
@@ -396,67 +436,56 @@ class RangeSonar {
       if (this.depth.length > 20 * this.rate) this.depth.shift();
     }
   }
-  setLock(rangeM) {
-    this.lock = Math.round(rangeM / this.dr); this.manual = true; this.apnea = makeHold();
-    this.zone = [Math.max(0.2, rangeM - 0.05), rangeM + 0.23];   // chest echoes plus their later bounces
+  setLock(rangeM) { this.manual = true; this.setZone(rangeM); }   // user picked the distance: no auto moves
+  setZone(rangeM) {
+    this.lock = Math.round(rangeM / this.dr);
+    this.zone = [Math.max(0.2, rangeM - ZONE.back), rangeM + ZONE.ahead];   // chest echoes plus their later bounces
+    const M = this.apnea.M; this.apnea = makeHold(); this.apnea.M = M;     // new zone = new level; keep movement floor
   }
-  // Score every slice in the subject zone: breathing-likeness x strength of the moving echo.
-  pick(nowMs) {
-    const r0 = Math.max(1, Math.round(this.minR / this.dr)), r1 = Math.round(this.maxR / this.dr);
-    this.scores = [];
-    let best = null;
-    for (let r = r0; r <= r1; r++) {
-      const ch = this.chs[this.tap(r)];
-      if (!analyzeChannel(ch)) continue;
-      // Is the motion real? Compare slow movement (distance from the average) with
-      // frame-to-frame jitter (noise). Far slices with weak echoes have mm-sized "motion"
-      // that is just noise; near slices have strong echoes but barely move.
-      const n = Math.min(ch.I.length, Math.round(20 * this.rate)), a0 = ch.I.length - n;
-      let mI = 0, mQ = 0;
-      for (let i = a0; i < ch.I.length; i++) { mI += ch.I[i]; mQ += ch.Q[i]; }
-      mI /= n; mQ /= n;
-      let slow = 0, jit = 0;
-      for (let i = a0; i < ch.I.length; i++) {
-        slow += (ch.I[i] - mI) ** 2 + (ch.Q[i] - mQ) ** 2;
-        if (i > a0) jit += ((ch.I[i] - ch.I[i - 1]) ** 2 + (ch.Q[i] - ch.Q[i - 1]) ** 2) / 2;
-      }
-      const motionSnr = Math.sqrt(slow / n) / (Math.sqrt(jit / (n - 1)) || 1e-12);
-      const s = ch.quality * Math.min(std(ch.disp), 20) * Math.min(1, motionSnr / 10);
-      this.scores.push([r, s]);
-      if (!best || s > best[1]) best = [r, s];
-    }
-    if (!best) return;
-    // Echoes of the chest that bounce off a desk or wall arrive later, so they look farther
-    // away and move in step with the breathing. The real chest is the nearest strong slice.
-    best = this.scores.find(sc => sc[1] >= 0.5 * best[1]);
-    if (this.lock === null) { this.lock = best[0]; return; }
+  // Once a second: score every slice in minR..maxR and keep a slow (30 s) average. Each window
+  // counts in proportion to how much of it the person was still, so movement barely counts but
+  // never starves the picker. The zone goes on the strongest slice among those whose score is
+  // within ZONE.near of the best (strongest = best snr). It moves only when the current slice falls
+  // out of that group and no hold is suspected. During a hold every slice looks like noise, so the
+  // scores sink evenly and the zone stays put.
+  pickZone(nowMs) {
+    const winMs = ZONE.n / this.rate * 1000, log = this.stillLog;
+    log.push([nowMs, this.apnea.moving !== true]);
+    while (log[0][0] < nowMs - winMs) log.shift();
     if (this.manual) return;
-    // Only move the lock if the current slice has looked dead for 20 s and we are not in a
-    // suspected hold. Otherwise a breath hold would make us jump to a passer-by.
-    const cur = this.chs[this.tap(this.lock)];
-    if (cur.quality < 0.3) this.lowSince ??= nowMs; else this.lowSince = null;
-    const curScore = (this.scores.find(s => s[0] === this.lock) || [0, 0])[1];
-    if (!this.apnea.alerting && this.apnea.holdStart === null && this.lowSince !== null &&
-        nowMs - this.lowSince > 20000 && best[1] > 2 * curScore) {
-      this.lock = best[0]; this.lowSince = null;
-    }
+    const r0 = Math.max(1, Math.ceil(this.minR / this.dr)), r1 = Math.round(this.maxR / this.dr);
+    const sc = []; for (let r = r0; r <= r1; r++) sc[r] = periodicity(this.chs[this.tap(r)], this.rate);
+    if (sc[r0] === null) return;
+    const w = log.filter(x => x[1]).length / log.length, d = 1 - 1 / ZONE.tauSec, z = this.zs ??= { p: [], snr: [], w: 0 };
+    z.w = d * z.w + w;
+    for (let r = r0; r <= r1; r++) { z.p[r] = d * (z.p[r] ?? 0) + w * sc[r].p; z.snr[r] = d * (z.snr[r] ?? 0) + w * sc[r].snr; }
+    if (z.w < 1) return;                                       // not one still window's worth yet
+    const S = r => z.p[r] / z.w;
+    let top = 0; for (let r = r0; r <= r1; r++) top = Math.max(top, S(r));
+    let b = null;
+    for (let r = r0; r <= r1; r++) if (S(r) >= top - ZONE.near && (b === null || z.snr[r] > z.snr[b])) b = r;
+    this.zscore = Array.from({ length: r1 + 1 }, (_, r) => (r < r0 ? null : S(r)));   // for display / debugging
+    if (this.lock === null) return this.setZone(b * this.dr);
+    if (S(this.lock) < top - ZONE.near && !this.apnea.alerting && this.apnea.holdStart === null) this.setZone(b * this.dr);
   }
   analyze(nowMs) {
     if (this.i0 === null || this.frames < 15 * this.rate) return null;
-    if (nowMs - this.lastPick >= 1000) { this.lastPick = nowMs; this.pick(nowMs); }
-    if (this.lock === null) return null;
-    const ch = this.chs[this.tap(this.lock)];
-    if (!analyzeChannel(ch)) return null;
-    this.best = ch;
     const r0 = Math.round(this.zone[0] / this.dr), r1 = Math.round(this.zone[1] / this.dr);
     const zone = [], fast = [];
     for (let r = r0; r <= r1; r++) zone.push(this.chs[this.tap(r)]);
     for (let r = 1; r <= 12; r++) fast.push(this.chs[this.tap(r)]);
-    return { ch, event: holdStep(this.apnea, holdFeatures(zone, fast, this.rate), nowMs) };
+    // runs before the first pick too, so the movement flag is ready to keep movement out of the scores
+    const event = holdStep(this.apnea, holdFeatures(zone, fast, this.rate), nowMs);
+    if (nowMs - this.lastPick >= 1000) { this.lastPick = nowMs; this.pickZone(nowMs); }
+    if (this.lock === null) return null;
+    const ch = this.chs[this.tap(this.lock)];
+    if (!analyzeChannel(ch)) return null;
+    this.best = ch;
+    return { ch, event };
   }
 }
 
 const api = { C, SR, TONE_WORKLET, PROBE_WORKLET, APNEA, std, fft, fitCircle, breathingSpectrum,
-  makeChannel, pushIQ, analyzeChannel, makeApnea, apneaStep, HOLD, makeHold, holdFeatures, holdStep, makeProbe, cir, ToneSonar, RangeSonar };
+  makeChannel, pushIQ, analyzeChannel, makeApnea, apneaStep, HOLD, makeHold, holdFeatures, holdStep, ZONE, periodicity, makeProbe, cir, ToneSonar, RangeSonar };
 if (typeof module !== 'undefined') module.exports = api; else window.DSP = api;
 })();
