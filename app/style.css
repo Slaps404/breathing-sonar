@@ -115,3 +115,61 @@ body.alarming .pill.ghost { background: transparent; color: #fff4ec; border-colo
   .sit { max-width: 220px; margin-bottom: 8px; }
   .lines { font-size: 16px; }
 }
+
+/* Judge view: a large panel beside the screens on a laptop, below them on a narrow screen.
+   It keeps its own colours so it stays readable while the page turns red for the alarm. */
+#judgeBtn { text-decoration: underline; padding: 4px 0; }
+.judge {
+  background: var(--bg); color: var(--text); border: 2px solid var(--line); border-radius: 22px;
+  padding: 18px 22px 14px; margin: 14px; transition: border-color 0.3s;
+}
+.judge[hidden] { display: none; }
+.judge.red { border-color: var(--bad); }
+.judge h2 { font: 600 14px system-ui, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: var(--soft); margin: 0 0 12px; }
+.judge figure { margin: 0; }
+.judge figcaption, .jcap { color: var(--soft); font-size: 13px; line-height: 1.35; margin-top: 6px; }
+.jtop { display: flex; gap: 22px; align-items: stretch; }
+.jdepth { flex: 1.5; min-width: 0; }
+#jDepth { display: block; width: 100%; height: 300px; border-radius: 12px; }
+.jwave { margin-top: 16px; }
+#jWave { display: block; width: 100%; height: 150px; }
+
+.jstate { flex: 1; min-width: 210px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.ring { width: 130px; height: 130px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 10; }
+.ring .track { stroke: var(--line); transition: stroke 0.3s; }
+.ring .arc { stroke: var(--warn); stroke-linecap: round; transition: stroke-dasharray 0.2s linear, stroke 0.3s; }
+.jlabel { font: 600 24px/1.2 system-ui, sans-serif; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.jsub { color: var(--soft); font-size: 14px; min-height: 2.6em; margin-top: 2px; }
+.jstate[data-state="ok"] .track { stroke: var(--accent); }
+.jstate[data-state="ok"] .jlabel { color: var(--accent); }
+.jstate[data-state="moving"] .track { stroke: var(--warn); }
+.jstate[data-state="moving"] .jlabel { color: var(--warn); }
+.jstate[data-state="below"] .arc { stroke: var(--bad); }
+.jstate[data-state="below"] .jlabel { color: var(--bad); }
+.jstate[data-state="alarm"] .track, .jstate[data-state="alarm"] .arc { stroke: var(--bad); }
+.jstate[data-state="alarm"] .jlabel { color: var(--bad); font-size: 28px; }
+.jstate.pulse .ring { animation: jpulse 0.6s ease-out 3; }
+@keyframes jpulse {
+  0% { transform: rotate(-90deg) scale(1); filter: drop-shadow(0 0 0 rgba(181, 72, 58, 0.8)); }
+  40% { transform: rotate(-90deg) scale(1.14); filter: drop-shadow(0 0 16px rgba(181, 72, 58, 0.9)); }
+  100% { transform: rotate(-90deg) scale(1); filter: drop-shadow(0 0 0 rgba(181, 72, 58, 0)); }
+}
+@media (prefers-reduced-motion: reduce) { .jstate.pulse .ring { animation: none; } }
+
+.jmeter { width: 100%; margin-top: 12px; text-align: left; }
+.bar { position: relative; height: 10px; border-radius: 5px; background: var(--line); margin-top: 4px; }
+.bar span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--accent); transition: width 0.2s linear; }
+.bar span.low { background: var(--bad); }
+.bar i { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--text); }
+
+/* Laptop: the active screen on the left, the judge view filling the rest */
+@media (min-width: 900px) {
+  body.judge-open { display: flex; align-items: flex-start; justify-content: center; }
+  body.judge-open .screen { flex: 0 0 400px; margin: 0; }
+  body.judge-open .judge { flex: 1; max-width: 900px; margin: 20px 20px 20px 0; position: sticky; top: 20px; }
+}
+@media (max-width: 640px) {
+  .jtop { flex-direction: column; }
+  #jDepth { height: 220px; }
+}
