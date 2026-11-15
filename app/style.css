@@ -20,7 +20,7 @@
   --panel: #f8fbfa;
   --cloud: #d3e3e8;
   --cloud-top: #ffffff;
-  --warm: #c0612b;
+  --sky: #dbe8eb;
   --cloud-edge: #b3c9cf;
   --ink: #0c151d;
   --cheek: #f29b93;
@@ -32,7 +32,7 @@
   :root {
     --bg: #0c151d; --text: #e3ecee; --soft: #8ea2ab; --field: #13202a; --line: #22323d;
     --pill: #e3ecee; --pilltext: #0c151d; --echo: #6fdcc0; --echo-soft: #2b6b5e; --accent: #6fdcc0;
-    --alarm: #7a1f2b; --cloud: #c9dbe2; --cloud-top: #ffffff; --cloud-edge: #ffffff00; --contour: #2c5149; --warm: #ffb48a; --halo: rgba(111, 220, 192, 0.16); --desk: #060a0e; --bezel: #000; --panel: #13202a;
+    --alarm: #7a1f2b; --cloud: #c9dbe2; --cloud-top: #ffffff; --cloud-edge: #ffffff00; --sky: #16242e; --desk: #060a0e; --bezel: #000; --panel: #13202a;
   }
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -98,7 +98,7 @@ h1.huge { font-size: 46px; margin: 26px 0 10px; }
 .hello-h { text-wrap: balance; font-size: 36px; margin: 34px 0 12px; }
 .kicker { font-size: 16px; color: var(--soft); margin: 0 0 6px; }
 .soft { color: var(--soft); font-size: 15.5px; margin: 14px 0 0; }
-.lead { font-size: 19px; margin: 0; }
+.lead { font-size: 18px; margin: 0; color: var(--soft); text-wrap: pretty; }
 .lead.strong { font-weight: 700; }
 .tiny { color: var(--soft); font-size: 13px; line-height: 1.4; margin: 0; }
 
@@ -126,7 +126,7 @@ input.bad { border-color: var(--bad); animation: shake 0.35s; }
 .pill.ghost { background: transparent; color: var(--text); border: 1.5px solid var(--line); font-weight: 600; box-shadow: none; }
 .pill.danger { color: var(--bad); }
 .textbtn { color: var(--soft); font-size: 15.5px; font-weight: 600; padding: 10px 4px; align-self: flex-start; }
-.mid.center .textbtn { align-self: center; }
+.mid.center .textbtn, #s-hello .bot .textbtn { align-self: center; }
 .top .textbtn { padding: 8px 4px; }
 .back, .iconbtn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--soft); flex: none; }
 .back:active, .iconbtn:active { background: var(--line); }
@@ -146,16 +146,13 @@ input.bad { border-color: var(--bad); animation: shake 0.35s; }
 .steps i.on:last-of-type, .steps i.on:has(+ i:not(.on)) { width: 38px; }
 
 /* ---------- Welcome mark: an echo. Rings ping out, a breath line drifts through (10 s, 4 in / 6 out) ---------- */
-.echo { position: relative; width: 240px; height: 240px; display: grid; place-items: center; }
-.echo .rings { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.echo .contour { fill: none; stroke: var(--contour, var(--line)); stroke-width: 1.5; }
-/* Soft light behind the cloud; only dark mode sets --halo, light mode already has a bright background */
-.echo::before { content: ""; position: absolute; inset: -30px; border-radius: 50%; background: radial-gradient(closest-side, var(--halo, transparent), transparent); }
-.echo .ping { fill: none; stroke: var(--echo); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: ping-out 5s ease-out infinite; }
-.echo .p2 { animation-delay: 2.5s; }
-@keyframes ping-out { from { opacity: 0.8; transform: scale(0.6); } to { opacity: 0; transform: scale(2.2); } }
+/* A round patch of sky the cloud floats in, with one slow echo leaving its edge */
+.echo { position: relative; width: 260px; height: 230px; display: grid; place-items: center; }
+.echo .sky { position: absolute; width: 210px; height: 210px; border-radius: 50%; background: var(--sky); }
+.echo .sky.ping { background: none; border: 1.5px solid var(--echo); animation: ping-out 6s ease-out infinite; }
+@keyframes ping-out { from { opacity: 0.5; transform: scale(1); } to { opacity: 0; transform: scale(1.5); } }
 .echo .float { position: relative; }
-.hello-cloud { width: 168px; animation: guide 10s ease-in-out infinite; }
+.hello-cloud { width: 220px; margin-top: 18px; animation: guide 10s ease-in-out infinite; }
 .screen.enter .echo.rise { animation: pop 1.1s var(--ease) both 0.1s; }
 @keyframes pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
 
@@ -246,7 +243,7 @@ body.is-phone .only-laptop, body.is-laptop .only-phone { display: none; }
 .cloud.lost .eyes { animation: look 3.2s ease-in-out infinite; }
 .cloud.lost .smile { opacity: 0; } .cloud.lost .oh { opacity: 1; } .cloud.lost .cheek { opacity: 0.2; }
 @keyframes look { 0%, 100% { translate: 0 0; } 25% { translate: -6px 0; } 65% { translate: 6px 0; } }
-.guidetxt { display: grid; opacity: 0; min-height: 1.5em; margin: 8px 0 0; color: var(--warm); font-weight: 700; font-size: 30px; letter-spacing: -0.01em; margin-top: 14px; transition: opacity 0.6s; }
+.guidetxt { display: grid; opacity: 0; min-height: 1.5em; margin: 8px 0 0; color: var(--text); font-weight: 700; font-size: 30px; letter-spacing: -0.01em; margin-top: 14px; transition: opacity 0.6s; }
 .guidetxt span { grid-area: 1 / 1; }
 .buddy.guiding .guidetxt { opacity: 1; }
 .warmbar { width: 130px; height: 4px; border-radius: 2px; background: var(--line); margin-top: 10px; overflow: hidden; transition: opacity 0.5s; }
