@@ -8,6 +8,7 @@ import subprocess
 import time
 
 import rumps
+from AppKit import NSAlert, NSAlertFirstButtonReturn, NSApplication, NSFloatingWindowLevel
 
 import tracks
 from guide import CUES, DEFAULT_PLAN, LEAD_IN, Overlay, parse_plan
@@ -27,6 +28,25 @@ DISTANCES = {"About 20 cm": 20, "About 30 cm": 30, "About 40 cm": 40, "About 50 
 IDLE = "◌"
 MENU_TEXT = {label: text for text, label in LABELS.items()}
 PLAN_FILE = DATA / "plan.txt"   # your last intervals, kept between runs
+
+
+def on_top(nsalert):
+    """A menu bar app is never the active app, so its dialogs open behind other windows.
+    macOS ignores requests to activate it, so float the dialog above normal windows instead."""
+    NSApplication.sharedApplication().activateIgnoringOtherApps_(True)
+    nsalert.window().setLevel_(NSFloatingWindowLevel)
+
+
+def alert(title, message="", ok="OK", cancel=None):
+    """Like rumps.alert, but the dialog shows up in front. True if OK was clicked."""
+    a = NSAlert.alloc().init()
+    a.setMessageText_(title)
+    a.setInformativeText_(message)
+    a.addButtonWithTitle_(ok)
+    if cancel:
+        a.addButtonWithTitle_(cancel)
+    on_top(a)
+    return a.runModal() == NSAlertFirstButtonReturn
 
 
 class SonarApp(rumps.App):
@@ -66,13 +86,15 @@ class SonarApp(rumps.App):
     def on_plan(self, _):
         win = rumps.Window("Intervals in seconds, separated by commas. End with x5 to repeat 5 times.\n"
                            "Words: normal, hold, moving, away.", "Guided take intervals",
-                           default_text=self.plan, ok="Save", cancel="Cancel", dimensions=(320, 24)).run()
+                           default_text=self.plan, ok="Save", cancel="Cancel", dimensions=(320, 24))
+        on_top(win._alert)
+        win = win.run()
         if not win.clicked:
             return
         try:
             parse_plan(win.text)
         except ValueError as err:
-            rumps.alert("Intervals not saved", str(err))
+            alert("Intervals not saved", str(err))
             return
         self.plan = win.text.strip()
         DATA.mkdir(exist_ok=True)
@@ -93,17 +115,17 @@ class SonarApp(rumps.App):
 
     def on_next(self, _):
         if self.guide or self.rec.running:
-            rumps.alert("Finish the current take first")
+            alert("Finish the current take first")
             return
         n = tracks.tier() or 1
         todo = tracks.todo(n)
         if not todo:
-            rumps.alert("All done", "Thank you! Choose Quit to pack the takes into a zip on your Desktop.\n"
+            alert("All done", "Thank you! Choose Quit to pack the takes into a zip on your Desktop.\n"
                         "Want to help more? Pick a bigger option under How much to help.")
             return
         step_id, _, cm, plan, setup = todo[0]
         k = tracks.count(n) - len(todo) + 1
-        if not rumps.alert(f"Take {k} of {tracks.count(n)}", setup + "\n\nAfter you click Start: hands off the laptop, "
+        if not alert(f"Take {k} of {tracks.count(n)}", setup + "\n\nAfter you click Start: hands off the laptop, "
                            "and follow the banner at the top of the screen.", ok="Start", cancel="Not now"):
             return
         if cm:
@@ -121,7 +143,7 @@ class SonarApp(rumps.App):
             self.end_guide("Cancelled")
             return
         if self.rec.running:
-            rumps.alert("Stop the current recording first")
+            alert("Stop the current recording first")
             return
         plan = plan or self.plan
         self.guide = {"plan": plan, "steps": parse_plan(plan), "i": -1, "t0": time.monotonic(), "ends": []}
@@ -144,7 +166,7 @@ class SonarApp(rumps.App):
                 self.rec.start()
             except Exception as err:    # e.g. no microphone permission
                 self.end_guide("Could not start")
-                rumps.alert("Could not start recording", str(err))
+                alert("Could not start recording", str(err))
                 return
             self.toggle.title = "Stop and save"
             total = 0
@@ -196,7 +218,7 @@ class SonarApp(rumps.App):
             try:
                 self.rec.start()
             except Exception as err:    # e.g. no microphone permission
-                rumps.alert("Could not start recording", str(err))
+                alert("Could not start recording", str(err))
                 return
             self.toggle.title = "Stop and save"
             self.set_label("Breathing normally")
