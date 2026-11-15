@@ -14,13 +14,16 @@ LEAD_IN = 5  # seconds of "get ready" before recording starts, so your hand is o
 
 # word typed in the plan -> label written to the JSON
 WORDS = {"normal": "normal", "breathe": "normal", "hold": "hold", "moving": "moving", "move": "moving",
-         "away": "empty room", "empty": "empty room", "fall": "fall", "slump": "slump", "slow": "slow"}
+         "away": "empty room", "empty": "empty room", "fall": "fall", "slump": "slump", "slow": "slow",
+         "fidget": "fidget", "small": "fidget", "shake": "shaking", "shaking": "shaking"}
 CUES = {"normal": "BREATHE NORMALLY", "hold": "HOLD BREATH", "moving": "MOVE AROUND", "empty room": "STEP AWAY",
-        "fall": "SLIDE TO THE FLOOR", "slump": "SLUMP IN CHAIR", "slow": "BREATHE SLOWLY"}
+        "fall": "SLIDE TO THE FLOOR", "slump": "SLUMP IN CHAIR", "slow": "BREATHE SLOWLY",
+        "fidget": "BREATHE + SMALL MOVES", "shaking": "BREATHE + SHAKE"}
 # cue background colours (red, green, blue)
 COLORS = {"normal": (0.16, 0.62, 0.56), "hold": (0.15, 0.27, 0.33), "moving": (0.91, 0.44, 0.32),
           "empty room": (0.45, 0.45, 0.45), "fall": (0.75, 0.2, 0.25), "slump": (0.55, 0.3, 0.6),
-          "slow": (0.2, 0.45, 0.7), None: (0.2, 0.2, 0.2)}
+          "slow": (0.2, 0.45, 0.7),
+          "fidget": (0.85, 0.6, 0.2), "shaking": (0.7, 0.5, 0.15), None: (0.2, 0.2, 0.2)}
 
 
 def parse_plan(text):
@@ -35,7 +38,7 @@ def parse_plan(text):
             steps.append((WORDS[step.group(1)], float(step.group(2))))
         else:
             raise ValueError(f'Could not read "{part}". Use e.g. "normal 30, hold 20, x5". '
-                             f'Words: normal, hold, moving, away, fall, slump, slow.')
+                             f'Words: normal, hold, moving, away, fall, slump, slow, fidget, shake.')
     if not steps or repeats < 1:
         raise ValueError("The plan needs at least one interval, e.g. normal 30")
     return steps * repeats

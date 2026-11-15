@@ -25,6 +25,8 @@ LABELS = {
     "Falling": "fall",
     "Slumping": "slump",
     "Breathing slowly": "slow",
+    "Breathing + small moves": "fidget",
+    "Breathing + shaking": "shaking",
 }
 # rough chest-to-laptop distance, menu text -> centimetres
 DISTANCES = {"About 20 cm": 20, "About 30 cm": 30, "About 40 cm": 40, "About 50 cm": 50, "About 60 cm": 60,
