@@ -495,7 +495,7 @@ function cir(p, frame) {
 class RangeSonar {
   constructor({ minR = 0.2, maxR = 1.2, showR = 3, zone = [0.29, 0.57], probe = {} } = {}) {
     this.mode = 'range';
-    this.p = makeProbe(probe);   // probe: e.g. { f0: 18000, f1: 20000 } for phones that cut sound above 20 kHz this.rate = this.p.rate; this.dr = this.p.dr;
+    this.p = makeProbe(probe); this.rate = this.p.rate; this.dr = this.p.dr;   // probe: e.g. { f0: 18000, f1: 20000 } for phones that cut sound above 20 kHz
     this.chs = Array.from({ length: this.p.L }, () => makeChannel(this.p.lambda, this.rate));
     this.emaR = new Float64Array(this.p.L); this.emaI = new Float64Array(this.p.L);
     this.nShow = Math.ceil(showR / this.dr);
