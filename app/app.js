@@ -20,6 +20,9 @@
   try { const v = localStorage.getItem(VOICE_KEY); if (v && $('voice').querySelector(`option[value="${v}"]`)) $('voice').value = v; } catch (e) { /* no storage */ }
   $('voice').addEventListener('change', () => { try { localStorage.setItem(VOICE_KEY, $('voice').value); } catch (e) { /* no storage */ } });
   $('hearVoice').addEventListener('click', () => { try { new Audio(`voices/${$('voice').value}.mp3`).play(); } catch (e) { /* no audio */ } });
+  // Home as a GPS fix { lat, lng }, saved when "I'm at home right now" is ticked. The call compares it with where
+  // the person is now, so it can say "at home" or "close to their home".
+  const HOME_KEY = 'breathing-sonar.home';
   let quiet = false;
   try { quiet = localStorage.getItem(QUIET_KEY) === '1'; } catch (e) { /* no storage */ }
   if (new URLSearchParams(location.search).has('quiet')) quiet = true;   // app/?quiet opens with sound off
@@ -111,7 +114,7 @@
   }
   function forget(e) {
     e.preventDefault();
-    try { localStorage.removeItem(STORE_KEY); } catch (err) { /* ignore */ }
+    try { localStorage.removeItem(STORE_KEY); localStorage.removeItem(HOME_KEY); } catch (err) { /* ignore */ }
     for (const id of ['friendName', 'friendPhone', 'userName', 'place']) $(id).value = '';
     $('forget').hidden = true;
     setFriendName();
@@ -127,10 +130,17 @@
       place: $('place').value.trim(),
     };
     save(contact);
-    // Ask for GPS now, while the person is here to allow it; the call says its street address (and the text, when on, gets a map link).
+    try { contact.home = JSON.parse(localStorage.getItem(HOME_KEY)) || undefined; } catch (e) { /* no storage */ }
+    const setHome = $('atHome').checked;
+    // Ask for GPS now, while the person is here to allow it; the call says where that is (and the text, when on, gets a map link).
     // Not saved with the contact, so it is fresh each session. Fails quietly (the typed place still goes).
     if (navigator.geolocation) navigator.geolocation.getCurrentPosition(
-      pos => { contact.lat = pos.coords.latitude; contact.lng = pos.coords.longitude; },
+      pos => {
+        contact.lat = pos.coords.latitude; contact.lng = pos.coords.longitude;
+        if (!setHome) return;
+        contact.home = { lat: contact.lat, lng: contact.lng };
+        try { localStorage.setItem(HOME_KEY, JSON.stringify(contact.home)); $('atHome').checked = false; } catch (e) { /* no storage */ }
+      },
       () => {}, { enableHighAccuracy: true, timeout: 15000 });
     $('start').disabled = true;
     $('sitErr').hidden = true;
