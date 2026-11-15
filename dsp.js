@@ -514,8 +514,13 @@ class RangeSonar {
     log.push([nowMs, this.apnea.moving !== true]);
     while (log[0][0] < nowMs - winMs) log.shift();
     if (this.manual) return;
-    if (this.apnea.moving === true) this.lastMove = nowMs;
-    if (this.lock !== null && nowMs - (this.lastMove ?? -1e9) < ZONE.settleSec * 1000) return;
+    if (this.apnea.moving === true) {
+      this.lastMove = nowMs;
+      this.zs = null; this.zscore = null; // the previous position is no longer a useful prior
+    }
+    const reacquiring = this.lock !== null && (this.lastMove ?? -Infinity) > this.zoneMove;
+    // A full fresh rhythm window keeps the movement itself out of the new ranking.
+    if (reacquiring && nowMs - this.lastMove < winMs + ZONE.settleSec * 1000) return;
     const r0 = Math.max(1, Math.ceil(this.minR / this.dr)), r1 = Math.round(this.maxR / this.dr);
     const sc = []; for (let r = r0; r <= r1; r++) sc[r] = periodicity(this.chs[this.tap(r)], this.rate);
     if (sc[r0] === null) return;
@@ -532,8 +537,9 @@ class RangeSonar {
       if (nowMs < winMs + ZONE.settleSec * 1000) return; // let the initial echo ranking settle before locking
       return this.setZone(b * this.dr);
     }
-    if ((this.lastMove ?? -Infinity) <= this.zoneMove) return;
-    if (S(this.lock) < top - ZONE.near && !this.apnea.alerting && this.apnea.holdStart === null) this.setZone(b * this.dr);
+    // Movement invalidates the old zone's level, including any hold inferred there.
+    // Commit one fresh pick, even if it chooses the same distance, then freeze again.
+    if (reacquiring) this.setZone(b * this.dr);
   }
   analyze(nowMs) {
     if (this.i0 === null || this.frames < 15 * this.rate) return null;

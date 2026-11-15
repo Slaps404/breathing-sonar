@@ -13,3 +13,13 @@ Review:
 - Stability: recorded stillness must not trigger zone changes.
 - Movement: reselection remains possible after movement and settling.
 - Alerts: stability alone does not establish reliable breath-hold detection.
+
+## Fresh movement test and reacquisition repair
+
+The 150.14-second take `take-2026-11-15T02-49-27-995Z` uses normal 80, moving 10, normal 60. Before this repair the fixed zone remained at 34.3 cm throughout. Movement was detected at approximately 83.5 seconds, but an old-zone hold alert beginning at 89 seconds blocked reselection. Old scores also retained the earlier position.
+
+Movement now discards the accumulated ranking. After a full rhythm window plus settling time, the picker commits one fresh selection without letting an old-zone hold veto it. It freezes again after that decision. Manual selection remains fixed.
+
+Regression command: `ZONE_REQUIRE_REACQUIRE=1 node tools/check-zone-stability.js data/take-2026-11-15T02-49-27-995Z`. It fails before the repair and passes after. Replay selects 34.3 cm at 32.3 seconds, then 40.0 cm at 115.5 seconds. No stillness-driven changes. Five older recordings also pass the stability assertion. The range simulation retains its 7.4-second hold-alert delay.
+
+Limits: the intended move was from about 40 to 70 cm, but distances were not saved in the metadata, and the new echo selection is only 40 cm. This proves reselection is no longer blocked, not correct chest localization. One false hold alert remains at 89 seconds, clearing on reacquisition at 115.5 seconds (previously two false alerts). Raw audio replay only; rerun physical validation next.

@@ -28,6 +28,11 @@ for (const base of bases) {
     }
     if (s.lock !== null && f % 25 === 0) trace.push([t, s.lock * s.dr * 100]);
   }
+  if (process.env.ZONE_REQUIRE_REACQUIRE) {
+    const move = meta.labels.find(l => l.label === 'moving');
+    assert.ok(move, 'recording needs a movement label');
+    assert.ok(moves.some(m => m.t > move.t && m.movement), 'must reacquire after labeled movement');
+  }
   results.push({ take: meta.id || base, moves, trace });
   console.log(base, JSON.stringify(moves));
 }
