@@ -1,0 +1,139 @@
+1
+00:00:00,000 --> 00:00:06,440
+Hi, I'm Zeke. About 70,000 people in the
+US died of an overdose last year. Three
+
+2
+00:00:06,440 --> 00:00:11,320
+and four of them were alone. An overdose
+slows your breathing, then it stops. And
+
+3
+00:00:11,320 --> 00:00:16,920
+if nobody's there, no one knows. I built
+BreathBuddy so somebody does and can come
+
+4
+00:00:16,920 --> 00:00:22,020
+to help. A friend sets it up in just a
+minute and texts you a link. There's
+
+5
+00:00:22,020 --> 00:00:27,220
+nothing to install, it's just a web app.
+You open it, press Start, and breathe with
+
+6
+00:00:27,220 --> 00:00:32,460
+a cloud. The speaker plays a sound too
+high for you to hear and the microphone
+
+7
+00:00:32,460 --> 00:00:38,040
+listens for the echo off your chest. Those
+slow breaths show it where you are. Now
+
+8
+00:00:38,040 --> 00:00:42,660
+it's locked onto my chest. It knows where
+my chest is and how much it moves when I
+
+9
+00:00:42,660 --> 00:00:44,600
+breathe normally.
+
+10
+00:00:45,000 --> 00:00:48,600
+Now I hold my breath,
+
+11
+00:00:48,800 --> 00:00:52,900
+and after a few seconds it asks out loud.
+
+12
+00:00:53,000 --> 00:00:55,000
+[App] Are you okay? Tap the screen or
+press any key.
+
+13
+00:00:55,100 --> 00:00:59,300
+After 6 seconds it calls my emergency
+contact through Twilio,
+
+14
+00:00:59,300 --> 00:01:03,300
+and an ElevenLabs voice agent explains
+what happened and tells them exactly where
+I am.
+
+15
+00:01:13,000 --> 00:01:15,600
+[Phone call] This is an automated safety
+alert for Zeke.
+
+16
+00:01:15,600 --> 00:01:17,500
+[Phone call] Their breathing appears to
+have stopped near
+
+17
+00:01:17,550 --> 00:01:20,250
+[address bleeped]
+
+18
+00:01:20,300 --> 00:01:23,200
+[Phone call] and they did not answer a
+check on their laptop.
+
+19
+00:01:23,200 --> 00:01:24,100
+[Phone call] Please check on them.
+
+20
+00:01:30,420 --> 00:01:35,400
+it caught 11 out of 11 breath holds live.
+On some hard recordings from yesterday
+
+21
+00:01:35,400 --> 00:01:40,720
+when I was moving around, it caught 23 out
+of 29, but that was before fully tuning
+
+22
+00:01:40,720 --> 00:01:47,280
+the slow breathing lock-in. That's only
+results with me with my laptop. So to
+
+23
+00:01:47,280 --> 00:01:51,920
+expand this, I would need to collect much
+more data from other people breathing and
+
+24
+00:01:51,920 --> 00:01:57,920
+other devices from iPhone, Android, and
+other things. Next, I want to be able to
+
+25
+00:01:57,920 --> 00:02:02,960
+reliably catch breathing that's slowing
+down on any device and be able to
+
+26
+00:02:02,960 --> 00:02:07,380
+accurately report the exact rate. And this
+is an experimental prototype. It's only
+
+27
+00:02:07,380 --> 00:02:13,840
+been tested on me so far with my laptop
+and my phone. But it runs on the browser
+
+28
+00:02:13,840 --> 00:02:22,640
+so it takes no setup to install and can
+instantly call someone to give someone who
+
+29
+00:02:22,640 --> 00:02:23,900
+overdoses another chance.
