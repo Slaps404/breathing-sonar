@@ -363,14 +363,13 @@
     $('warm').classList.toggle('guiding', on);
   }
 
-  // Warm-up ring while searching. The first 15 s are a fixed wait (the sonar needs that much data), so
-  // show seconds left. After that it still needs a still moment to lock on, which has no fixed length.
+  // While searching, the first 15 s are a fixed wait (the sonar needs that much sound); after that it
+  // still needs a still moment to lock on, which has no fixed length. No progress bar: it could only
+  // show the first part, so just say which part we're in.
   function setWarmup(f, total = 15) {
     warm = f; warmTotal = total;
     if (status !== 'searching') return;
-    $('warmBar').style.width = `${(f * 100).toFixed(1)}%`;
-    $('warm').setAttribute('aria-valuenow', Math.round(f * 100));
-    $('watchSub').textContent = f < 1 ? `Sit still. About ${Math.ceil(total * (1 - f))} s left.` : 'Almost there. Keep still.';
+    $('watchSub').textContent = f < 1 ? 'Sit still while I listen.' : 'Almost there. Keep still.';
   }
 
   // The cloud breathes with you: its size follows the newest chest position, 0.95 at the middle of a
