@@ -4,9 +4,9 @@ Three kinds of recording. Read plainly, at talking speed. Nothing in the video s
 and the phone call, which must be heard.
 
 - **OPEN and CLOSE:** you on camera, talking to the lens. Film on the phone, landscape, chest up, quiet room.
-- **VO 1-7:** voice only, played over the footage. Record on the phone (Voice Memos), one file per line.
+- **VO 1-8:** voice only, played over the footage. Record on the phone (Voice Memos), one file per line.
 
-Save them into `docs/submission/video/in/` with these names: `open.mov`, `close.mov`, `vo1.m4a` ... `vo7.m4a`.
+Save them into `docs/submission/video/in/` with these names: `open.mov`, `close.mov`, `vo1.m4a` ... `vo8.m4a` (vo8 plays between vo4's call and vo5).
 
 | File | Over this picture | Say | About |
 |---|---|---|---|
@@ -17,6 +17,7 @@ Save them into `docs/submission/video/in/` with these names: `open.mov`, `close.
 | (none) | "Are you okay?" appears, beeps | Leave the alarm sound. | 2 s |
 | vo4 | The six second countdown | "It asks if I'm okay. I get six seconds to tap. I don't." | 5 s |
 | (none) | Phone rings, the voice message plays | Leave the call sound. | 15 s |
+| vo8 | Diagram: sound leaving the speaker, bouncing off the chest | "Here's how it works. Sound leaves the speaker, bounces off your chest, and comes back to the microphone. When you breathe in, your chest moves a few millimetres closer and the echo shifts. That tiny shift, repeating with every breath, is what it follows." | 15 s |
 | vo5 | The signal chart or panel, line dropping during a hold | "Here's what it sees. This line is how much my chest is moving at breathing speed. When I hold my breath it drops to a fraction of normal, and that drop raises the alarm." | 11 s |
 | vo6 | Limits card | "This morning it caught every breath hold I tried, live, in a quiet room: eleven out of eleven. On our harder recordings, with me moving around, twenty-three of twenty-nine. That's one person and one laptop." | 14 s |
 | vo7 | Limits card, second half | "Today it detects breathing that stops. Catching breathing that's only slowing down is the next step." | 7 s |
