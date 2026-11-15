@@ -283,8 +283,15 @@ function apneaStep(st, disp, rate, nowMs) {
 // whether anything in range still stirs: fast echo change stirDb above that slice's own quiet floor within
 // the last stirSec. Two real move-back takes: stir mostly 14-37 dB at the new distance (gaps up to 7 s);
 // three walk-aways: under 12 dB once the person is out of range. Works for stirDb 12-22 and stirSec 8-15.
-const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120, stirDb: 12, stirSec: 10 };
-function makeHold() { return { alerting: false, holdStart: null, below: 0, quiet: 0, last: null, B: [], M: [], moving: [] }; }
+// The alarm clears on movement, or when breathing is back: the level is within 3 dB of normal AND the
+// motion is sustained. Level alone is not enough: one shoulder twitch in a hold put as much power in the
+// 8 s spectrum as breathing does and cleared the alarm mid-hold (take 03-09-51, 115.9 s). Sustained motion
+// S = how far the echoes move per second (stepSec, each end averaged over smoothSec), taken at the quietest
+// quarter (sustainQ) of the last 8 s, so it is high only if about 6 of the 8 s had motion. It must be within
+// sustainDb of its own normal. Chosen by replaying 14 takes (docs/diagnostics/sustained-recovery.md).
+const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120, stirDb: 12, stirSec: 10,
+  stepSec: 1, smoothSec: 0.5, sustainQ: 0.25, sustainDb: 4 };
+function makeHold() { return { alerting: false, holdStart: null, below: 0, quiet: 0, last: null, B: [], S: [], M: [], moving: [] }; }
 // IQ = list of channels (each with .I/.Q history) in the zone; fast = channels for movement.
 function holdFeatures(zone, fast, rate) {
   const n = Math.round(HOLD.winSec * rate);
@@ -311,7 +318,19 @@ function holdFeatures(zone, fast, rate) {
     const L = ch.I.length;
     for (let i = L - k2 + 1; i < L; i++) { M += (ch.I[i] - ch.I[i - 1]) ** 2 + (ch.Q[i] - ch.Q[i - 1]) ** 2; c++; }
   }
-  return { B: 10 * Math.log10(B + 1e-30), M: 10 * Math.log10(M / c + 1e-30) };
+  // sustained motion: per frame, (mean of the last smoothSec) minus (the same, stepSec earlier), squared and
+  // summed over the zone; then the sustainQ quantile over the window (see HOLD)
+  const kb = Math.max(1, Math.round(HOLD.smoothSec * rate)), lag = Math.round(HOLD.stepSec * rate);
+  const m0 = Math.max(kb + lag, zone[0].I.length - n), sp = new Float64Array(zone[0].I.length - m0);
+  for (const ch of zone) for (const part of [ch.I, ch.Q]) {
+    let a = 0, b = 0;                                 // running sums of the two averaging windows
+    for (let i = m0 - kb; i < m0; i++) { a += part[i]; b += part[i - lag]; }
+    for (let i = m0; i < part.length; i++) {
+      a += part[i] - part[i - kb]; b += part[i - lag] - part[i - lag - kb];
+      sp[i - m0] += ((a - b) / kb) ** 2;
+    }
+  }
+  return { B: 10 * Math.log10(B + 1e-30), M: 10 * Math.log10(M / c + 1e-30), S: 10 * Math.log10(pct(sp, HOLD.sustainQ) + 1e-30) };
 }
 function pct(xs, q) { const a = [...xs].sort((x, y) => x - y); return a[Math.min(a.length - 1, Math.floor(q * a.length))]; }
 function holdStep(st, feat, nowMs, blocked = false) {   // blocked: do not start an alert now
@@ -320,8 +339,8 @@ function holdStep(st, feat, nowMs, blocked = false) {   // blocked: do not start
   st.M.push([nowMs, feat.M]); while (st.M[0][0] < nowMs - HOLD.floorSec * 1000) st.M.shift();
   const moving = feat.M > pct(st.M.map(x => x[1]), 0.2) + HOLD.moveDb;
   st.moving = moving;
-  if (!moving) st.B.push([nowMs, feat.B]);
-  while (st.B.length && st.B[0][0] < nowMs - HOLD.baseSec * 1000) st.B.shift();
+  if (!moving) { st.B.push([nowMs, feat.B]); st.S.push(feat.S); }
+  while (st.B.length && st.B[0][0] < nowMs - HOLD.baseSec * 1000) { st.B.shift(); st.S.shift(); }
   if (moving) { st.quiet = 0; st.below = 0; } else st.quiet += dt;
   if (st.B.length < 45) return null;   // need ~10 s of still history (analyze runs ~5 times a second)
   const base = pct(st.B.map(x => x[1]), 0.75);
@@ -330,7 +349,7 @@ function holdStep(st, feat, nowMs, blocked = false) {   // blocked: do not start
     if (st.quiet >= HOLD.quietSec && feat.B < base - HOLD.dropDb) { st.below += dt; st.holdStart ??= nowMs; }
     else { st.below = 0; st.holdStart = null; }
     if (st.below >= HOLD.confirmSec && !blocked) { st.alerting = true; return 'start'; }
-  } else if (moving || feat.B > base - HOLD.dropDb / 2) { st.alerting = false; st.below = 0; st.holdStart = null; return 'end'; }
+  } else if (moving || (feat.B > base - HOLD.dropDb / 2 && feat.S > pct(st.S, 0.75) - HOLD.sustainDb)) { st.alerting = false; st.below = 0; st.holdStart = null; return 'end'; }
   return null;
 }
 

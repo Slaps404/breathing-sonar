@@ -5,7 +5,11 @@ const root=process.cwd(), source=fs.readFileSync('dsp.js','utf8');
 const seconds=Number(process.argv[2]);
 if (!Number.isFinite(seconds) || seconds < -1) throw new Error('Provide -1 (baseline) or recovery seconds >= 0');
 let code=source;
-if(seconds>=0) code=code.replace("} else if (moving || feat.B > base - HOLD.dropDb / 2) { st.alerting = false; st.below = 0; st.holdStart = null; return 'end'; }", `} else { st.recovery = !moving && feat.B > base - HOLD.dropDb / 2 ? (st.recovery || 0) + dt : 0; if (st.recovery >= ${seconds} && !moving && feat.B > base - HOLD.dropDb / 2) { st.alerting = false; st.recovery = 0; st.below = 0; st.holdStart = null; return 'end'; } }`);
+// The candidate replaces the runtime's clearing line. "back" = the runtime's own recovery test (level and sustained motion).
+const back="(feat.B > base - HOLD.dropDb / 2 && feat.S > pct(st.S, 0.75) - HOLD.sustainDb)";
+const line=`} else if (moving || ${back}) { st.alerting = false; st.below = 0; st.holdStart = null; return 'end'; }`;
+if(!source.includes(line)) throw new Error('dsp.js clearing line changed: update this tool, or it would replay the runtime unchanged');
+if(seconds>=0) code=code.replace(line, `} else { st.recovery = !moving && ${back} ? (st.recovery || 0) + dt : 0; if (st.recovery >= ${seconds} && !moving && ${back}) { st.alerting = false; st.recovery = 0; st.below = 0; st.holdStart = null; return 'end'; } }`);
 const mod=new Module(path.join(root,'dsp.js'));mod._compile(code,path.join(root,'dsp.js'));const D=mod.exports;
 const out=[];
 for(const file of fs.readdirSync('data').filter(f=>/^take-.*\.wav$/.test(f))) {
