@@ -1,12 +1,40 @@
 {
- "made": "2026-11-15T05:47:08.424Z",
+ "made": "2026-11-15T06:37:16.642Z",
  "twins": 12,
+ "totals": {
+  "seen": [
+   3,
+   6,
+   21,
+   72
+  ],
+  "held": [
+   10,
+   10,
+   40,
+   120
+  ],
+  "loto": [
+   13,
+   16,
+   84,
+   192
+  ]
+ },
+ "lockWithin6cm": {
+  "twins": 0.43333333333333335,
+  "loto": 0.6333333333333333
+ },
+ "falsePerMin": {
+  "real": 0.11584562155037484,
+  "twins": 0.12549942334623942,
+  "loto": 0.24134504489661426
+ },
  "rows": [
   {
    "id": "take-2026-11-14T22-41-04-642Z",
+   "trainEnd": 150,
    "real": {
-    "caught": 3,
-    "holds": 5,
     "lat": [
      null,
      null,
@@ -14,161 +42,76 @@
      6.9,
      6.8
     ],
-    "false": 0,
+    "false": [],
     "lock": 34,
-    "relocks": 0,
+    "lockT": 32.256,
     "drops": [
      4.7,
      5.8,
      12,
      11.1,
      10.6
-    ],
-    "quality": 0.39,
-    "bpm": 19.7
+    ]
    },
-   "sims": [
+   "own": [
     {
-     "caught": 1,
-     "holds": 5,
      "lat": [
-      13.7,
       null,
+      15.4,
+      14,
       null,
-      null,
-      null
+      11.7
      ],
-     "false": 2,
-     "lock": 97,
-     "relocks": 0,
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
      "drops": [
-      12.7,
-      3.2,
-      2.8,
-      5.4,
-      5
-     ],
-     "quality": 0.4,
-     "bpm": 4.7
+      0.8,
+      7.4,
+      8,
+      4.9,
+      7.3
+     ]
     },
     {
-     "caught": 0,
-     "holds": 5,
      "lat": [
       null,
+      7.3,
       null,
-      null,
-      null,
+      9.2,
       null
      ],
-     "false": 2,
-     "lock": 69,
-     "relocks": 0,
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
      "drops": [
-      2.6,
-      2.2,
-      5.8,
-      3.2,
-      1.5
-     ],
-     "quality": 0.3,
-     "bpm": 4.1
-    },
-    {
-     "caught": 0,
-     "holds": 5,
-     "lat": [
-      null,
-      null,
-      null,
-      null,
-      null
-     ],
-     "false": 0,
-     "lock": 57,
-     "relocks": 0,
-     "drops": [
-      6.8,
+      2.9,
+      6.3,
       3.3,
-      2.4,
-      4.1,
-      2.9
-     ],
-     "quality": 0.26,
-     "bpm": 18.2
+      6.6,
+      2.1
+     ]
     },
     {
-     "caught": 2,
-     "holds": 5,
-     "lat": [
-      null,
-      null,
-      20.2,
-      null,
-      10.2
-     ],
-     "false": 4,
-     "lock": 103,
-     "relocks": 0,
-     "drops": [
-      4.8,
-      0.4,
-      7,
-      3.5,
-      9.1
-     ],
-     "quality": 0.31,
-     "bpm": 3.9
-    },
-    {
-     "caught": 2,
-     "holds": 5,
-     "lat": [
-      null,
-      3.8,
-      null,
-      null,
-      13.4
-     ],
-     "false": 0,
-     "lock": 63,
-     "relocks": 0,
-     "drops": [
-      5.3,
-      5.7,
-      4.2,
-      5.7,
-      6.7
-     ],
-     "quality": 0.33,
-     "bpm": 4.1
-    },
-    {
-     "caught": 1,
-     "holds": 5,
      "lat": [
       null,
       7.7,
+      13.6,
       null,
-      null,
-      null
+      13.2
      ],
-     "false": 4,
-     "lock": 97,
-     "relocks": 0,
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
      "drops": [
-      4.5,
-      7.1,
-      2.9,
       4.3,
-      5
-     ],
-     "quality": 0.42,
-     "bpm": 4.2
+      8.6,
+      6.6,
+      0.4,
+      7.1
+     ]
     },
     {
-     "caught": 0,
-     "holds": 5,
      "lat": [
       null,
       null,
@@ -176,1115 +119,2009 @@
       null,
       null
      ],
-     "false": 0,
-     "lock": 86,
-     "relocks": 0,
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
      "drops": [
-      2.9,
+      2.2,
       3.5,
-      2.8,
-      3.9,
-      0.9
-     ],
-     "quality": 0.34,
-     "bpm": 5.7
+      1.7,
+      4.3,
+      3.5
+     ]
     },
     {
-     "caught": 2,
-     "holds": 5,
+     "lat": [
+      null,
+      13.7,
+      null,
+      7.1,
+      19.8
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      3.8,
+      8.6,
+      5.6,
+      7.5,
+      6.7
+     ]
+    },
+    {
+     "lat": [
+      null,
+      14.5,
+      null,
+      null,
+      9.1
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      1.5,
+      6.1,
+      3.3,
+      4.4,
+      6.5
+     ]
+    },
+    {
      "lat": [
       null,
       null,
       null,
-      12.6,
+      null,
+      9.3
+     ],
+     "false": [
+      202.7
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      1.6,
+      5.2,
+      3.5,
+      6.1,
+      6.6
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "false": [
+      153.2
+     ],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      2.9,
+      2,
+      5.4,
+      3.8,
+      5.9
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "false": [
+      152.8
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      2.2,
+      4.7,
+      6,
+      5.5,
+      1.7
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      2.5,
+      4.3,
+      5.5,
+      5.3,
+      5.4
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      4.9,
+      5.8,
+      3.9,
+      4,
+      5.9
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      2.5,
+      3.8,
+      4.6,
+      5.5,
+      5.4
+     ]
+    }
+   ],
+   "loto": [
+    {
+     "lat": [
+      null,
+      3.2,
+      null,
+      6.9,
+      1.9
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      1.3,
+      9,
+      9.5,
+      8,
+      7.5
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      6.3,
+      4.5,
+      null
+     ],
+     "false": [
+      79.6
+     ],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      5.8,
+      9.6,
+      12.1,
+      10.9,
+      10
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null,
+      null,
+      2.1
+     ],
+     "false": [
+      79.8,
+      179
+     ],
+     "lock": 57,
+     "lockT": 32.256,
+     "drops": [
+      1.9,
+      4.3,
+      5.7,
+      5.5,
+      2
+     ]
+    },
+    {
+     "lat": [
+      null,
+      3.6,
+      6.7,
+      7.9,
+      7
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      4.7,
+      9.2,
+      9,
+      9.7,
+      10.2
+     ]
+    },
+    {
+     "lat": [
+      null,
+      9.2,
+      1.4,
+      null,
+      null
+     ],
+     "false": [
+      61.3,
+      177.1
+     ],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      3.2,
+      5.6,
+      7.7,
+      10,
+      5.8
+     ]
+    },
+    {
+     "lat": [
+      null,
+      6.2,
+      null,
+      4.7,
+      5.7
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      1.4,
+      9.8,
+      12,
+      8.2,
+      10.2
+     ]
+    },
+    {
+     "lat": [
+      13.7,
+      6.6,
+      null,
+      null,
+      2.1
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      7.7,
+      11.8,
+      11,
+      8.2,
+      8
+     ]
+    },
+    {
+     "lat": [
+      14.1,
+      0.2,
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      6.9,
+      7.6,
+      7.1,
+      8,
+      10.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      2.6,
+      4.5,
+      2.8,
+      4.2,
+      4.3
+     ]
+    },
+    {
+     "lat": [
+      null,
+      1.1,
+      2.7,
+      2.6,
+      null
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      6.1,
+      12.1,
+      11.3,
+      9.5,
+      9.6
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      5.7,
+      null,
+      7.6
+     ],
+     "false": [
+      74.3,
+      178
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      3.3,
+      9.5,
+      10.9,
+      10.3,
+      10.2
+     ]
+    },
+    {
+     "lat": [
+      null,
+      1.1,
+      9.1,
+      8.4,
       8.1
      ],
-     "false": 3,
-     "lock": 97,
-     "relocks": 0,
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
      "drops": [
-      3,
-      1.8,
-      3.9,
-      6.6,
-      7.1
-     ],
-     "quality": 0.31,
-     "bpm": 4
-    },
-    {
-     "caught": 0,
-     "holds": 5,
-     "lat": [
-      null,
-      null,
-      null,
-      null,
-      null
-     ],
-     "false": 3,
-     "lock": 97,
-     "relocks": 0,
-     "drops": [
-      6.4,
-      5.3,
-      4.7,
-      2.4,
-      3.8
-     ],
-     "quality": 0.33,
-     "bpm": 7.9
-    },
-    {
-     "caught": 2,
-     "holds": 5,
-     "lat": [
-      15.8,
-      null,
-      null,
-      null,
-      0.6
-     ],
-     "false": 0,
-     "lock": 80,
-     "relocks": 0,
-     "drops": [
-      9.6,
-      3.5,
-      5.1,
-      2.1,
-      5.2
-     ],
-     "quality": 0.4,
-     "bpm": 4.4
-    },
-    {
-     "caught": 2,
-     "holds": 5,
-     "lat": [
-      17.5,
-      null,
-      null,
-      null,
-      18.5
-     ],
-     "false": 2,
-     "lock": 97,
-     "relocks": 0,
-     "drops": [
+      5.6,
+      11.5,
       12.7,
-      5.5,
-      6.8,
-      2.7,
-      6.8
-     ],
-     "quality": 0.4,
-     "bpm": 4.3
-    },
-    {
-     "caught": 2,
-     "holds": 5,
-     "lat": [
-      null,
-      null,
-      11.9,
-      16.5,
-      null
-     ],
-     "false": 5,
-     "lock": 97,
-     "relocks": 0,
-     "drops": [
-      2.4,
-      2.8,
-      7.6,
-      5.3,
-      6.3
-     ],
-     "quality": 0.54,
-     "bpm": 4.5
+      10.1,
+      8
+     ]
     }
    ]
   },
   {
    "id": "take-2026-11-15T00-15-23-440Z",
+   "trainEnd": 100,
    "real": {
-    "caught": 1,
-    "holds": 3,
     "lat": [
      null,
      16,
-     null
+     4.4
     ],
-    "false": 0,
+    "false": [],
     "lock": 23,
-    "relocks": 0,
+    "lockT": 32.256,
     "drops": [
      6.1,
      8,
      2.9
-    ],
-    "quality": 0.44,
-    "bpm": 4.7
+    ]
    },
-   "sims": [
+   "own": [
     {
-     "caught": 0,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      null
-     ],
-     "false": 1,
-     "lock": 80,
-     "relocks": 0,
-     "drops": [
-      6.3,
-      3.4,
-      3.1
-     ],
-     "quality": 0.62,
-     "bpm": 4.2
-    },
-    {
-     "caught": 3,
-     "holds": 3,
-     "lat": [
-      14.2,
-      8.7,
-      1.6
-     ],
-     "false": 0,
-     "lock": 80,
-     "relocks": 0,
-     "drops": [
-      6.9,
-      6.8,
-      6.2
-     ],
-     "quality": 0.48,
-     "bpm": 4.4
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      5
-     ],
-     "false": 1,
-     "lock": 63,
-     "relocks": 0,
-     "drops": [
-      2.4,
-      6.7,
-      7.1
-     ],
-     "quality": 0.65,
-     "bpm": 4.4
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      null,
-      2.1,
-      null
-     ],
-     "false": 0,
-     "lock": 63,
-     "relocks": 0,
-     "drops": [
-      3.3,
-      9.4,
-      9
-     ],
-     "quality": 0.63,
-     "bpm": 4.6
-    },
-    {
-     "caught": 0,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      null
-     ],
-     "false": 0,
-     "lock": 23,
-     "relocks": 0,
-     "drops": [
-      0,
-      4.2,
-      3.9
-     ],
-     "quality": 0.21,
-     "bpm": null
-    },
-    {
-     "caught": 2,
-     "holds": 3,
-     "lat": [
-      null,
-      7.9,
-      13.4
-     ],
-     "false": 0,
-     "lock": 80,
-     "relocks": 0,
-     "drops": [
-      6.7,
-      3.8,
-      5.2
-     ],
-     "quality": 0.49,
-     "bpm": 4.6
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      5.9
-     ],
-     "false": 1,
-     "lock": 57,
-     "relocks": 0,
-     "drops": [
-      4.5,
-      11.3,
-      11.5
-     ],
-     "quality": 0.56,
-     "bpm": 4.6
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      5
-     ],
-     "false": 1,
-     "lock": 80,
-     "relocks": 0,
-     "drops": [
-      6.1,
-      3.2,
-      2
-     ],
-     "quality": 0.62,
-     "bpm": 4.7
-    },
-    {
-     "caught": 2,
-     "holds": 3,
      "lat": [
       null,
       7.5,
-      4
+      5.5
      ],
-     "false": 0,
-     "lock": 63,
-     "relocks": 0,
+     "false": [],
+     "lock": 57,
+     "lockT": 32.256,
      "drops": [
-      2.7,
-      9.4,
-      9.1
-     ],
-     "quality": 0.55,
-     "bpm": 4.6
-    },
-    {
-     "caught": 3,
-     "holds": 3,
-     "lat": [
-      15.9,
-      4.1,
-      5.2
-     ],
-     "false": 0,
-     "lock": 51,
-     "relocks": 0,
-     "drops": [
+      3.6,
       8.5,
-      13.9,
-      11.6
-     ],
-     "quality": 0.26,
-     "bpm": 6.4
+      5.8
+     ]
     },
     {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      13.8
-     ],
-     "false": 1,
-     "lock": 80,
-     "relocks": 0,
-     "drops": [
-      6.8,
-      4.5,
-      7.8
-     ],
-     "quality": 0.52,
-     "bpm": 6.1
-    },
-    {
-     "caught": 0,
-     "holds": 3,
      "lat": [
       null,
       null,
       null
      ],
-     "false": 0,
-     "lock": 120,
-     "relocks": 0,
+     "false": [],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      5.5,
+      6.1,
+      4.2
+     ]
+    },
+    {
+     "lat": [
+      null,
+      8.1,
+      14.6
+     ],
+     "false": [],
+     "lock": 69,
+     "lockT": 32.256,
+     "drops": [
+      0.4,
+      5,
+      3.6
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      1.9,
+      3.5,
+      1.8
+     ]
+    },
+    {
+     "lat": [
+      null,
+      19.2,
+      8
+     ],
+     "false": [],
+     "lock": 51,
+     "lockT": 32.256,
+     "drops": [
+      2.3,
+      6.9,
+      9.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      8.5,
+      8.7
+     ],
+     "false": [],
+     "lock": 57,
+     "lockT": 32.256,
      "drops": [
       1.5,
-      1.8,
-      1.6
+      5.7,
+      5.9
+     ]
+    },
+    {
+     "lat": [
+      null,
+      5.1,
+      null
      ],
-     "quality": 0.25,
-     "bpm": null
+     "false": [],
+     "lock": 74,
+     "lockT": 32.256,
+     "drops": [
+      4.3,
+      6.6,
+      4.4
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      4.6,
+      1.7,
+      4.6
+     ]
+    },
+    {
+     "lat": [
+      null,
+      21.5,
+      null
+     ],
+     "false": [
+      74.5
+     ],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      0.6,
+      5.7,
+      6.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      2.2,
+      3.7,
+      3.6
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      2.7
+     ],
+     "false": [
+      61.3
+     ],
+     "lock": 69,
+     "lockT": 32.256,
+     "drops": [
+      5.4,
+      3.8,
+      4.4
+     ]
+    },
+    {
+     "lat": [
+      null,
+      4.1,
+      0.8
+     ],
+     "false": [],
+     "lock": 69,
+     "lockT": 32.256,
+     "drops": [
+      2,
+      4.3,
+      2.7
+     ]
+    }
+   ],
+   "loto": [
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      3.1,
+      3.5,
+      3.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      6.8,
+      14
+     ],
+     "false": [
+      122.3
+     ],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      4.9,
+      9.8,
+      5.3
+     ]
+    },
+    {
+     "lat": [
+      null,
+      2.1,
+      8.4
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      2.9,
+      8.1,
+      6.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      5.5,
+      null
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      1.1,
+      10.4,
+      7
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [
+      128.7
+     ],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      3.5,
+      5.1,
+      8.5
+     ]
+    },
+    {
+     "lat": [
+      null,
+      7.9,
+      2.7
+     ],
+     "false": [],
+     "lock": 51,
+     "lockT": 32.256,
+     "drops": [
+      4.5,
+      3.3,
+      3.9
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      3.5,
+      4.7,
+      5.4
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      5.7
+     ],
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      5.2,
+      4.2,
+      5.5
+     ]
+    },
+    {
+     "lat": [
+      null,
+      6.4,
+      5.2
+     ],
+     "false": [],
+     "lock": 57,
+     "lockT": 32.256,
+     "drops": [
+      4.6,
+      2.8,
+      0.9
+     ]
+    },
+    {
+     "lat": [
+      13.7,
+      8.7,
+      19.3
+     ],
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      8.1,
+      6.5,
+      7
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 80,
+     "lockT": 32.256,
+     "drops": [
+      0.7,
+      1.2,
+      1.8
+     ]
+    },
+    {
+     "lat": [
+      null,
+      4.1,
+      4.8
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      4.4,
+      9.6,
+      11.5
+     ]
     }
    ]
   },
   {
    "id": "take-2026-11-15T02-54-00-030Z",
+   "trainEnd": 150,
    "real": {
-    "caught": 3,
-    "holds": 3,
     "lat": [
      6.8,
      10.3,
      4.4
     ],
-    "false": 0,
+    "false": [],
     "lock": 29,
-    "relocks": 0,
+    "lockT": 32.256,
     "drops": [
      8.3,
      7.7,
      13.1
-    ],
-    "quality": 0.45,
-    "bpm": 4.1
+    ]
    },
-   "sims": [
+   "own": [
     {
-     "caught": 3,
-     "holds": 3,
      "lat": [
       7.2,
-      12.4,
-      9.3
+      15.8,
+      null
      ],
-     "false": 2,
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      7.6,
+      6.2,
+      4.1
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      11.2
+     ],
+     "false": [
+      122.5
+     ],
      "lock": 46,
-     "relocks": 0,
+     "lockT": 32.256,
      "drops": [
-      12.1,
+      8.1,
       8.3,
-      10
-     ],
-     "quality": 0.45,
-     "bpm": 4
+      7.1
+     ]
     },
     {
-     "caught": 1,
-     "holds": 3,
      "lat": [
-      1.2,
+      null,
       null,
       null
      ],
-     "false": 2,
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      3.1,
+      3.6,
+      2.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      1.6,
+      2.8,
+      5.4
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
      "lock": 74,
-     "relocks": 0,
+     "lockT": 32.256,
      "drops": [
-      2.1,
-      6.6,
-      4.8
-     ],
-     "quality": 0.74,
-     "bpm": 4.2
+      1.5,
+      1.9,
+      1.8
+     ]
     },
     {
-     "caught": 1,
-     "holds": 3,
      "lat": [
+      1.5,
       null,
-      12,
       null
      ],
-     "false": 3,
-     "lock": 109,
-     "relocks": 0,
+     "false": [],
+     "lock": 46,
+     "lockT": 32.256,
      "drops": [
-      4.3,
-      9.8,
-      0.6
-     ],
-     "quality": 0.34,
-     "bpm": 4.1
+      7.8,
+      6.5,
+      7.3
+     ]
     },
     {
-     "caught": 0,
-     "holds": 3,
      "lat": [
       null,
       null,
       null
      ],
-     "false": 1,
-     "lock": 86,
-     "relocks": 0,
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
      "drops": [
-      3.1,
-      3.1,
-      4.5
-     ],
-     "quality": 0.4,
-     "bpm": 4.8
+      3.7,
+      0.7,
+      3.4
+     ]
     },
     {
-     "caught": 3,
-     "holds": 3,
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      4.8,
+      4.5,
+      5.8
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      3.6,
+      4.6,
+      4.4
+     ]
+    },
+    {
      "lat": [
       1.2,
-      12.8,
-      5
+      null,
+      null
      ],
-     "false": 1,
+     "false": [
+      105.4
+     ],
      "lock": 40,
-     "relocks": 0,
+     "lockT": 32.256,
      "drops": [
-      6.8,
-      6.7,
-      8
-     ],
-     "quality": 0.45,
-     "bpm": 4.4
+      8.3,
+      8.2,
+      8.5
+     ]
     },
     {
-     "caught": 1,
-     "holds": 3,
+     "lat": [
+      null,
+      14.5,
+      9.5
+     ],
+     "false": [
+      123.8
+     ],
+     "lock": 51,
+     "lockT": 32.256,
+     "drops": [
+      5.8,
+      8,
+      8.4
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      3.9,
+      5.3,
+      2.3
+     ]
+    }
+   ],
+   "loto": [
+    {
      "lat": [
       1.2,
       null,
       null
      ],
-     "false": 0,
-     "lock": 74,
-     "relocks": 0,
+     "false": [
+      120.8,
+      189.5
+     ],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      8.2,
+      9.9,
+      8.3
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [
+      59.1,
+      110.1
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      11.7,
+      8.8,
+      6.9
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [
+      182.2
+     ],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      7.6,
+      7.9,
+      9.1
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [
+      108.8
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      7.5,
+      8,
+      6
+     ]
+    },
+    {
+     "lat": [
+      9.8,
+      null,
+      null
+     ],
+     "false": [
+      116.9,
+      191.2
+     ],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      6.7,
+      4.1,
+      4.1
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [
+      184.1
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      3.9,
+      8,
+      11.5
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [
+      123.1,
+      191.2
+     ],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      3.4,
+      8,
+      5.6
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [
+      193.1
+     ],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      6.5,
+      8.3,
+      11.6
+     ]
+    },
+    {
+     "lat": [
+      0.6,
+      null,
+      null
+     ],
+     "false": [
+      110.8
+     ],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      9.8,
+      13.6,
+      8.4
+     ]
+    },
+    {
+     "lat": [
+      0.4,
+      null,
+      null
+     ],
+     "false": [
+      120.1
+     ],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      10.8,
+      6.6,
+      5.9
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [
+      188.2
+     ],
+     "lock": 34,
+     "lockT": 32.256,
      "drops": [
       5.1,
-      7,
-      3.3
-     ],
-     "quality": 0.74,
-     "bpm": 4.3
+      9.2,
+      6.8
+     ]
     },
     {
-     "caught": 1,
-     "holds": 3,
      "lat": [
       1.2,
       null,
       null
      ],
-     "false": 2,
-     "lock": 74,
-     "relocks": 0,
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
      "drops": [
-      6.4,
-      1.6,
-      3.6
-     ],
-     "quality": 0.66,
-     "bpm": 4.1
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      1.2,
-      null,
-      null
-     ],
-     "false": 2,
-     "lock": 74,
-     "relocks": 0,
-     "drops": [
-      4.4,
-      4.2,
-      6.5
-     ],
-     "quality": 0.63,
-     "bpm": 4.6
-    },
-    {
-     "caught": 0,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      null
-     ],
-     "false": 0,
-     "lock": 114,
-     "relocks": 0,
-     "drops": [
-      4.4,
-      2.7,
-      1.9
-     ],
-     "quality": 0.26,
-     "bpm": 4
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      null,
-      7.5,
-      null
-     ],
-     "false": 1,
-     "lock": 63,
-     "relocks": 0,
-     "drops": [
-      4.9,
-      10.5,
-      6.3
-     ],
-     "quality": 0.46,
-     "bpm": 4.4
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      1.2,
-      null,
-      null
-     ],
-     "false": 1,
-     "lock": 74,
-     "relocks": 0,
-     "drops": [
-      5,
-      5.9,
-      2.3
-     ],
-     "quality": 0.77,
-     "bpm": 4.1
-    },
-    {
-     "caught": 0,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      null
-     ],
-     "false": 3,
-     "lock": 51,
-     "relocks": 0,
-     "drops": [
-      12.7,
-      10.4,
-      8.8
-     ],
-     "quality": 0.55,
-     "bpm": 4.2
+      10.1,
+      13.3,
+      12.1
+     ]
     }
    ]
   },
   {
    "id": "take-2026-11-15T03-09-51-923Z",
+   "trainEnd": 120,
    "real": {
-    "caught": 3,
-    "holds": 3,
     "lat": [
      12.3,
      3.8,
      0.2
     ],
-    "false": 0,
+    "false": [],
     "lock": 34,
-    "relocks": 0,
+    "lockT": 32.256,
     "drops": [
      9.6,
      10.5,
      12.1
-    ],
-    "quality": 0.34,
-    "bpm": 4.1
+    ]
    },
-   "sims": [
+   "own": [
     {
-     "caught": 3,
-     "holds": 3,
-     "lat": [
-      16.1,
-      5.7,
-      11.1
-     ],
-     "false": 1,
-     "lock": 91,
-     "relocks": 0,
-     "drops": [
-      6.3,
-      10.1,
-      5.8
-     ],
-     "quality": 0.5,
-     "bpm": 4.6
-    },
-    {
-     "caught": 1,
-     "holds": 3,
      "lat": [
       1.2,
-      null,
-      null
+      8.3,
+      9.3
      ],
-     "false": 2,
-     "lock": 86,
-     "relocks": 0,
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
      "drops": [
-      3.7,
-      4.8,
-      3.9
-     ],
-     "quality": 0.36,
-     "bpm": 6.3
+      10,
+      7.9,
+      9.1
+     ]
     },
     {
-     "caught": 1,
-     "holds": 3,
      "lat": [
-      null,
-      2.3,
+      1.2,
+      6.4,
       null
      ],
-     "false": 1,
-     "lock": 97,
-     "relocks": 0,
-     "drops": [
-      5.1,
-      2.9,
-      4.6
-     ],
-     "quality": 0.4,
-     "bpm": 5.5
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      null,
-      null,
-      7.2
-     ],
-     "false": 3,
-     "lock": 46,
-     "relocks": 0,
-     "drops": [
-      3.9,
-      2.6,
-      7.2
-     ],
-     "quality": 0.53,
-     "bpm": 4.3
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      0.8,
-      null,
-      null
-     ],
-     "false": 3,
+     "false": [],
      "lock": 57,
-     "relocks": 0,
-     "drops": [
-      2.8,
-      1.9,
-      6.2
-     ],
-     "quality": 0.51,
-     "bpm": 4.7
-    },
-    {
-     "caught": 1,
-     "holds": 3,
-     "lat": [
-      null,
-      14,
-      null
-     ],
-     "false": 3,
-     "lock": 46,
-     "relocks": 0,
+     "lockT": 32.256,
      "drops": [
       3.3,
-      6.1,
-      6.5
-     ],
-     "quality": 0.47,
-     "bpm": 4
+      3.3,
+      4.4
+     ]
     },
     {
-     "caught": 3,
-     "holds": 3,
      "lat": [
       1.2,
-      12.5,
-      11.5
-     ],
-     "false": 1,
-     "lock": 51,
-     "relocks": 0,
-     "drops": [
-      5.4,
-      9.2,
+      null,
       8.1
      ],
-     "quality": 0.55,
-     "bpm": 4.4
+     "false": [],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      9.8,
+      7.1,
+      8.7
+     ]
     },
     {
-     "caught": 2,
-     "holds": 3,
      "lat": [
       1.2,
-      7,
+      9.3,
       null
      ],
-     "false": 0,
-     "lock": 69,
-     "relocks": 0,
+     "false": [],
+     "lock": 57,
+     "lockT": 32.256,
      "drops": [
-      1.4,
+      3.5,
       3.9,
-      4.6
-     ],
-     "quality": 0.56,
-     "bpm": 4.7
+      1.7
+     ]
     },
     {
-     "caught": 1,
-     "holds": 3,
      "lat": [
-      13.1,
+      null,
       null,
       null
      ],
-     "false": 2,
-     "lock": 103,
-     "relocks": 0,
+     "false": [],
+     "lock": 74,
+     "lockT": 32.256,
      "drops": [
-      9.5,
-      4.3,
-      2.6
-     ],
-     "quality": 0.45,
-     "bpm": 4.6
+      2,
+      0.5,
+      2.5
+     ]
     },
     {
-     "caught": 1,
-     "holds": 3,
      "lat": [
-      null,
-      9.8,
+      1.2,
+      6.4,
+      8.1
+     ],
+     "false": [],
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      9.1,
+      8.2,
+      8.9
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      5.9,
       null
      ],
-     "false": 1,
-     "lock": 91,
-     "relocks": 0,
+     "false": [],
+     "lock": 51,
+     "lockT": 32.256,
+     "drops": [
+      4.6,
+      6.9,
+      7.5
+     ]
+    },
+    {
+     "lat": [
+      15.7,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      7.1,
+      4.8,
+      5.5
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [
+      77.3
+     ],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      4.6,
+      3.1,
+      2.5
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 63,
+     "lockT": 32.256,
+     "drops": [
+      3,
+      2.2,
+      1
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      6.4,
+      7.3,
+      10.2
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      2.1,
+      null
+     ],
+     "false": [],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      7.2,
+      8.4,
+      7.2
+     ]
+    }
+   ],
+   "loto": [
+    {
+     "lat": [
+      2.9,
+      6.4,
+      null
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      9.3,
+      7.6,
+      7.4
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      7.9,
+      null
+     ],
+     "false": [
+      43.8
+     ],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      7.8,
+      5.3,
+      6.9
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      8.7,
+      6.1,
+      8.1
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      7.6,
+      6.1,
+      10.1
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      9.1,
+      null
+     ],
+     "false": [],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      6.5,
+      5.2,
+      6.9
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      8.1,
+      8.9
+     ],
+     "false": [],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      7.5,
+      6.5,
+      6.3
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      null,
+      4.9
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      6.2,
+      6.8,
+      9.8
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      1.9,
+      null
+     ],
+     "false": [],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      6.3,
+      5.2,
+      5.6
+     ]
+    },
+    {
+     "lat": [
+      7.2,
+      null,
+      1.5
+     ],
+     "false": [
+      123.8
+     ],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      10.4,
+      6.4,
+      8.4
+     ]
+    },
+    {
+     "lat": [
+      0.3,
+      8.3,
+      8.9
+     ],
+     "false": [],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      9.3,
+      8.4,
+      9.9
+     ]
+    },
+    {
+     "lat": [
+      1.2,
+      3.4,
+      null
+     ],
+     "false": [],
+     "lock": 46,
+     "lockT": 32.256,
      "drops": [
       4.5,
-      7.2,
-      4
-     ],
-     "quality": 0.41,
-     "bpm": 4.9
+      6.7,
+      4.2
+     ]
     },
     {
-     "caught": 3,
-     "holds": 3,
      "lat": [
-      3.8,
-      0.6,
-      10.8
-     ],
-     "false": 2,
-     "lock": 91,
-     "relocks": 0,
-     "drops": [
-      9.6,
-      6.2,
-      9.9
-     ],
-     "quality": 0.31,
-     "bpm": 3.8
-    },
-    {
-     "caught": 0,
-     "holds": 3,
-     "lat": [
-      null,
+      1.2,
       null,
       null
      ],
-     "false": 2,
-     "lock": 103,
-     "relocks": 0,
-     "drops": [
-      2.9,
-      3.3,
-      3.3
+     "false": [
+      149.8
      ],
-     "quality": 0.46,
-     "bpm": 4.5
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      9.1,
+      10.6,
+      10.2
+     ]
     }
    ]
   },
   {
    "id": "take-2026-11-15T03-40-26-237Z",
+   "trainEnd": 166,
    "real": {
-    "caught": 2,
-    "holds": 2,
     "lat": [
      7.6,
      7.2
     ],
-    "false": 2,
+    "false": [
+     55.9,
+     135.5
+    ],
     "lock": 34,
-    "relocks": 0,
+    "lockT": 32.256,
     "drops": [
      11.5,
      9.6
-    ],
-    "quality": 0.28,
-    "bpm": 4.1
+    ]
    },
-   "sims": [
+   "own": [
     {
-     "caught": 1,
-     "holds": 2,
      "lat": [
-      null,
-      0.2
+      7.6,
+      8.9
      ],
-     "false": 2,
-     "lock": 46,
-     "relocks": 0,
+     "false": [
+      102,
+      180.1
+     ],
+     "lock": 51,
+     "lockT": 32.256,
      "drops": [
-      13.8,
-      12.2
-     ],
-     "quality": 0.75,
-     "bpm": 4.4
+      13.3,
+      12.7
+     ]
     },
     {
-     "caught": 0,
-     "holds": 2,
      "lat": [
       null,
       null
      ],
-     "false": 2,
-     "lock": 46,
-     "relocks": 0,
-     "drops": [
-      13.4,
-      13.1
+     "false": [
+      54,
+      61.3,
+      83.9,
+      130
      ],
-     "quality": 0.62,
-     "bpm": 4.4
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      12.7,
+      13.6
+     ]
     },
     {
-     "caught": 0,
-     "holds": 2,
      "lat": [
       null,
       null
      ],
-     "false": 1,
-     "lock": 40,
-     "relocks": 0,
-     "drops": [
-      10.9,
-      15
+     "false": [
+      54.4,
+      91.3,
+      99.7
      ],
-     "quality": 0.71,
-     "bpm": 4.5
+     "lock": 29,
+     "lockT": 32.256,
+     "drops": [
+      2.2,
+      1.2
+     ]
     },
     {
-     "caught": 0,
-     "holds": 2,
      "lat": [
-      null,
-      null
-     ],
-     "false": 3,
-     "lock": 46,
-     "relocks": 0,
-     "drops": [
-      14.4,
-      14.6
-     ],
-     "quality": 0.73,
-     "bpm": 4.2
-    },
-    {
-     "caught": 0,
-     "holds": 2,
-     "lat": [
-      null,
-      null
-     ],
-     "false": 2,
-     "lock": 40,
-     "relocks": 0,
-     "drops": [
-      14.5,
-      15.8
-     ],
-     "quality": 0.56,
-     "bpm": 4.6
-    },
-    {
-     "caught": 1,
-     "holds": 2,
-     "lat": [
-      null,
+      15.1,
       4.7
      ],
-     "false": 3,
-     "lock": 46,
-     "relocks": 0,
-     "drops": [
-      14.2,
-      16.7
+     "false": [
+      61.3
      ],
-     "quality": 0.72,
-     "bpm": 4.5
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      6.8,
+      3.6
+     ]
     },
     {
-     "caught": 0,
-     "holds": 2,
      "lat": [
       null,
-      null
+      8.7
      ],
-     "false": 3,
-     "lock": 46,
-     "relocks": 0,
+     "false": [
+      124.8
+     ],
+     "lock": 74,
+     "lockT": 32.256,
      "drops": [
-      9.5,
-      10.1
-     ],
-     "quality": 0.73,
-     "bpm": 4.3
+      17.4,
+      16
+     ]
     },
     {
-     "caught": 0,
-     "holds": 2,
      "lat": [
-      null,
+      1.2,
       null
      ],
-     "false": 2,
-     "lock": 40,
-     "relocks": 0,
-     "drops": [
-      14.4,
-      15.9
+     "false": [
+      195
      ],
-     "quality": 0.72,
-     "bpm": 4.4
-    },
-    {
-     "caught": 0,
-     "holds": 2,
-     "lat": [
-      null,
-      null
-     ],
-     "false": 1,
-     "lock": 46,
-     "relocks": 0,
+     "lock": 29,
+     "lockT": 32.256,
      "drops": [
       13.6,
-      11.3
-     ],
-     "quality": 0.7,
-     "bpm": 4.4
-    },
-    {
-     "caught": 1,
-     "holds": 2,
-     "lat": [
-      null,
-      4.7
-     ],
-     "false": 4,
-     "lock": 46,
-     "relocks": 0,
-     "drops": [
-      16.7,
-      14.7
-     ],
-     "quality": 0.72,
-     "bpm": 4.3
-    },
-    {
-     "caught": 0,
-     "holds": 2,
-     "lat": [
-      null,
-      null
-     ],
-     "false": 3,
-     "lock": 46,
-     "relocks": 0,
-     "drops": [
-      14.4,
-      14.1
-     ],
-     "quality": 0.74,
-     "bpm": 4.2
-    },
-    {
-     "caught": 0,
-     "holds": 2,
-     "lat": [
-      null,
-      null
-     ],
-     "false": 2,
-     "lock": 46,
-     "relocks": 0,
-     "drops": [
-      16.1,
       11.5
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
      ],
-     "quality": 0.75,
-     "bpm": 4.2
+     "false": [],
+     "lock": 69,
+     "lockT": 32.256,
+     "drops": [
+      4.9,
+      5.3
+     ]
+    },
+    {
+     "lat": [
+      null,
+      6.8
+     ],
+     "false": [
+      86.9,
+      128.3
+     ],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      10.6,
+      8.4
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [
+      51.7
+     ],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      3.2,
+      2
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [
+      149.6
+     ],
+     "lock": 57,
+     "lockT": 32.256,
+     "drops": [
+      5.5,
+      6
+     ]
+    },
+    {
+     "lat": [
+      null,
+      1.5
+     ],
+     "false": [
+      124.6
+     ],
+     "lock": 51,
+     "lockT": 32.256,
+     "drops": [
+      14.6,
+      13.9
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 80,
+     "lockT": 32.256,
+     "drops": [
+      2.8,
+      3.2
+     ]
+    }
+   ],
+   "loto": [
+    {
+     "lat": [
+      8.9,
+      null
+     ],
+     "false": [
+      61.3
+     ],
+     "lock": 34,
+     "lockT": 32.256,
+     "drops": [
+      7.2,
+      4.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      4.2
+     ],
+     "false": [
+      43.8,
+      118.2
+     ],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      7.6,
+      6.9
+     ]
+    },
+    {
+     "lat": [
+      null,
+      8.9
+     ],
+     "false": [
+      61.3,
+      103.3,
+      122.1
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      6,
+      8.3
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [
+      61.3,
+      121.2
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      9.9,
+      7.6
+     ]
+    },
+    {
+     "lat": [
+      8.7,
+      null
+     ],
+     "false": [
+      61.3,
+      106.3,
+      181.8
+     ],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      10.2,
+      5.3
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [
+      61.3,
+      121.4
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      6.7,
+      6.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [
+      61.3,
+      121
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      8.1,
+      4.9
+     ]
+    },
+    {
+     "lat": [
+      null,
+      5.9
+     ],
+     "false": [
+      122.3
+     ],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      5,
+      4.3
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [],
+     "lock": 23,
+     "lockT": 32.256,
+     "drops": [
+      4.1,
+      3.9
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [
+      61.3,
+      122.9
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      9.8,
+      5.1
+     ]
+    },
+    {
+     "lat": [
+      null,
+      null
+     ],
+     "false": [
+      61.3,
+      84.1,
+      119.5
+     ],
+     "lock": 40,
+     "lockT": 32.256,
+     "drops": [
+      4.9,
+      6.8
+     ]
+    },
+    {
+     "lat": [
+      null,
+      8.5
+     ],
+     "false": [
+      61.3,
+      136.4
+     ],
+     "lock": 46,
+     "lockT": 32.256,
+     "drops": [
+      6.6,
+      4.4
+     ]
     }
    ]
   }

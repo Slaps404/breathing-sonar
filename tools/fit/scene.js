@@ -78,22 +78,47 @@ function coloured(n, rate, levels, bands, r) {
 // plan: [{label, a, b, ...}] with labels normal | hold | moving | empty room | twitch | hand | shift.
 //   twitch: {label:'twitch', a, b, mm}  short body jolt inside any segment (overlay, list in `extra`)
 // room: pooled measurement (measured.json .pooled.empty) ; person: see PERSON (null = nobody).
-function simulate({ segs, extra = [], T, person = PERSON, room, bands, seed = 1, i0 = 20, A0 = 7 }) {
+// room      = background table { still[], bands{} }. With a person: that take's own levels DURING HOLDS (everything
+//             that moves when breathing does not: sway, heartbeat, room). Then only breathing is added on top.
+// emptyRoom = background once the person has walked out (pooled empty-room takes); faded in over 3 s.
+// excess    = extra motion per slice and band present while the person breathes normally and absent in holds
+//             (measured normal minus measured hold minus what the modelled chest already gives). Not rhythmic.
+//             Covers what a few point reflectors cannot: the whole body moves a little more when it breathes.
+function simulate({ segs, extra = [], T, person = PERSON, room, emptyRoom = null, excess = null, bands, seed = 1, i0 = 20, A0 = 7 }) {
   const p = D.makeProbe(), rate = p.rate, L = p.L, n = Math.floor(T * rate), nTap = 30;
   const re = new Float32Array(n * L), im = new Float32Array(n * L), snr = new Float32Array(n).fill(68);
   const r = rng(seed * 9973 + 7), rs = rng(seed * 31 + 3);
   // 1. empty room
+  const leave = emptyRoom ? segs.find(x => x.label === 'empty room') : null, back = emptyRoom ? segs.find(x => x.label === 'returned') : null;
+  const goneW = t => !leave || t < leave.a ? 0 : back && t >= back.a ? 0 : Math.min(1, (t - leave.a) / 3);
+  // Levels are not steady in the recordings: the breathing-band level of a slice swings about 10 dB (10th to
+  // 90th percentile) within one take, steady noise only about 6. So the background's strength wanders slowly
+  // (bgWander dB rms, wanderTau s), the same for all slices: the body is one thing.
+  const Pw = { bgWander: 0, bodyWander: 0, wanderTau: 10, ...(person || {}) }, gain = new Float64Array(n).fill(1);
+  if (Pw.bgWander > 0) { const rw = rng(seed * 577 + 11); let w = gauss(rw) * Pw.bgWander; for (let f = 0; f < n; f++) { w += -w / (Pw.wanderTau * rate) + gauss(rw) * Math.sqrt(2 / (Pw.wanderTau * rate)) * Pw.bgWander; gain[f] = Math.pow(10, w / 20); } }
   for (let s = 0; s < nTap; s++) {
-    const R = Math.min(s, room.still.length - 1), lv = Object.fromEntries(Object.keys(bands).map(k => [k, room.bands[k][R]]));
-    const c = coloured(n, rate, lv, bands, r), a = A0 * Math.pow(10, room.still[R] / 20), ph = 2 * Math.PI * rs();
-    for (let f = 0; f < n; f++) { re[f * L + i0 + s] = a * Math.cos(ph) + A0 * c.re[f]; im[f * L + i0 + s] = a * Math.sin(ph) + A0 * c.im[f]; }
+    const R = Math.min(s, room.still.length - 1), ph = 2 * Math.PI * rs(), tab = [room, ...(leave ? [emptyRoom] : [])].map(rm => ({
+      a: A0 * Math.pow(10, rm.still[R] / 20), c: coloured(n, rate, Object.fromEntries(Object.keys(bands).map(k => [k, rm.bands[k][R]])), bands, r) }));
+    for (let f = 0; f < n; f++) {
+      const w = leave ? goneW((f + 1) / rate) : 0, w0 = Math.sqrt(1 - w), w1 = Math.sqrt(w);   // power crossfade
+      let a = tab[0].a * (1 - w), cr = w0 * gain[f] * tab[0].c.re[f], ci = w0 * gain[f] * tab[0].c.im[f];
+      if (leave) { a += tab[1].a * w; cr += w1 * tab[1].c.re[f]; ci += w1 * tab[1].c.im[f]; }
+      re[f * L + i0 + s] = a * Math.cos(ph) + A0 * cr; im[f * L + i0 + s] = a * Math.sin(ph) + A0 * ci;
+    }
+  }
+  if (excess) {
+    const gate = new Float64Array(n), rx = rng(seed * 811 + 13), bw = (person && person.bodyWander) || 0, tau = (person && person.wanderTau) || 10; let g = 1, w = gauss(rx) * bw;
+    for (let f = 0; f < n; f++) { const t = (f + 1) / rate, sg = segs.find(x => t >= x.a && t < x.b), on = !sg || (sg.label !== 'hold' && sg.label !== 'empty room');
+      g += ((on ? 1 : 0) - g) * Math.min(1, 1 / (1.5 * rate)); w += -w / (tau * rate) + gauss(rx) * Math.sqrt(2 / (tau * rate)) * bw; gate[f] = g * Math.pow(10, w / 20); }
+    for (let s = 0; s < nTap; s++) { const R = Math.min(s, excess.breath.length - 1), c = coloured(n, rate, Object.fromEntries(Object.keys(bands).map(k => [k, excess[k][R]])), bands, r);
+      for (let f = 0; f < n; f++) { re[f * L + i0 + s] += A0 * gate[f] * c.re[f]; im[f * L + i0 + s] += A0 * gate[f] * c.im[f]; } }
   }
   if (!person) return pack();
   // 2. the person's motion, frame by frame
-  const P = { ...PERSON, ...person }, psf = makePsf(p, i0, nTap), dt = 1 / rate;
+  const P = { wanderTau: 10, ...PERSON, ...person }, psf = makePsf(p, i0, nTap), dt = 1 / rate;
   const tau = d => i0 * p.P / L + 2 * d / C * SR;   // round-trip delay in samples; the direct path sits at slice i0
   const at = (t, lab) => segs.find(s => t >= s.a && t < s.b && (!lab || s.label === lab));
-  let ph = 2 * Math.PI * r(), wob = 0, dep = 1, sway = 0, drift = 0, trem = 0, hph = 0, settle = 0, pos = 0, vel = 0, gone = 0, farS = 0, lastCycle = 0, hand = 0;
+  let ph = 2 * Math.PI * r(), wob = 0, dep = 1, sway = 0, drift = 0, trem = 0, hph = 0, settle = 0, pos = 0, vel = 0, gone = 0, farS = 0, lastCycle = 0, hand = 0, ksS = 1, wB = 0;
   const hr = (62 + 16 * r()) / 60;
   for (let f = 0; f < n; f++) {
     const t = (f + 1) / rate, seg = at(t), lab = seg ? seg.label : 'normal';
@@ -102,11 +127,12 @@ function simulate({ segs, extra = [], T, person = PERSON, room, bands, seed = 1,
     if (!holding && !empty) { ph += 2 * Math.PI * P.bpm / 60 * (1 + wob) * dt; settle += -settle * dt / 3; }
     else settle += (1 - settle) * dt / 12;
     const cyc = Math.floor(ph / (2 * Math.PI)); if (cyc !== lastCycle) { lastCycle = cyc; dep = Math.max(0.4, 1 + P.depthWobble * gauss(r)); }
-    const ks = holding ? P.holdSway : 1;
+    // body sway outside holds: people also freeze when they hold their breath. Eases in/out over ~1.5 s.
+    ksS += ((holding ? P.holdSway : 1) - ksS) * Math.min(1, dt / 1.5); const ks = ksS;
     sway += -sway * dt / P.swayTau + gauss(r) * Math.sqrt(2 * dt / P.swayTau) * P.sway;
     drift += -drift * dt / P.driftTau + gauss(r) * Math.sqrt(2 * dt / P.driftTau) * P.drift;
     trem += -trem * dt / 0.08 + gauss(r) * Math.sqrt(2 * dt / 0.08) * P.tremor;
-    farS += -farS * dt / P.far.tau + gauss(r) * Math.sqrt(2 * dt / P.far.tau) * P.far.sway;
+    if (P.far) farS += -farS * dt / P.far.tau + gauss(r) * Math.sqrt(2 * dt / P.far.tau) * P.far.sway;
     hph += 2 * Math.PI * hr * dt;
     if (moving) { vel += -vel * dt / 0.5 + gauss(r) * Math.sqrt(2 * dt / 0.5) * P.moveSpeed; pos += vel * dt; pos -= pos * dt / 4; } else vel = 0;
     if (empty) gone += dt; else if (gone > 0 && lab !== 'empty room') gone = 0;
@@ -117,8 +143,9 @@ function simulate({ segs, extra = [], T, person = PERSON, room, bands, seed = 1,
       if (e.label === 'hand') hand = Math.sin(Math.PI * u);       // 0..1 reach towards the keyboard and back
       if (e.label === 'shift') pos = (e.from || 0) + ((e.mm) - (e.from || 0)) * (0.5 - 0.5 * Math.cos(Math.PI * u));
     }
-    const breath = P.depth * dep * (Math.sin(ph) + 0.2 * Math.sin(2 * ph)) / 1.1 - (holding ? P.holdSettle * settle : 0);
-    const body = ks * sway + drift + jolt + pos;                 // mm, shared by every body part
+    wB += -wB * dt / P.wanderTau + gauss(r) * Math.sqrt(2 * dt / P.wanderTau) * (P.bodyWander || 0); const gB = Math.pow(10, wB / 20);
+    const breath = gB * P.depth * dep * (Math.sin(ph) + 0.2 * Math.sin(2 * ph)) / 1.1 - (holding ? P.holdSettle * settle : 0);
+    const body = ks * gB * (sway + drift) + jolt + pos;                 // mm, shared by every body part
     const walk = empty ? gone * 1000 : 0;                        // leaves at 1 m/s
     const o = f * L + i0;
     for (const [off, gDb, kb, kw] of P.parts) {

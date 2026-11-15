@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 330" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="13">
+  <rect width="860" height="330" fill="#ffffff"/>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#555"/></marker></defs>
+  <g fill="#f3f6fb" stroke="#4a6fa5" stroke-width="1.5">
+    <rect x="20" y="30" width="170" height="64" rx="8"/><rect x="250" y="30" width="170" height="64" rx="8"/>
+    <rect x="250" y="210" width="170" height="64" rx="8"/><rect x="20" y="210" width="170" height="64" rx="8"/>
+  </g>
+  <g fill="#fff6e5" stroke="#c98a1b" stroke-width="1.5"><rect x="480" y="120" width="170" height="64" rx="8"/></g>
+  <g fill="#eaf6ec" stroke="#3d8b4f" stroke-width="1.5"><rect x="690" y="30" width="150" height="64" rx="8"/><rect x="690" y="210" width="150" height="64" rx="8"/></g>
+  <g fill="#222" text-anchor="middle">
+    <text x="105" y="56" font-weight="600">Recorded takes</text><text x="105" y="76" fill="#555">mic audio + labels</text>
+    <text x="335" y="56" font-weight="600">Measure</text><text x="335" y="76" fill="#555">motion level per distance</text>
+    <text x="105" y="236" font-weight="600">Scene (simulation)</text><text x="105" y="256" fill="#555">room + chest + events</text>
+    <text x="335" y="236" font-weight="600">Measure</text><text x="335" y="256" fill="#555">same code as above</text>
+    <text x="565" y="146" font-weight="600">Fit</text><text x="565" y="166" fill="#555">shrink the mismatch</text>
+    <text x="765" y="56" font-weight="600">Detector (dsp.js)</text><text x="765" y="76" fill="#555">alarms on real takes</text>
+    <text x="765" y="236" font-weight="600">Detector (dsp.js)</text><text x="765" y="256" fill="#555">alarms on sim takes</text>
+  </g>
+  <g stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)">
+    <path d="M190 62H250"/><path d="M190 242H250"/>
+    <path d="M420 62C470 62 470 130 480 140"/><path d="M420 242C470 242 470 175 480 165"/>
+    <path d="M565 184C565 300 130 310 108 276" stroke-dasharray="5 4"/>
+    <path d="M105 30C105 8 765 8 765 30"/><path d="M105 274C105 322 765 322 765 276"/>
+  </g>
+  <path d="M765 96V208" stroke="#3d8b4f" stroke-width="2" stroke-dasharray="3 4" fill="none"/>
+  <text x="775" y="150" fill="#3d8b4f" font-weight="600">compare</text><text x="775" y="168" fill="#3d8b4f">= the test</text>
+  <text x="330" y="304" fill="#555" text-anchor="middle">new settings for the scene</text>
+  <text x="430" y="20" fill="#555" text-anchor="middle">alarms are never fed back into the fit</text>
+</svg>

@@ -2,7 +2,7 @@
 // profiles (one complex value per ~2.8 cm slice per frame, 23.4 frames/s) and caches them, so
 // measuring and replaying is fast. Cache: data/.cir/<id>.bin (data/ is not committed).
 const fs = require('fs'), path = require('path');
-const D = require('../../dsp.js');
+const D = require(process.env.DSP || '../../dsp.js');   // DSP=<path> runs another version of the detector
 const ROOT = path.join(__dirname, '..', '..'), DATA = path.join(ROOT, 'data'), CACHE = path.join(DATA, '.cir');
 
 function meta(id) {
