@@ -576,7 +576,9 @@ class RangeSonar {
     for (let r = r0; r <= r1; r++) if (S(r) >= top - ZONE.near && (b === null || z.snr[r] > z.snr[b])) b = r;
     this.zscore = Array.from({ length: r1 + 1 }, (_, r) => (r < r0 ? null : S(r)));   // for display / debugging
     if (this.lock === null) {
-      if (nowMs < winMs + ZONE.settleSec * 1000) return; // let the initial echo ranking settle before locking
+      // Let the initial echo ranking settle before locking. Counted in received audio, not nowMs: the app's clock
+      // (performance.now) starts at page load, so after time on the setup screens it locked ~10 s early.
+      if (this.frames / this.rate * 1000 < winMs + ZONE.settleSec * 1000) return;
       return this.setZone(b * this.dr);
     }
     // Movement invalidates the old zone's level, including any hold inferred there.
