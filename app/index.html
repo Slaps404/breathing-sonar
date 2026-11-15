@@ -8,8 +8,8 @@
   if (location.hostname === '[::]' || location.hostname === '0.0.0.0') location.hostname = 'localhost';
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f4ede3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1c1917" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef3f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c151d" media="(prefers-color-scheme: dark)">
 <title>Breathing watch</title>
 <!-- Installable app (PWA): manifest = name and icon for the home screen, sw.js = opens with no network. -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -25,183 +25,434 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <!-- The cloud buddy's body, drawn once and reused on the hello and watch screens -->
+  <!-- One smooth outline: puffs on top, three small puffs underneath -->
+  <path id="cloudShape" d="M40 140 A28 28 0 0 1 30 86 A36 36 0 0 1 74 50 A42 42 0 0 1 146 50 A36 36 0 0 1 190 86 A28 28 0 0 1 180 140 A300 300 0 0 1 40 140 Z"/>
+  <linearGradient id="cloudFill" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" style="stop-color: var(--cloud-top)"/>
+    <stop offset="1" style="stop-color: var(--cloud)"/>
+  </linearGradient>
+</defs></svg>
 
-<!-- One thought per screen. Each screen: .top (back), .mid (the thought), .bot (one button). -->
+<!-- Layout: .stage holds the phone (.device) and, with ?debug, the dev dashboard (#dev).
+     On a phone .device is the whole screen. On a laptop it is drawn as a phone in the middle. -->
+<div class="stage">
+<div class="device" id="device">
 
-<!-- 1. Who to call -->
-<form id="s-who" class="screen" novalidate>
-  <div class="top"></div>
-  <div class="mid">
-    <h1>Who should this <span class="dev">phone</span> call if your breathing stops?</h1>
-    <input id="friendName" type="text" autocomplete="off" autocapitalize="words" enterkeyhint="next" maxlength="40" placeholder="Their name" aria-label="Their name">
-    <input id="friendPhone" type="tel" inputmode="tel" autocomplete="off" enterkeyhint="next" maxlength="24" placeholder="Their phone number" aria-label="Their phone number">
-    <p class="err" id="whoErr" role="alert" hidden></p>
-    <p class="soft">No account. Nothing is recorded. Nothing leaves this <span class="dev">phone</span> unless that call is made.</p>
-    <details>
-      <summary>No one to call?</summary>
-      <p class="soft">Never Use Alone stays on the phone with you instead: <a href="tel:+18776961996">877-696-1996</a></p>
-    </details>
-  </div>
-  <div class="bot">
-    <button type="submit" class="pill">Continue</button>
-    <a href="#" id="forget" class="tiny" hidden>Forget these details</a>
-  </div>
-</form>
+  <!-- Fake phone status bar, only drawn in the laptop phone frame -->
+  <div class="sbar" aria-hidden="true"><span id="sbarTime">9:41</span><span class="sbar-icons"><i></i><i></i><i></i><b></b></span></div>
 
-<!-- 2. Who you are -->
-<form id="s-you" class="screen" novalidate hidden>
-  <div class="top"><button type="button" class="back" data-go="who" aria-label="Back">&#8592;</button></div>
-  <div class="mid">
-    <h1>What does <span class="fname">your friend</span> call you?</h1>
-    <input id="userName" type="text" autocomplete="off" autocapitalize="words" enterkeyhint="next" maxlength="40" placeholder="Your name" aria-label="Your name">
-    <input id="place" type="text" autocomplete="off" enterkeyhint="done" maxlength="120" placeholder="Where you are (optional)" aria-label="Where you are, optional">
-    <input id="homeAddress" type="text" autocomplete="off" enterkeyhint="done" maxlength="200" placeholder="Your home address (optional)" aria-label="Your home address, optional">
-    <p class="err" id="youErr" role="alert" hidden></p>
-    <p class="soft">So they know the call is about you, and where to go. With your home address, the call can say "at home" or how far from home you are.</p>
-  </div>
-  <div class="bot"><button type="submit" class="pill">Continue</button></div>
-</form>
+  <!-- One thought per screen. Each screen: .top (back / progress), .mid (the thought), .bot (one button).
+       Elements with class "rise" fade up one after another when a screen opens; --i is their order. -->
 
-<!-- 3. Where to sit, then start -->
-<form id="s-sit" class="screen" novalidate hidden>
-  <div class="top">
-    <button type="button" class="back" data-go="you" aria-label="Back">&#8592;</button>
-    <a href="#" class="tiny" data-go="who">Calls <span class="fname"></span> · Change</a>
-  </div>
-  <div class="mid center">
-    <h1>Sit like this.</h1>
-    <svg class="sit" viewBox="0 0 300 150" role="img" aria-label="Person sitting 30 to 40 centimetres away, chest facing the screen">
-      <line x1="16" y1="112" x2="196" y2="112" class="ln"/>
-      <!-- laptop (shown on laptops) -->
-      <g class="only-laptop">
-        <line x1="44" y1="110" x2="104" y2="110" class="ln thick"/>
-        <line x1="44" y1="110" x2="28" y2="60" class="ln thick"/>
-      </g>
-      <!-- phone propped up (shown on phones) -->
-      <g class="only-phone">
-        <line x1="50" y1="110" x2="38" y2="62" class="ln thick"/>
-        <line x1="50" y1="110" x2="68" y2="110" class="ln"/>
-      </g>
-      <path d="M120 76 q7 10 0 20" class="wave"/>
-      <path d="M134 70 q11 16 0 32" class="wave"/>
-      <path d="M148 64 q15 22 0 44" class="wave"/>
-      <circle cx="222" cy="40" r="15" class="ln"/>
-      <path d="M222 56 v6 M198 140 v-52 q0 -24 24 -24 q24 0 24 24 v52" class="ln"/>
-      <line x1="44" y1="130" x2="198" y2="130" class="dim"/>
-      <line x1="44" y1="125" x2="44" y2="135" class="dim"/>
-      <line x1="198" y1="125" x2="198" y2="135" class="dim"/>
-      <text x="121" y="146" text-anchor="middle" class="dimtxt">30-40 cm</text>
-    </svg>
-    <ul class="lines">
-      <li class="only-laptop">A forearm away from the screen.</li>
-      <li class="only-phone">Prop the phone up, a forearm away.</li>
-      <li>Chest facing the screen.</li>
-      <li class="only-laptop">Hands off the laptop.</li>
-      <li class="only-phone">Hands off the phone.</li>
-      <li>Sound on, no headphones.</li>
-    </ul>
-    <p class="voicerow">
-      <label for="voice">Voice</label>
-      <select id="voice">
-        <option value="cjVigY5qzO86Huf0OWal">Eric</option>
-        <option value="EXAVITQu4vr4xnSDxMaL">Sarah</option>
-        <option value="JBFqnCBsd6RMkjVDRZzb">George</option>
-        <option value="SAz9YHcvj6GT2YYXdXww">River</option>
-      </select>
-      <button type="button" class="tiny" id="hearVoice">Hear it</button>
-    </p>
-    <p class="err" id="sitErr" role="alert" hidden></p>
-  </div>
-  <div class="bot">
-    <button type="submit" class="pill" id="start">Start</button>
-    <p class="tiny">A prototype, not a medical device. It can miss things, and it only works while you stay in front of this <span class="dev">phone</span>.</p>
-  </div>
-</form>
-
-<!-- 4. Watching -->
-<main id="s-watch" class="screen" hidden>
-  <div class="top"><button type="button" class="tiny" id="soundBtn" aria-pressed="true">Sound on (m)</button><button type="button" class="tiny" id="judgeBtn" aria-expanded="false">Show the sonar</button></div>
-  <div class="mid center">
-    <div class="dot" id="dot"></div>
-    <h1 id="watchTitle">Finding your breathing.</h1>
-    <p class="soft" id="watchSub">Sit still for a few seconds.</p>
-    <div class="warm" id="warm" role="progressbar" aria-label="Finding your breathing" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="warmFill"></div></div>
-    <canvas id="wave" class="wave" aria-label="Your breathing, last 20 seconds" role="img"></canvas>
-    <button type="button" class="tiny" id="holdBtn" aria-pressed="false">Mark: I'm holding my breath (h)</button>
-  </div>
-  <div class="bot">
-    <button type="button" class="pill ghost" id="stop">Stop</button>
-    <p class="tiny">Leave this on for as long as you are here. Keep the screen facing you.</p>
-  </div>
-</main>
-
-<!-- 5. Breathing stopped: tap anywhere to cancel -->
-<main id="s-alarm" class="screen" hidden>
-  <div class="top"></div>
-  <div class="mid center">
-    <h1 class="huge">Are you okay?</h1>
-    <p class="lead">Calling <span class="fname"></span> in <b id="count">6</b></p>
-  </div>
-  <div class="bot"><p class="lead">Tap anywhere if you are.</p></div>
-</main>
-
-<!-- 6. The call was made, or failed -->
-<main id="s-called" class="screen" hidden>
-  <div class="top"></div>
-  <div class="mid center">
-    <h1 id="calledTitle"></h1>
-    <p class="lead" id="calledSub"></p>
-    <a class="dial" id="calledPhone"></a>
-  </div>
-  <div class="bot">
-    <button type="button" class="pill" id="resume">I'm okay, keep watching</button>
-    <button type="button" class="pill ghost" id="stop2">Stop</button>
-  </div>
-</main>
-
-<!-- Judge view: what the sonar sees, live. Opened from the watch screen (button or "s"). Stays up during the alarm. -->
-<aside id="judge" class="judge" hidden aria-label="What the sonar sees">
-  <h2>What the sonar sees</h2>
-  <div class="jtop">
-    <figure class="jdepth">
-      <canvas id="jDepth" role="img" aria-label="Motion by distance, last 20 seconds"></canvas>
-      <figcaption>Echo motion by distance from the laptop, last 20 s. Bright = moving. Right: how much each distance repeats like breathing. The box is the slice it picked as your chest.</figcaption>
-    </figure>
-    <div class="jstate" id="jState">
-      <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
-        <circle cx="60" cy="60" r="50" class="track"/>
-        <circle cx="60" cy="60" r="50" class="arc" id="jArc" pathLength="100" stroke-dasharray="0 100"/>
-      </svg>
-      <div class="jlabel" id="jLabel">Starting</div>
-      <div class="jsub" id="jSub"></div>
-      <div class="jmeter">
-        <div class="jcap">Breathing strength vs your normal</div>
-        <div class="bar"><span id="jLevel"></span><i id="jMark"></i></div>
-        <div class="jcap" id="jLevelTxt"></div>
+  <!-- 0. Welcome (first visit only) -->
+  <section id="s-hello" class="screen" hidden>
+    <div class="top"></div>
+    <div class="mid center">
+      <div class="echo rise" style="--i:0" aria-hidden="true">
+        <svg class="rings" viewBox="0 0 220 220">
+          <circle cx="110" cy="110" r="105" class="contour"/>
+          <circle cx="110" cy="110" r="78" class="contour"/>
+          <circle cx="110" cy="110" r="50" class="ping"/>
+          <circle cx="110" cy="110" r="50" class="ping p2"/>
+        </svg>
+        <div class="float"><div class="cloud hello-cloud">
+          <svg class="cloudsvg" viewBox="0 0 220 166" aria-hidden="true">
+            <use href="#cloudShape" class="puff"/>
+            <ellipse cx="88" cy="48" rx="17" ry="8" transform="rotate(-22 88 48)" class="shine"/>
+            <circle cx="112" cy="38" r="3.5" class="shine"/>
+            <g class="face">
+              <ellipse cx="68" cy="112" rx="11" ry="6.5" class="cheek"/><ellipse cx="152" cy="112" rx="11" ry="6.5" class="cheek"/>
+              <g class="eyes"><circle cx="84" cy="96" r="7.5"/><circle cx="136" cy="96" r="7.5"/><circle cx="86.5" cy="93" r="2.3" class="spark"/><circle cx="138.5" cy="93" r="2.3" class="spark"/></g>
+              <path d="M100 111 q10 9 20 0" class="mouth smile"/>
+              <ellipse cx="110" cy="113" rx="4.5" ry="5.5" class="mouth oh"/>
+            </g>
+          </svg>
+        </div></div>
       </div>
-      <div class="jmeter">
-        <div class="jcap" id="jRate"></div>
-        <div class="bar"><span id="jSlow"></span><i id="jSlowMark"></i></div>
-        <div class="jcap" id="jSlowTxt"></div>
-      </div>
+      <h1 class="rise hello-h" style="--i:1">Hi. I'm here with you.</h1>
+      <p class="lead rise" style="--i:2">I'll breathe along with you and keep a quiet watch. If your breathing stops, I'll call your friend.</p>
     </div>
-  </div>
-  <figure class="jwave">
-    <canvas id="jWave" role="img" aria-label="Chest movement, last 20 seconds"></canvas>
-    <figcaption id="jWaveCap">Chest movement, last 20 s</figcaption>
-  </figure>
-</aside>
+    <div class="bot">
+      <button type="button" class="pill rise" style="--i:3" data-go="how">Let's begin</button>
+      <p class="tiny rise" style="--i:4">Takes about a minute. No account.</p>
+      <button type="button" class="textbtn rise" style="--i:5" data-go="invite">Setting this up for someone?</button>
+    </div>
+  </section>
 
-<p class="stub" id="stub" hidden>stub:
-  <a href="#" data-sim="stopped">stops</a>
-  <a href="#" data-sim="resumed">resumes</a>
-  <a href="#" data-sim="lost">lost</a>
-  <a href="#" data-sim="watching">back</a>
-</p>
+  <!-- 1. How it works: three short looping pictures, swipe or tap Next -->
+  <section id="s-how" class="screen" hidden>
+    <div class="top"><button type="button" class="back" data-go="hello" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button type="button" class="textbtn" data-go="who">Skip</button></div>
+    <div class="mid">
+      <div class="slides" id="slides">
+        <div class="track" id="slideTrack">
+          <div class="slide" aria-label="Step 1 of 3">
+            <svg class="art art-sonar" viewBox="0 0 260 170" aria-hidden="true">
+              <rect x="22" y="38" width="50" height="94" rx="11" class="dev-body"/>
+              <rect x="29" y="47" width="36" height="70" rx="5" class="dev-screen"/>
+              <path class="arc a1" d="M90 66 q14 19 0 38"/>
+              <path class="arc a2" d="M104 56 q22 29 0 58"/>
+              <path class="arc a3" d="M118 46 q30 39 0 78"/>
+              <g class="chest"><circle cx="202" cy="58" r="16" class="figure"/>
+                <path d="M170 150 v-38 q0 -28 32 -28 q32 0 32 28 v38" class="figure"/></g>
+            </svg>
+            <h1>It listens with sound you can't hear.</h1>
+            <p class="soft">A high tone bounces off your chest. Each breath moves it a few millimetres, and the echo shows it.</p>
+          </div>
+          <div class="slide" aria-label="Step 2 of 3">
+            <svg class="art art-ask" viewBox="0 0 260 170" aria-hidden="true">
+              <circle cx="96" cy="108" r="40" class="ripple r1"/>
+              <circle cx="96" cy="108" r="40" class="ripple r2"/>
+              <g class="still"><circle cx="96" cy="74" r="16" class="figure"/>
+                <path d="M64 150 v-34 q0 -28 32 -28 q32 0 32 28 v34" class="figure"/></g>
+              <g class="bubble"><rect x="128" y="20" width="112" height="44" rx="22" class="bubblefill"/>
+                <path d="M146 60 l-10 16 l22 -14 z" class="bubblefill"/>
+                <text x="184" y="48" text-anchor="middle" class="bubbletxt">Are you okay?</text></g>
+            </svg>
+            <h1>If your breathing stops, it asks if you're okay.</h1>
+            <p class="soft">A loud alarm and a big countdown. Tap anywhere to say you're fine.</p>
+          </div>
+          <div class="slide" aria-label="Step 3 of 3">
+            <svg class="art art-call" viewBox="0 0 260 170" aria-hidden="true">
+              <g class="ringer"><rect x="98" y="26" width="64" height="120" rx="14" class="dev-body"/>
+                <rect x="106" y="38" width="48" height="96" rx="7" class="dev-screen"/>
+                <circle cx="130" cy="72" r="15" class="sagefill"/>
+                <rect x="114" y="98" width="32" height="7" rx="3.5" class="sagefill dim"/>
+                <circle cx="130" cy="120" r="7" class="okfill"/></g>
+              <path class="sound s1" d="M178 62 q10 14 0 28"/><path class="sound s2" d="M192 52 q18 24 0 48"/>
+              <path class="sound s1" d="M82 62 q-10 14 0 28"/><path class="sound s2" d="M68 52 q-18 24 0 48"/>
+            </svg>
+            <h1>If you don't answer, it calls your friend.</h1>
+            <p class="soft">No account. Nothing is recorded. Nothing leaves this <span class="devword">phone</span> unless that call is made.</p>
+          </div>
+        </div>
+      </div>
+      <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+    <div class="bot"><button type="button" class="pill" id="howNext">Next</button></div>
+  </section>
+
+  <!-- 2. Who to call -->
+  <form id="s-who" class="screen" novalidate hidden>
+    <div class="top"><button type="button" class="back" id="whoBack" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><div class="steps" aria-label="Step 1 of 3"><i class="on"></i><i></i><i></i></div><span class="topspace"></span></div>
+    <div class="mid">
+      <h1 class="rise" style="--i:1">Who should this <span class="devword">phone</span> call if your breathing stops?</h1>
+      <div class="rise" style="--i:2">
+        <input id="friendName" type="text" autocomplete="off" autocapitalize="words" enterkeyhint="next" maxlength="40" placeholder="Their name" aria-label="Their name">
+        <input id="friendPhone" type="tel" inputmode="tel" autocomplete="off" enterkeyhint="next" maxlength="24" placeholder="Their phone number" aria-label="Their phone number">
+      </div>
+      <p class="err" id="whoErr" role="alert" hidden></p>
+      <button type="button" class="textbtn rise" style="--i:3" data-sheet="sh-noone">No one to call?</button>
+    </div>
+    <div class="bot"><button type="submit" class="pill">Continue</button></div>
+  </form>
+
+  <!-- 3. Who you are -->
+  <form id="s-you" class="screen" novalidate hidden>
+    <div class="top"><button type="button" class="back" data-go="who" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><div class="steps" aria-label="Step 2 of 3"><i class="on"></i><i class="on"></i><i></i></div><span class="topspace"></span></div>
+    <div class="mid">
+      <h1 class="rise" style="--i:1">What does <span class="fname">your friend</span> call you?</h1>
+      <div class="rise" style="--i:2">
+        <input id="userName" type="text" autocomplete="off" autocapitalize="words" enterkeyhint="next" maxlength="40" placeholder="Your name" aria-label="Your name">
+        <input id="homeAddress" type="text" autocomplete="off" enterkeyhint="done" maxlength="200" placeholder="Your home address (optional)" aria-label="Your home address, optional">
+      </div>
+      <p class="err" id="youErr" role="alert" hidden></p>
+      <p class="soft rise" style="--i:3">So they know the call is about you. Your <span class="devword">phone</span> will ask to share your location, so the call can say where you are. With your home address, it can say "at home".</p>
+    </div>
+    <div class="bot"><button type="submit" class="pill">Continue</button></div>
+  </form>
+
+  <!-- Link from a partner (app/?friend=..&phone=..&name=..): everything is filled in, so this is the only setup screen.
+       Optional home address, then the phone asks for location. -->
+  <form id="s-ready" class="screen" novalidate hidden>
+    <div class="top"><span class="topspace"></span></div>
+    <div class="mid">
+      <p class="kicker rise" style="--i:0">Set up by <span class="fname"></span></p>
+      <h1 class="rise" style="--i:1">Hi <span id="readyUser"></span>. <span class="fname"></span> is your person.</h1>
+      <p class="soft rise" style="--i:2">If your breathing stops and you don't answer, this <span class="devword">phone</span> calls <span class="fname"></span> at <b id="readyPhone"></b>.</p>
+      <div class="rise" style="--i:3">
+        <input id="readyHome" type="text" autocomplete="street-address" enterkeyhint="done" maxlength="200" placeholder="Your home address (optional)" aria-label="Your home address, optional">
+      </div>
+      <p class="soft rise" style="--i:4">With it, the call can say "at home". Next, your <span class="devword">phone</span> asks to share your location, so the call can tell <span class="fname"></span> where you are.</p>
+    </div>
+    <div class="bot"><button type="submit" class="pill">Continue</button></div>
+  </form>
+
+  <!-- Partner side: the person who gets called makes the link and sends it. -->
+  <form id="s-invite" class="screen" novalidate hidden>
+    <div class="top"><button type="button" class="back" data-go="hello" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><span class="topspace"></span></div>
+    <div class="mid">
+      <p class="kicker rise" style="--i:0">For someone else</p>
+      <h1 class="rise" style="--i:1">You'll be the one it calls.</h1>
+      <div class="rise" style="--i:2">
+        <input id="invMyName" type="text" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="40" placeholder="Your name" aria-label="Your name">
+        <input id="invMyPhone" type="tel" inputmode="tel" autocomplete="tel" enterkeyhint="next" maxlength="24" placeholder="Your phone number" aria-label="Your phone number">
+        <input id="invTheirName" type="text" autocomplete="off" autocapitalize="words" enterkeyhint="done" maxlength="40" placeholder="Their name" aria-label="Their name">
+      </div>
+      <p class="err" id="invErr" role="alert" hidden></p>
+      <p class="soft rise" style="--i:3">You get a link to send them. It opens in their browser with all of this filled in. Nothing to install: they just press Start.</p>
+    </div>
+    <div class="bot"><button type="submit" class="pill">Make the link</button></div>
+  </form>
+
+  <section id="s-share" class="screen" hidden>
+    <div class="top"><button type="button" class="back" data-go="invite" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><span class="topspace"></span></div>
+    <div class="mid">
+      <h1 class="rise" style="--i:1">Send this to <span id="shareName"></span>.</h1>
+      <div class="rise" style="--i:2"><input id="shareLink" type="text" readonly aria-label="The link"></div>
+      <p class="soft rise" style="--i:3">Your number is in the link, so send it only to them.</p>
+      <p class="err" id="shareWarn" hidden></p>
+    </div>
+    <div class="bot">
+      <button type="button" class="pill" id="shareBtn">Send the link</button>
+      <button type="button" class="pill ghost" id="copyBtn">Copy link</button>
+    </div>
+  </section>
+
+  <!-- 4. Where to sit, then start. A returning person lands here. -->
+  <form id="s-sit" class="screen" novalidate hidden>
+    <div class="top">
+      <button type="button" class="back" id="sitBack" data-go="you" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="steps" id="sitSteps" aria-label="Step 3 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      <button type="button" class="iconbtn" data-sheet="sh-settings" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button>
+    </div>
+    <div class="mid center">
+      <p class="kicker rise" style="--i:0" id="welcomeBack">Last step</p>
+      <h1 class="rise" style="--i:1">Sit like this.</h1>
+      <svg class="sit rise" style="--i:2" viewBox="0 0 300 150" role="img" aria-label="Person sitting 30 to 40 centimetres away, chest facing the screen">
+        <line x1="16" y1="112" x2="196" y2="112" class="ln"/>
+        <g class="only-laptop">
+          <line x1="44" y1="110" x2="104" y2="110" class="ln thick"/>
+          <line x1="44" y1="110" x2="28" y2="60" class="ln thick"/>
+        </g>
+        <g class="only-phone">
+          <line x1="50" y1="110" x2="38" y2="62" class="ln thick"/>
+          <line x1="50" y1="110" x2="68" y2="110" class="ln"/>
+        </g>
+        <path d="M120 76 q7 10 0 20" class="wave w1"/>
+        <path d="M134 70 q11 16 0 32" class="wave w2"/>
+        <path d="M148 64 q15 22 0 44" class="wave w3"/>
+        <circle cx="222" cy="40" r="15" class="ln"/>
+        <path d="M222 56 v6" class="ln"/>
+        <path d="M198 140 v-52 q0 -24 24 -24 q24 0 24 24 v52" class="ln body"/>
+        <line x1="44" y1="130" x2="198" y2="130" class="dim"/>
+        <line x1="44" y1="125" x2="44" y2="135" class="dim"/>
+        <line x1="198" y1="125" x2="198" y2="135" class="dim"/>
+        <text x="121" y="146" text-anchor="middle" class="dimtxt">30-40 cm</text>
+      </svg>
+      <ul class="checks rise" style="--i:3">
+        <li class="only-laptop">A forearm away from the screen</li>
+        <li class="only-phone">Prop the phone up, a forearm away</li>
+        <li>Chest facing the screen</li>
+        <li class="only-laptop">Hands off the laptop</li>
+        <li class="only-phone">Hands off the phone</li>
+        <li>Sound on, no headphones</li>
+      </ul>
+      <p class="err" id="sitErr" role="alert" hidden></p>
+    </div>
+    <div class="bot">
+      <button type="button" class="chipbtn" data-go="who">Calls <b class="fname"></b> &middot; Change</button>
+      <button type="submit" class="pill" id="start">Start watching</button>
+      <p class="tiny">A prototype, not a medical device. It can miss things, and it only works while you stay in front of this <span class="devword">phone</span>.</p>
+      <button type="button" class="textbtn installbtn" data-sheet="sh-install" hidden>Keep it on your home screen</button>
+    </div>
+  </form>
+
+  <!-- 5. Watching. While it looks for you, the orb paces your breathing (in 4 s, out 6 s).
+       Once it has you, the orb follows your real chest movement. -->
+  <main id="s-watch" class="screen" hidden>
+    <div class="top"></div>
+    <div class="mid center">
+      <div class="buddy" id="warm" role="progressbar" aria-label="Finding your breathing" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="float"><div class="cloud" id="orb">
+          <svg class="cloudsvg" viewBox="0 0 220 166" aria-hidden="true">
+            <use href="#cloudShape" class="puff"/>
+            <ellipse cx="88" cy="48" rx="17" ry="8" transform="rotate(-22 88 48)" class="shine"/>
+            <circle cx="112" cy="38" r="3.5" class="shine"/>
+            <g class="face">
+              <ellipse cx="68" cy="112" rx="11" ry="6.5" class="cheek"/><ellipse cx="152" cy="112" rx="11" ry="6.5" class="cheek"/>
+              <g class="eyes"><circle cx="84" cy="96" r="7.5"/><circle cx="136" cy="96" r="7.5"/><circle cx="86.5" cy="93" r="2.3" class="spark"/><circle cx="138.5" cy="93" r="2.3" class="spark"/></g>
+              <path d="M100 111 q10 9 20 0" class="mouth smile"/>
+              <ellipse cx="110" cy="113" rx="4.5" ry="5.5" class="mouth oh"/>
+            </g>
+          </svg>
+        </div></div>
+        <div class="ground" aria-hidden="true"></div>
+        <p class="guidetxt" id="orbText"><span class="g-in">Breathe in with me</span><span class="g-out">And slowly out</span></p>
+        <div class="warmbar" aria-hidden="true"><i id="warmBar"></i></div>
+      </div>
+      <h1 id="watchTitle">Getting to know your breathing.</h1>
+      <p class="soft" id="watchSub">Sit still for a few seconds.</p>
+    </div>
+    <div class="bot">
+      <button type="button" class="pill ghost" id="stop">Stop</button>
+      <p class="tiny">Keep me facing you. I'll stay as long as you need.</p>
+    </div>
+  </main>
+
+  <!-- 6. Breathing stopped: tap anywhere to cancel -->
+  <main id="s-alarm" class="screen" hidden>
+    <div class="top"></div>
+    <div class="mid center">
+      <div class="countwrap">
+        <span class="alarm-ripple"></span><span class="alarm-ripple two"></span>
+        <svg class="countring" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="90" class="track"/><circle cx="100" cy="100" r="90" class="drain" id="drain" pathLength="100"/></svg>
+        <b id="count">6</b>
+      </div>
+      <h1 class="huge">Are you okay?</h1>
+      <p class="lead">Calling <span class="fname"></span> when this reaches zero.</p>
+    </div>
+    <div class="bot"><p class="lead strong">Tap anywhere if you are.</p></div>
+  </main>
+
+  <!-- 7. The call was made, or failed -->
+  <main id="s-called" class="screen" hidden>
+    <div class="top"></div>
+    <div class="mid center">
+      <div class="calling" aria-hidden="true"><span></span><span></span><span></span>
+        <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></div>
+      <h1 id="calledTitle"></h1>
+      <p class="lead" id="calledSub"></p>
+    </div>
+    <div class="bot">
+      <button type="button" class="pill" id="callYourself" hidden></button>
+      <button type="button" class="pill" id="resume">I'm okay, keep watching</button>
+      <button type="button" class="pill ghost" id="stop2">Stop</button>
+    </div>
+  </main>
+
+  <!-- Bottom sheets (slide up over the current screen) -->
+  <div class="scrim" id="scrim" hidden></div>
+  <div class="sheet" id="sh-noone" role="dialog" aria-modal="true" aria-labelledby="noone-h" hidden>
+    <div class="grab"></div>
+    <h2 id="noone-h">No one to call?</h2>
+    <p>Never Use Alone stays on the phone with you instead. Free, 24/7, and judgment-free.</p>
+    <button type="button" class="pill" id="callNUA">Call 877-696-1996</button>
+    <button type="button" class="pill ghost" data-close>Not now</button>
+  </div>
+  <div class="sheet" id="sh-install" role="dialog" aria-modal="true" aria-labelledby="inst-h" hidden>
+    <div class="grab"></div>
+    <h2 id="inst-h">Keep it on your home screen</h2>
+    <p>Optional. The link keeps working. This just puts an icon on your home screen, so it opens in one tap.</p>
+    <p id="instHow">In Safari, tap the Share button, then "Add to Home Screen".</p>
+    <button type="button" class="pill" id="installNow" hidden>Add it</button>
+    <button type="button" class="pill ghost" data-close>Not now</button>
+  </div>
+  <div class="sheet" id="sh-settings" role="dialog" aria-modal="true" aria-labelledby="set-h" hidden>
+    <div class="grab"></div>
+    <h2 id="set-h">Settings</h2>
+    <button type="button" class="row" data-go="who"><span>Who gets called</span><b class="fname"></b></button>
+    <div class="row">
+      <span>Alarm and call voice</span>
+      <span class="rowctl">
+        <select id="voice" aria-label="Voice">
+          <option value="cjVigY5qzO86Huf0OWal">Eric</option>
+          <option value="EXAVITQu4vr4xnSDxMaL">Sarah</option>
+          <option value="JBFqnCBsd6RMkjVDRZzb">George</option>
+          <option value="SAz9YHcvj6GT2YYXdXww">River</option>
+        </select>
+        <button type="button" class="smallbtn" id="hearVoice">Play</button>
+      </span>
+    </div>
+    <button type="button" class="row installbtn" data-sheet="sh-install" hidden><span>Add to home screen</span><b>Optional</b></button>
+    <button type="button" class="pill ghost danger" id="forget">Forget my details</button>
+    <button type="button" class="pill" data-close>Done</button>
+  </div>
+</div>
+
+<!-- Dev dashboard: only with ?debug (remembered on this device; ?debug=0 turns it off). Wired in dev.js.
+     Everything that collects data lives here: sonar view, hold marker, saving takes, simulated runs. -->
+<aside id="dev" class="dev" hidden aria-label="Dev dashboard">
+  <header class="devhead">
+    <div class="devtitle"><b>Dev dashboard</b><span class="chip" id="devScreen">-</span><span class="chip" id="devStatus">idle</span></div>
+    <button type="button" class="iconbtn" id="devClose" aria-label="Hide dev dashboard"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </header>
+  <div class="devgrid">
+    <section class="card wide">
+      <h3>What the sonar sees</h3>
+      <div id="judge" class="judge">
+        <div class="jtop">
+          <figure class="jdepth">
+            <canvas id="jDepth" role="img" aria-label="Motion by distance, last 20 seconds"></canvas>
+            <figcaption>Echo motion by distance, last 20 s. Bright = moving. Right: how much each distance repeats like breathing. The box is the slice picked as the chest.</figcaption>
+          </figure>
+          <div class="jstate" id="jState">
+            <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="50" class="track"/>
+              <circle cx="60" cy="60" r="50" class="arc" id="jArc" pathLength="100" stroke-dasharray="0 100"/>
+            </svg>
+            <div class="jlabel" id="jLabel">Not running</div>
+            <div class="jsub" id="jSub">Start a run (real or fake). Fake runs have no sonar data.</div>
+            <div class="jmeter">
+              <div class="jcap">Breathing strength vs normal</div>
+              <div class="bar"><span id="jLevel"></span><i id="jMark"></i></div>
+              <div class="jcap" id="jLevelTxt"></div>
+            </div>
+            <div class="jmeter">
+              <div class="jcap" id="jRate"></div>
+              <div class="bar"><span id="jSlow"></span><i id="jSlowMark"></i></div>
+              <div class="jcap" id="jSlowTxt"></div>
+            </div>
+          </div>
+        </div>
+        <figure class="jwave">
+          <canvas id="jWave" role="img" aria-label="Chest movement, last 20 seconds"></canvas>
+          <figcaption id="jWaveCap">Chest movement, last 20 s</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Run</h3>
+      <button type="button" class="switch" id="devFake" aria-pressed="false"><span>Fake sonar (no mic)</span><i></i></button>
+      <button type="button" class="switch" id="devRecord" aria-pressed="true"><span>Record take (.wav on Stop)</span><i></i></button>
+      <button type="button" class="switch" id="devRealCall" aria-pressed="true"><span>Place the real call</span><i></i></button>
+      <button type="button" class="switch" id="devSound" aria-pressed="true"><span>Alarm sound <kbd>m</kbd></span><i></i></button>
+      <div class="btnrow">
+        <button type="button" class="dbtn primary" id="devStart">Start</button>
+        <button type="button" class="dbtn" id="devStop">Stop</button>
+      </div>
+      <button type="button" class="dbtn hold" id="holdBtn" aria-pressed="false">Mark: I'm holding my breath <kbd>h</kbd></button>
+    </section>
+
+    <section class="card">
+      <h3>Simulate</h3>
+      <div class="btnrow wrap">
+        <button type="button" class="dbtn bad" data-sim="stopped">Breathing stopped</button>
+        <button type="button" class="dbtn" data-sim="resumed">Breathing resumed</button>
+        <button type="button" class="dbtn" data-sim="watching">Watching</button>
+        <button type="button" class="dbtn" data-sim="searching">Searching</button>
+        <button type="button" class="dbtn warn" data-sim="lost">Can't find you</button>
+        <button type="button" class="dbtn warn" data-sim="deaf">Can't hear</button>
+      </div>
+      <h3>Go to screen</h3>
+      <div class="btnrow wrap" id="devScreens"></div>
+    </section>
+
+    <section class="card">
+      <h3>Event log</h3>
+      <ol class="log" id="devLog"></ol>
+    </section>
+
+    <section class="card wide">
+      <h3>Saved on this device</h3>
+      <pre class="store" id="devStore"></pre>
+      <div class="btnrow wrap">
+        <button type="button" class="dbtn" id="devFill">Fill demo contact</button>
+        <button type="button" class="dbtn" id="devReset">Reset onboarding</button>
+        <button type="button" class="dbtn" id="devLeave">Leave dev mode</button>
+      </div>
+    </section>
+  </div>
+</aside>
+</div>
+<button type="button" class="devfab" id="devFab" hidden aria-label="Show dev dashboard">DEV <kbd>s</kbd></button>
 
 <script src="../dsp.js"></script>
 <script src="hooks.js"></script>
 <script src="judge.js"></script>
 <script src="app.js"></script>
+<script src="dev.js"></script>
 </body>
 </html>

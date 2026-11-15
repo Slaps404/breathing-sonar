@@ -21,11 +21,15 @@ window.SonarHooks = {
   //                           the same signal the test page draws (sonar.analyze(...).ch.disp).
   //                           While searching it is a rough preview instead (sonar.preview()), from second 1.
   //   onDebug(snapshot)       optional. Everything the judge view draws, ~5 times a second (see snapshot below)
+  //   onMark(event)           optional. Every event written with mark() (the dev dashboard's log)
   // Returns { stop(), mark(event), label(name) }. Throws if the mic is refused: the UI shows the message.
-  // Records the run: every mic frame, labels (what the person says they are doing: 'normal' / 'hold', set with
-  // label(); starts 'normal') and events (status, detector, alarm, taps; set with mark()). stop() downloads
-  // take-<time>.wav + .json in the collectors' format, so `node tools/replay-take.js <path>` replays it.
-  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug, onWarmup }) {
+  // record (dev only, app/?debug): keep the run: every mic frame, labels (what the person says they are doing:
+  // 'normal' / 'hold', set with label(); starts 'normal') and events (status, detector, alarm, taps; set with mark()).
+  // stop() then downloads take-<time>.wav + .json in the collectors' format, so `node tools/replay-take.js <path>`
+  // replays it. Without record nothing is kept (an hour of mic frames would be ~350 MB of memory).
+  // fake (dev only): no mic, no sound. A made-up chest line; label('hold') flattens it and fires the alarm after 7 s.
+  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug, onWarmup, onMark, record = false, fake = false }) {
+    if (fake) return window.SonarHooks.fakeMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onWarmup, onMark });
     const LOST_MS = 3000, DEAF_DB = 20;
     // Probe loudness sets itself, like screen brightness: start quiet and step up only until the mic hears the
     // probe TARGET_DB above the noise next to its band, then stay put (a level change later would look like a
@@ -49,18 +53,19 @@ window.SonarHooks = {
     const sonar = new DSP.RangeSonar(band ? { probe: { f0: band * 1000, f1: band * 1000 + 2000 } } : {});
     const node = new AudioWorkletNode(ctx, 'probe', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
       processorOptions: { signal: sonar.p.sig, amp: VOLUME } });
-    const take = window.SonarHooks.makeTake(sonar.p, VOLUME, stream.getAudioTracks()[0]?.label || '');
-    node.port.onmessage = e => { take.push(e.data); sonar.ingestFrame(e.data); };
+    const take = record ? window.SonarHooks.makeTake(sonar.p, VOLUME, stream.getAudioTracks()[0]?.label || '') : null;
+    const mark = event => { if (take) take.mark(event); if (onMark) onMark(event); };
+    node.port.onmessage = e => { if (take) take.push(e.data); sonar.ingestFrame(e.data); };
     ctx.createMediaStreamSource(stream).connect(node);
     node.connect(ctx.destination);
 
     let status = null, movingSince = null, level = 0, levelAt = performance.now(), tuned = false, deaf = false, alarmUp = false;
-    const setStatus = s => { if (s !== status) { status = s; take.mark('status: ' + s); onStatus(s); } };
+    const setStatus = s => { if (s !== status) { status = s; mark('status: ' + s); onStatus(s); } };
     setStatus('searching');
     const timer = setInterval(() => {
       const now = performance.now();
       if (!tuned && now - levelAt > STEP_MS) {
-        if (sonar.snr >= TARGET_DB || level === LEVELS.length - 1) { tuned = true; take.mark(`volume: ${LEVELS[level]} (probe ${sonar.snr.toFixed(0)} dB)`); }
+        if (sonar.snr >= TARGET_DB || level === LEVELS.length - 1) { tuned = true; mark(`volume: ${LEVELS[level]} (probe ${sonar.snr.toFixed(0)} dB)`); }
         else { level++; levelAt = now; node.port.postMessage({ amp: LEVELS[level] }); }
       }
       // The mic must hear the speaker's own probe, or nothing below means anything. Working takes read 32-72 dB;
@@ -71,10 +76,10 @@ window.SonarHooks = {
       // Losing the probe (speaker muted mid-run) looks exactly like breathing stopping: replays alarmed 8-11 s
       // after a mute. That is not a person in trouble, so no alarm and no call while deaf; the screen says why.
       if (res && res.event === 'start') {
-        if (deaf) take.mark('detector: stopped (' + res.why + '), ignored: probe not heard');
-        else { alarmUp = true; take.mark('detector: stopped (' + res.why + ')'); onBreathingStopped(); }
+        if (deaf) mark('detector: stopped (' + res.why + '), ignored: probe not heard');
+        else { alarmUp = true; mark('detector: stopped (' + res.why + ')'); onBreathingStopped(); }
       }
-      if (res && res.event === 'end') { take.mark('detector: resumed'); if (alarmUp) { alarmUp = false; onBreathingResumed(); } }
+      if (res && res.event === 'end') { mark('detector: resumed'); if (alarmUp) { alarmUp = false; onBreathingResumed(); } }
       // Before the chest slice is found, draw a rough line from the slice that moves most (sonar.preview).
       if (onWave) onWave(res ? res.ch.disp : sonar.preview(), sonar.rate);
       if (onDebug) onDebug(window.SonarHooks.snapshot(sonar, res));
@@ -88,15 +93,47 @@ window.SonarHooks = {
     }, 200);
 
     return {
-      mark: take.mark,
-      label: take.label,
+      mark,
+      label(name) { if (take) take.label(name); if (onMark) onMark('label: ' + name); },
       stop() {
         clearInterval(timer);
         node.disconnect();
         stream.getTracks().forEach(t => t.stop());
         ctx.close();
-        take.download();
+        if (take) take.download();
       },
+    };
+  },
+
+  // Dev only (app/?debug, "Fake sonar"): same callbacks as startMonitoring, no mic and no sound.
+  // Breathes at 15 / min with a little noise. label('hold') flattens the line; held 7 s while watching
+  // fires onBreathingStopped, and label('normal') brings breathing back (onBreathingResumed).
+  fakeMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onWarmup, onMark }) {
+    const RATE = 10, WARM_S = 6, STOP_S = 7, mm = [];
+    let t = 0, held = 0, holding = false, alarm = false, status = 'searching';
+    const mark = event => { if (onMark) onMark(event); };
+    mark('fake sonar: started');
+    onStatus('searching');
+    const timer = setInterval(() => {
+      for (let k = 0; k < 2; k++) {                 // 2 samples per 200 ms tick = 10 / s
+        t += 1 / RATE;
+        const v = holding ? 0.06 * Math.sin(t * 5) : 1.3 * Math.sin(2 * Math.PI * t * 0.25);
+        mm.push(v + (Math.random() - 0.5) * 0.1);
+      }
+      while (mm.length > 20 * RATE) mm.shift();
+      if (onWarmup) onWarmup(Math.min(1, t / WARM_S), WARM_S);
+      if (status === 'searching' && t >= WARM_S) { status = 'watching'; mark('status: watching'); onStatus('watching'); }
+      if (onWave) onWave(status === 'watching' ? mm : mm.map(v => v * 0.4), RATE);
+      if (status !== 'watching') return;
+      if (holding) {
+        held += 0.2;
+        if (held >= STOP_S && !alarm) { alarm = true; mark('detector: stopped (fake)'); onBreathingStopped(); }
+      } else if (alarm) { alarm = false; mark('detector: resumed'); onBreathingResumed(); }
+    }, 200);
+    return {
+      mark,
+      label(name) { holding = name === 'hold'; held = 0; mark('label: ' + name); },
+      stop() { clearInterval(timer); mark('fake sonar: stopped'); },
     };
   },
 
