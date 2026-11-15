@@ -2,7 +2,7 @@
 
 ## Tagline
 
-A web page that uses your laptop's speaker and mic to listen for your breathing, and phones a friend if it stops.
+A web app that listens for your breathing with sound, and phones a friend if it stops.
 
 ## Inspiration
 
