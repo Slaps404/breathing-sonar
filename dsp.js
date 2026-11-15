@@ -577,7 +577,12 @@ class RangeSonar {
     const S = r => z.p[r] / z.w;
     let top = 0; for (let r = r0; r <= r1; r++) top = Math.max(top, S(r));
     let b = null;
-    for (let r = r0; r <= r1; r++) if (S(r) >= top - ZONE.near && (b === null || z.snr[r] > z.snr[b])) b = r;
+    // Slices about as rhythmic as the best come in runs, one run per body (a chest spans 2-3 slices). Take the
+    // closest run: the person at the device is nearer than anyone behind them (dad at 1 m won on snr in take
+    // 05-52). Inside that run, keep the strongest echo, since the run's front edge is often weak.
+    const ok = r => S(r) >= top - ZONE.near;
+    let r = r0; while (r <= r1 && !ok(r)) r++;
+    for (; r <= r1 && ok(r); r++) if (b === null || z.snr[r] > z.snr[b]) b = r;
     this.zscore = Array.from({ length: r1 + 1 }, (_, r) => (r < r0 ? null : S(r)));   // for display / debugging
     if (this.lock === null) {
       // Let the initial echo ranking settle before locking. Counted in received audio, not nowMs: the app's clock
