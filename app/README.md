@@ -9,12 +9,13 @@ Run: `python3 -m http.server` in the repo root, open `http://localhost:8000/app/
 ## How it connects
 
 ```
-app.js (screens)  --startMonitoring()-->  sonar        (stub in hooks.js)
-                  --callFriend()------->  phone call   (stub in hooks.js)
+app.js (screens)  --startMonitoring()-->  sonar        (../dsp.js, range mode)
+                  --callFriend()------->  phone call   (call/server.py on 127.0.0.1:8788)
 ```
 
-Both hooks live in `hooks.js` with their contracts in comments. Replace the bodies there; `app.js` should not need changes.
-While `SonarHooks.isStub` is true, a small "stub:" bar at the top right has links to fake a breathing stop.
+Both hooks live in `hooks.js` with their contracts in comments; `app.js` only talks to them.
+For the call, run `python3 call/server.py` first (needs the keys in `.env`).
+Setting `SonarHooks.isStub = true` brings back a small "stub:" bar with links to fake a breathing stop (only works with the old stub body).
 
 - `COUNTDOWN_S` in `app.js`: seconds to tap the screen before the friend is phoned (15).
 - Contact details are kept in this browser's localStorage only. "Forget these details" clears them.
