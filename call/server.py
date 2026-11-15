@@ -37,8 +37,8 @@ cause, no other location). If asked, say you are an automated alert and they sho
 {{user_name}}. Once they say they will check, say thank you and use the end_call tool.
 If you reach voicemail, a call screener, or get no answer after asking twice, repeat the alert once and use end_call.
 Never say goodbye without using end_call in the same turn."""
-# Carrier delivery requires a registered SMS sender. API acceptance does not confirm delivery.
-SEND_SMS = True
+# Off: texts are blocked (Twilio 30034) until an A2P campaign is approved. Set True once it is.
+SEND_SMS = False
 SMS = ("Sonar safety alert: {user}'s breathing appears to have stopped and they did not respond. "
        "Check on them now. If you cannot reach them, call 911.\nLocation: {where}")
 
