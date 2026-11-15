@@ -17,6 +17,7 @@
   const QUIET_KEY = 'breathing-sonar.quiet';
   let quiet = false;
   try { quiet = localStorage.getItem(QUIET_KEY) === '1'; } catch (e) { /* no storage */ }
+  if (new URLSearchParams(location.search).has('quiet')) quiet = true;   // app/?quiet opens with sound off
   function setQuiet(on) {
     quiet = on;
     try { localStorage.setItem(QUIET_KEY, on ? '1' : '0'); } catch (e) { /* no storage */ }
