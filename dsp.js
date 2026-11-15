@@ -394,10 +394,13 @@ function slowStep(st, ch, moving, nowMs) {
 // would favour slices next to the direct path, where the speaker's own sound leaks in.
 // Offline evidence (2 takes): a breathing-band vs fast-band power ratio picked 91-142 cm on the still
 // take (chest at 28-40 cm); this score picked 28-40 cm.
-const ZONE = { n: 512, lagMin: 1.6, lagMax: 6.7, tauSec: 30, near: 0.05, back: 0.05, ahead: 0.23, settleSec: 10 };
+const ZONE = { n: 512, lagMin: 1.6, lagMax: 6.7, tauSec: 30, near: 0.05, back: 0.05, ahead: 0.23, settleSec: 10, firstSec: 4 };
 // settleSec: after movement, keep the zone put this long. Someone who walks out leaves noise where their chest
 // was; moving the zone 1 s later (to a wall's echo) wiped the breathing level the hold check compares against,
 // so walk-aways never alarmed (walkside1 take). 10 s lets the hold check see the drop first.
+// firstSec: the first lock waits only this long after one full rhythm window (22 s), so it locks at ~26 s, not 32 s.
+// Replay, 10 older labelled takes + 5 app runs: 2-5 s all keep the locks and catch 22-23/29 holds (10 s: 21/29);
+// 1 s and below start locking on the wrong distance (0.5 s: 18/29).
 function periodicity(ch, rate, n = ZONE.n) {
   if (ch.I.length < n) return null;
   const re = new Float64Array(n), im = new Float64Array(n), a0 = ch.I.length - n;
@@ -590,7 +593,7 @@ class RangeSonar {
     if (this.lock === null) {
       // Let the initial echo ranking settle before locking. Counted in received audio, not nowMs: the app's clock
       // (performance.now) starts at page load, so after time on the setup screens it locked ~10 s early.
-      if (this.frames / this.rate * 1000 < winMs + ZONE.settleSec * 1000) return;
+      if (this.frames / this.rate * 1000 < winMs + ZONE.firstSec * 1000) return;
       return this.setZone(b * this.dr);
     }
     // Movement invalidates the old zone's level, including any hold inferred there.
