@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><title>A: how it works</title><script src="lib.js"></script><script>
+// Prototype A: diagram explainer. Sound goes out, echo comes back, the line follows the chest, the line goes flat, it calls.
+const P = DARK, LX = 250, PX = 1000, CY = 300;
+function laptop(c, a) { c.save(); c.globalAlpha = a; c.strokeStyle = P.text; c.lineWidth = 4; c.lineJoin = 'round';
+  c.strokeRect(LX - 90, CY - 75, 150, 105); c.beginPath(); c.moveTo(LX - 115, CY + 48); c.lineTo(LX + 85, CY + 48); c.lineTo(LX + 60, CY + 30); c.lineTo(LX - 90, CY + 30); c.closePath(); c.stroke(); c.restore(); }
+function person(c, a, chest) { c.save(); c.globalAlpha = a; c.strokeStyle = P.text; c.lineWidth = 4; c.lineCap = 'round';
+  c.beginPath(); c.arc(PX + 30, CY - 95, 34, 0, 7); c.stroke();
+  c.beginPath(); c.moveTo(PX + 60, CY - 50); c.quadraticCurveTo(PX + 95, CY + 20, PX + 70, CY + 120); c.stroke();         // back
+  c.strokeStyle = P.warn; c.lineWidth = 6; c.beginPath(); c.moveTo(PX + 5, CY - 50); c.quadraticCurveTo(PX - 30 - chest, CY + 20, PX + 0, CY + 120); c.stroke();   // chest
+  c.restore(); }
+function arcs(c, t, from, dir, color, a) { for (let k = 0; k < 5; k++) { const u = ((t * 0.55 + k / 5) % 1), x = from + dir * u * (PX - LX - 150); c.save(); c.globalAlpha = a * (1 - u) * 0.9; c.strokeStyle = color; c.lineWidth = 3;
+  c.beginPath(); c.arc(x - dir * 60, CY, 60 + u * 40, dir > 0 ? -0.6 : Math.PI - 0.6, dir > 0 ? 0.6 : Math.PI + 0.6); c.stroke(); c.restore(); } }
+setup((c, t) => {
+  c.fillStyle = P.bg; c.fillRect(0, 0, W, H);
+  text(c, 'How it hears you breathe', W / 2, H / 2, { size: 64, color: P.text, alpha: show(t, 0.2, 2.4) });
+  const scene = seg(t, 2.4, 3.2) * (1 - seg(t, 13.2, 13.8)), holdK = seg(t, 9.0, 9.6);      // holdK: breathing stops
+  const breathe = Math.sin(t * 2 * Math.PI / 3.6) * (1 - holdK), chest = 9 * breathe;
+  laptop(c, scene); person(c, scene, chest);
+  arcs(c, t, LX + 110, +1, P.text, scene * seg(t, 3.0, 3.6));
+  arcs(c, t + 0.4, PX - 60, -1, P.warn, scene * seg(t, 5.2, 5.8));
+  const cap = (s, a, b) => text(c, s, W / 2, 500, { size: 34, color: P.text, alpha: show(t, a, b), maxW: 1120 });
+  cap('The speaker plays a sound at 20 kHz. Too high for most adults to hear.', 3.0, 5.4);
+  cap('It bounces off your chest. The mic hears the echo.', 5.4, 7.6);
+  cap('Breathing moves the chest a little. The echo shifts with it.', 7.6, 9.6);
+  cap('If that movement stops, it asks: are you okay?', 9.6, 11.6);
+  cap('No answer in 6 seconds, and it phones a friend.', 11.6, 13.4);
+  // breathing line along the bottom
+  const la = scene * seg(t, 6.6, 7.4); if (la > 0) { c.save(); c.globalAlpha = la; c.strokeStyle = P.line; c.lineWidth = 2; c.beginPath(); c.moveTo(160, 630); c.lineTo(1120, 630); c.stroke();
+    c.strokeStyle = t > 10.2 ? P.alarm : P.warn; c.lineWidth = 4; c.lineJoin = 'round'; c.beginPath();
+    for (let x = 0; x <= 960; x += 4) { const tt = t - (960 - x) / 160, k = 1 - seg(tt, 9.0, 9.6), y = 630 - 34 * Math.sin(tt * 2 * Math.PI / 3.6) * k; x ? c.lineTo(160 + x, y) : c.moveTo(160 + x, y); } c.stroke(); c.restore(); }
+  // countdown ring, then phone
+  const ra = show(t, 10.2, 12.2, 0.3); if (ra > 0) { const u = clamp((t - 10.4) / 1.8); c.save(); c.globalAlpha = ra; c.translate(W / 2, CY - 10); c.fillStyle = P.bg; c.beginPath(); c.arc(0, 0, 78, 0, 7); c.fill();
+    c.strokeStyle = P.line; c.lineWidth = 10; c.beginPath(); c.arc(0, 0, 64, 0, 7); c.stroke(); c.strokeStyle = P.alarm; c.lineCap = 'round'; c.beginPath(); c.arc(0, 0, 64, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * (1 - u)); c.stroke(); c.restore();
+    text(c, String(Math.max(1, Math.ceil(6 * (1 - u)))), W / 2, CY - 8, { size: 56, color: P.text, alpha: ra, font: SANS, weight: 600 }); }
+  const pa = show(t, 12.0, 13.6, 0.3); if (pa > 0) { const sh = Math.sin(t * 40) * 5; c.save(); c.globalAlpha = pa; c.translate(W / 2 + sh, CY - 10); c.fillStyle = P.bg; c.fillRect(-70, -110, 140, 220); c.strokeStyle = P.good; c.lineWidth = 5;
+    c.beginPath(); c.roundRect(-42, -78, 84, 156, 14); c.stroke(); c.restore(); text(c, 'calling', W / 2 + sh, CY - 10, { size: 20, color: P.good, alpha: pa, font: SANS }); }
+  text(c, 'Breathing Sonar', W / 2, H / 2 - 30, { size: 72, color: P.text, alpha: seg(t, 13.8, 14.4) });
+  text(c, 'Prototype. Not a medical device.', W / 2, H / 2 + 50, { size: 26, color: P.soft, alpha: seg(t, 14.2, 14.8), font: SANS });
+}, 16);
+</script>
