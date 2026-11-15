@@ -37,7 +37,7 @@ window.SonarHooks = {
   // Real: call/server.py (run `python3 call/server.py`) has ElevenLabs ring the friend through Twilio.
   // The server takes a list of friends and rings them all at once; the UI has one friend for now.
   async callFriend(contact) {
-    const res = await fetch('http://127.0.0.1:8787/call', {
+    const res = await fetch('http://127.0.0.1:8788/call', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

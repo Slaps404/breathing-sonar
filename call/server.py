@@ -1,6 +1,6 @@
 """Phone alert: when breathing stops, ElevenLabs phones every friend at once through your Twilio number.
 
-Run:   python3 call/server.py                      (listens on http://127.0.0.1:8787, the app POSTs /call)
+Run:   python3 call/server.py                      (listens on http://127.0.0.1:8788, the app POSTs /call)
 Test:  python3 call/server.py --test +16195550123 [--name Sam] [--user Alex] [--place "the library"]
 
 Keys come from .env in the repo root (never committed). First run sets up ElevenLabs once:
@@ -19,7 +19,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parent.parent
 STATE = Path(__file__).with_name("state.json")
 API = "https://api.elevenlabs.io/v1/convai"
-PORT = 8787
+PORT = 8788
 
 FIRST = ("Hi {{friend_name}}. This is an automated safety alert for {{user_name}}. "
          "Their breathing appears to have stopped{{place_phrase}}, and they did not answer a check on their laptop. "
