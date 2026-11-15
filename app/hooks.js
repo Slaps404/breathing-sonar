@@ -39,7 +39,7 @@ window.SonarHooks = {
     const sonar = new DSP.RangeSonar();
     const node = new AudioWorkletNode(ctx, 'probe', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
       processorOptions: { signal: sonar.p.sig, amp: VOLUME } });
-    const take = window.SonarHooks.makeTake(sonar.p, VOLUME);
+    const take = window.SonarHooks.makeTake(sonar.p, VOLUME, stream.getAudioTracks()[0]?.label || '');
     node.port.onmessage = e => { take.push(e.data); sonar.ingestFrame(e.data); };
     ctx.createMediaStreamSource(stream).connect(node);
     node.connect(ctx.destination);
@@ -77,7 +77,7 @@ window.SonarHooks = {
 
   // Recording of one run. Frames arrive one probe period (P samples) at a time, starting at probe[0],
   // so WAV sample n lines up with probe[n % P], as in collect/recorder.py.
-  makeTake(p, amp) {
+  makeTake(p, amp, mic = '') {   // mic: the input's name, so a take shows which mic recorded it
     const SR = DSP.SR, P = p.P, started = new Date(), frames = [], labels = [{ label: 'normal', sample: 0, t: 0 }], events = [];
     const id = 'take-' + started.toISOString().replace(/[:.]/g, '-');
     let peak = 0;
@@ -98,7 +98,7 @@ window.SonarHooks = {
         wav.setUint32(24, SR, true); wav.setUint32(28, 2 * SR, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true);
         str(36, 'data'); wav.setUint32(40, 2 * n, true);
         const meta = { id, source: 'app', started: started.toISOString(), sampleRate: SR, P, f0: p.f0, f1: p.f1, amp,
-          samples: n, seconds: +(n / SR).toFixed(2), labels, events, peak: +peak.toFixed(4), userAgent: navigator.userAgent };
+          samples: n, seconds: +(n / SR).toFixed(2), labels, events, peak: +peak.toFixed(4), mic, userAgent: navigator.userAgent };
         const save = (blob, name) => {
           const a = document.createElement('a');
           a.href = URL.createObjectURL(blob); a.download = name; a.click();
