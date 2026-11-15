@@ -91,7 +91,6 @@ window.SonarHooks = {
       download() {
         const n = samples(), wav = new DataView(new ArrayBuffer(44));
         const str = (o, t) => { for (let i = 0; i < t.length; i++) wav.setUint8(o + i, t.charCodeAt(i)); };
-        str(0, 'RIFF'); wav.setUint32(4, 36 + 2 * n, true); str(8, 'WAVEfmt ');
         wav.setUint32(16, 16, true); wav.setUint16(20, 1, true); wav.setUint16(22, 1, true);
         wav.setUint32(24, SR, true); wav.setUint32(28, 2 * SR, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true);
         str(36, 'data'); wav.setUint32(40, 2 * n, true);
@@ -102,8 +101,14 @@ window.SonarHooks = {
           a.href = URL.createObjectURL(blob); a.download = name; a.click();
           setTimeout(() => URL.revokeObjectURL(a.href), 60000);
         };
-        save(new Blob([wav, ...frames], { type: 'audio/wav' }), id + '.wav');
-        save(new Blob([JSON.stringify(meta)], { type: 'application/json' }), id + '.json');
+        // One file: the labels ride inside the .wav as a 'json' chunk after the audio, because Chrome
+        // blocks a second automatic download. Players skip unknown chunks; tools/replay-take.js reads it.
+        let js = new TextEncoder().encode(JSON.stringify(meta));
+        if (js.length % 2) js = new Uint8Array([...js, 32]);       // RIFF chunks are padded to even length
+        const jh = new DataView(new ArrayBuffer(8));
+        'json'.split('').forEach((c, i) => jh.setUint8(i, c.charCodeAt(0))); jh.setUint32(4, js.length, true);
+        str(0, 'RIFF'); wav.setUint32(4, 36 + 2 * n + 8 + js.length, true); str(8, 'WAVEfmt ');
+        save(new Blob([wav, ...frames, jh, js], { type: 'audio/wav' }), id + '.wav');
       },
     };
   },

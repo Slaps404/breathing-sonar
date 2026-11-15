@@ -1,14 +1,17 @@
 // Run a recorded take (data/take-*.wav + .json from the collectors) through the live detector in dsp.js
 // and score it against the take's labels.
-// Usage: node tools/replay-take.js data/take-<id> [--skip frames.json] [--minR 0.2 --maxR 1.2] [--lock 0.34]
+// Usage: node tools/replay-take.js data/take-<id> (app takes: the .wav alone holds the labels) [--skip frames.json] [--minR 0.2 --maxR 1.2] [--lock 0.34]
 //   --skip: JSON list of frame numbers with audio dropouts; the previous frame is repeated for those.
 const fs = require('fs');
 const D = require('../dsp.js');
 const base = process.argv[2];
 const arg = (name, def) => { const i = process.argv.indexOf('--' + name); return i > 0 ? process.argv[i + 1] : def; };
-const meta = JSON.parse(fs.readFileSync(base + '.json'));
 const wav = fs.readFileSync(base + '.wav');
-const pcm = new Int16Array(wav.buffer, wav.byteOffset + 44, (wav.length - 44) >> 1);
+const dataBytes = wav.readUInt32LE(40), jsonAt = 44 + dataBytes + (dataBytes % 2);
+// Labels: base.json from the collectors, or the 'json' chunk the app puts after the audio.
+const meta = fs.existsSync(base + '.json') ? JSON.parse(fs.readFileSync(base + '.json'))
+  : JSON.parse(wav.toString('utf8', jsonAt + 8, jsonAt + 8 + wav.readUInt32LE(jsonAt + 4)));
+const pcm = new Int16Array(wav.buffer, wav.byteOffset + 44, dataBytes >> 1);
 const skip = new Set(arg('skip') ? JSON.parse(fs.readFileSync(arg('skip'))) : []);
 
 const s = new D.RangeSonar({ minR: +arg('minR', 0.2), maxR: +arg('maxR', 1.2) });
