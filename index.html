@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <script>
+  if (['breathbuddy.us', 'www.breathbuddy.us'].includes(location.hostname)) {
+    location.replace('/app/' + location.search + location.hash);
+  }
   // `python3 -m http.server` prints http://[::]:8000/ (or 0.0.0.0). Chrome hides the mic there,
   // but allows it on localhost, so swap to the same page on localhost.
   if (location.hostname === '[::]' || location.hostname === '0.0.0.0') location.hostname = 'localhost';

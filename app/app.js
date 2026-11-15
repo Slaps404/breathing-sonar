@@ -189,7 +189,7 @@
   }
 
   // Links always point at the public site, so one made while testing on localhost still opens on their phone.
-  const PUBLIC_APP = 'https://slaps404.github.io/breathing-sonar/app/';
+  const PUBLIC_APP = 'https://breathbuddy.us/app/';
   let inviteLink = '';
   function onInvite(e) {
     e.preventDefault();
