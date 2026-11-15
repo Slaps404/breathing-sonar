@@ -35,6 +35,13 @@ STEPS = [
 # checked on the before and after. Separate from the friend tiers; progress shares track-done.txt.
 SIT = "Sit upright about 40 cm from the screen. "
 EVENTS = [
+    # Sideways exit: you leave across the sonar beam (perpendicular to the screen's line of sight), not
+    # straight back along it, so the echo distance barely changes while you leave.
+    *[(f"walkside{i}", 0, 40, "normal 60, moving 8, away 60",
+       SIT + f"When the banner says MOVE AROUND, stand up and walk away to your {side}, sideways along "
+       "the screen (parallel to it, not backward). Keep going that way out of the room. "
+       "Stay away until it says SAVED. If you come back early, click I'm back in the menu.")
+      for i, side in [(1, "left"), (2, "right")]],
     *[(f"walkaway{i}", 0, 40, "normal 60, moving 8, away 60",
        SIT + f"When the banner says MOVE AROUND, get up and walk out of the room{via}. "
        "Stay away until it says SAVED. If you come back early, click I'm back in the menu.")
