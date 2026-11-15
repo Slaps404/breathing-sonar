@@ -21,6 +21,11 @@ window.SonarHooks = {
   // Returns { stop() }. Throws if the mic is refused: the UI shows the message.
   async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave }) {
     const LOST_MS = 3000, VOLUME = 0.7;
+    // Browsers hide the mic API on plain http pages that are not localhost (e.g. http://192.168.x.x).
+    if (!navigator.mediaDevices) {
+      throw new Error('this browser blocks the mic on ' + location.origin +
+        '. Open http://localhost:8000/app/ on this computer, or use an https link');
+    }
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
     });
