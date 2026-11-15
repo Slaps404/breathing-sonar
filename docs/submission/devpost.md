@@ -53,14 +53,15 @@ If the call fails, the screen shows the friend's number in large text so anyone 
 
 Results from replaying two labeled recordings through the live detector (`node tools/replay-take.js`), one person at a MacBook, breath holds of 20 seconds:
 
-<!-- RESULTS: pending re-replay -->
-
 | Take | Holds caught | False alarms | Time to alert |
 |---|---|---|---|
-| Sitting still, 5 holds | 4 of 5 | 0 | 6.8-8.2 s into the hold |
-| With movement between holds | 2 of 3 | 2 | 5.9-14.7 s into the hold |
+| Sitting still, 5 holds | 5 of 5 | 0 | 6.8-8.2 s (4 holds); 15.8 s (1 hold, caught by the slow-breathing alarm) |
+| Moving between holds, 5 holds | 3 of 5 | 2 | 5.9-14.7 s |
+| Sitting still, 3 holds (second session) | 1 of 3 | 0 | 16.0 s |
+| Free-form, mostly moving, 3 holds | 1 of 3 | 12 | 6.9 s |
+| Walked away, empty room | no holds | 1 | n/a |
 
-The movement take had 5 holds. The last two were left out of scoring (they fall in steps marked to ignore in our analysis script). An earlier version with a hand-set distance zone caught 7 of 8 clean holds with 1 false alarm on the same recordings (commit c0b0154). The automatic picker gives up a little for not needing setup.
+Total: 10 of 19 holds caught, 15 false alarms, across all 6 recordings we have (one person, one MacBook; one more 100 s take of normal breathing had 2 false alarms). Sitting still works best. Movement is the main source of false alarms, and the 6 s countdown is there for that reason. Before the slow-breathing alarm, the first take was 4 of 5; it now catches the fifth hold through that alarm. The rate it reads is not reliable yet: in the second session it read 6-9 breaths per minute during normal breathing.
 
 Other things we are proud of:
 - The whole sonar runs in a browser tab. No install, and no audio leaves the device.
