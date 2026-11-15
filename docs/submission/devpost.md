@@ -60,8 +60,9 @@ Results from replaying two labeled recordings through the live detector (`node t
 | Sitting still, 3 holds (second session) | 1 of 3 | 0 | 16.0 s |
 | Free-form, mostly moving, 3 holds | 1 of 3 | 12 | 6.9 s |
 | Walked away, empty room | no holds | 1 | n/a |
+| Normal breathing only, 100 s | no holds | 2 | n/a |
 
-Total: 10 of 19 holds caught, 15 false alarms, across all 6 recordings we have (one person, one MacBook; one more 100 s take of normal breathing had 2 false alarms). Sitting still works best. Movement is the main source of false alarms, and the 6 s countdown is there for that reason. Before the slow-breathing alarm, the first take was 4 of 5; it now catches the fifth hold through that alarm. The rate it reads is not reliable yet: in the second session it read 6-9 breaths per minute during normal breathing.
+Total: 10 of 16 holds caught, 17 false alarms, across all 6 recordings we have (one person, one MacBook). Sitting still works best. Movement is the main source of false alarms, and the 6 s countdown is there for that reason. Before the slow-breathing alarm, the first take was 4 of 5; it now catches the fifth hold through that alarm. The rate it reads is not reliable yet: in the second session it read 6-9 breaths per minute during normal breathing.
 
 Other things we are proud of:
 - The whole sonar runs in a browser tab. No install, and no audio leaves the device.
