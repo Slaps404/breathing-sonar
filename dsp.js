@@ -228,11 +228,15 @@ function analyzeChannel(ch, winSec = 20, rateSec = 30) {
   let disp = new Array(N);
   if (ch.center) {
     const { cx, cy } = ch.center;
-    let prev = 0, off = 0;
+    // Add up the angle step by step. A step over a quarter turn in one frame (~2 mm in 43 ms) is not a chest: it
+    // is a weak, still echo jittering across the centre, where the angle flips by up to half a turn. Those steps
+    // are dropped, or a held breath drew a staircase that the detrend below turned into ramps and drops (take 05-52).
+    let prev = Math.atan2(ys[0] - cy, xs[0] - cx), acc = 0;
     for (let i = 0; i < N; i++) {
       const a = Math.atan2(ys[i] - cy, xs[i] - cx);
-      if (i) { const d = a - prev; if (d > Math.PI) off -= 2 * Math.PI; else if (d < -Math.PI) off += 2 * Math.PI; }
-      prev = a; disp[i] = (a + off) * k;
+      let d = a - prev; if (d > Math.PI) d -= 2 * Math.PI; else if (d < -Math.PI) d += 2 * Math.PI;
+      if (Math.abs(d) <= Math.PI / 2) acc += d;
+      prev = a; disp[i] = acc * k;
     }
   } else {
     // No clean ring yet: straight-line (PCA) projection, converted to an angle relative to the
