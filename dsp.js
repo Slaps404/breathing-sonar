@@ -365,7 +365,10 @@ function slowStep(st, ch, moving, nowMs) {
 // would favour slices next to the direct path, where the speaker's own sound leaks in.
 // Offline evidence (2 takes): a breathing-band vs fast-band power ratio picked 91-142 cm on the still
 // take (chest at 28-40 cm); this score picked 28-40 cm.
-const ZONE = { n: 512, lagMin: 1.6, lagMax: 6.7, tauSec: 30, near: 0.05, back: 0.05, ahead: 0.23 };
+const ZONE = { n: 512, lagMin: 1.6, lagMax: 6.7, tauSec: 30, near: 0.05, back: 0.05, ahead: 0.23, settleSec: 10 };
+// settleSec: after movement, keep the zone put this long. Someone who walks out leaves noise where their chest
+// was; moving the zone 1 s later (to a wall's echo) wiped the breathing level the hold check compares against,
+// so walk-aways never alarmed (walkside1 take). 10 s lets the hold check see the drop first.
 function periodicity(ch, rate, n = ZONE.n) {
   if (ch.I.length < n) return null;
   const re = new Float64Array(n), im = new Float64Array(n), a0 = ch.I.length - n;
@@ -513,6 +516,8 @@ class RangeSonar {
     log.push([nowMs, this.apnea.moving !== true]);
     while (log[0][0] < nowMs - winMs) log.shift();
     if (this.manual) return;
+    if (this.apnea.moving === true) this.lastMove = nowMs;
+    if (this.lock !== null && nowMs - (this.lastMove ?? -1e9) < ZONE.settleSec * 1000) return;
     const r0 = Math.max(1, Math.ceil(this.minR / this.dr)), r1 = Math.round(this.maxR / this.dr);
     const sc = []; for (let r = r0; r <= r1; r++) sc[r] = periodicity(this.chs[this.tap(r)], this.rate);
     if (sc[r0] === null) return;
