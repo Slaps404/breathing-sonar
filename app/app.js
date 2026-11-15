@@ -5,12 +5,13 @@
 (function () {
   const $ = id => document.getElementById(id);
   const STORE_KEY = 'breathing-sonar.contact';
-  const COUNTDOWN_S = 15;   // time to tap "I'm okay" before the friend is phoned
+  const COUNTDOWN_S = 6;    // time to tap "I'm okay" before the friend is phoned
 
   let contact = null;       // { friendName, friendPhone, userName, place }
   let session = null;       // what startMonitoring returned: { stop() }
   let countTimer = null;
   let beeper = null;
+  let voice = null;         // the alarm voice clip while it plays
   let wakeLock = null;
 
   // Wording and the sit picture follow the device.
@@ -114,6 +115,7 @@
         onStatus: setStatus,
         onBreathingStopped: startAlarm,
         onBreathingResumed: cancelAlarm,
+        onWave: drawWave,
       });
     } catch (err) {
       $('sitErr').textContent = 'Could not start: ' + (err && err.message ? err.message : 'microphone not available') +
@@ -123,6 +125,7 @@
       return;
     }
     $('start').disabled = false;
+    drawWave([], 1);
     keepAwake();
     show('watch');
   }
@@ -139,6 +142,30 @@
     $('watchTitle').textContent = title;
     $('watchSub').textContent = typeof sub === 'function' ? sub() : sub;
     $('dot').className = 'dot ' + dot;
+  }
+
+  // Breathing line: chest movement over the last 20 s, newest on the right. Like the test page,
+  // the scale has a floor, so a held breath draws flat instead of zooming in on noise. The floor is
+  // +-1 mm here (test page: +-3 mm on a taller plot): on a recorded take, breathing moved 1-3 mm
+  // peak to peak and a hold about 0.5 mm, so 3 mm made breathing a small ripple on this short line.
+  const WAVE_FLOOR_MM = 1;
+  function drawWave(mm, rate) {
+    const c = $('wave'), g = c.getContext('2d'), dpr = window.devicePixelRatio || 1;
+    const w = c.clientWidth, h = c.clientHeight;
+    if (!w || !h) return;                       // screen hidden (alarm showing): skip
+    if (c.width !== Math.round(w * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+    if (mm.length < 2) return;
+    const N = Math.round(20 * rate), scale = Math.max(WAVE_FLOOR_MM, 1.1 * Math.max(...mm.map(Math.abs)));
+    g.strokeStyle = getComputedStyle(c).color;  // follows the light / dark theme
+    g.lineWidth = 1.5; g.lineJoin = 'round';
+    g.beginPath();
+    mm.forEach((v, i) => {
+      const x = ((N - mm.length + i) / (N - 1)) * w, y = h / 2 - (v / scale) * (h * 0.45);
+      i ? g.lineTo(x, y) : g.moveTo(x, y);
+    });
+    g.stroke();
   }
 
   // A sleeping device cannot watch anything, so ask the browser to keep the screen on.
@@ -193,12 +220,18 @@
       beeper = { ctx, id: setInterval(beep, 700) };
     } catch (e) { /* no audio: the screen still shows the alarm */ }
     try { if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) { /* no vibration */ }
-    try { speechSynthesis.speak(new SpeechSynthesisUtterance('Are you okay? Tap the screen.')); } catch (e) { /* no speech */ }
+    // Recorded voice (ElevenLabs clip). If it cannot play, the browser's own voice says the line instead.
+    const say = () => { try { speechSynthesis.speak(new SpeechSynthesisUtterance('Are you okay? Tap the screen.')); } catch (e) { /* no speech */ } };
+    try {
+      voice = new Audio('alert.mp3');
+      voice.play().catch(() => { if (voice) say(); });
+    } catch (e) { say(); }
   }
   function stopAlarmNoise() {
     clearInterval(countTimer); countTimer = null;
     if (beeper) { clearInterval(beeper.id); beeper.ctx.close(); beeper = null; }
     try { if (navigator.vibrate) navigator.vibrate(0); } catch (e) { /* no vibration */ }
+    if (voice) { voice.pause(); voice = null; }
     try { speechSynthesis.cancel(); } catch (e) { /* no speech */ }
   }
 

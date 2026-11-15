@@ -93,6 +93,7 @@ body.is-phone .only-laptop, body.is-laptop .only-phone { display: none; }
 @keyframes glow { 0%, 100% { box-shadow: 0 0 0 6px rgba(111, 174, 146, 0.18); } 50% { box-shadow: 0 0 0 14px rgba(111, 174, 146, 0.08); } }
 @media (prefers-reduced-motion: reduce) { .dot.on { animation: none; } }
 #s-watch h1, #s-called h1 { margin-bottom: 4px; }
+canvas.wave { display: block; width: 100%; max-width: 320px; height: 56px; margin-top: 22px; color: var(--soft); opacity: 0.8; }
 
 /* Alarm and called: same layout, the whole page changes colour */
 body.alarming { background: var(--alarm); color: #fff4ec; }

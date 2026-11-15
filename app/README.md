@@ -16,5 +16,5 @@ app.js (screens)  --startMonitoring()-->  sonar        (../dsp.js, range mode)
 Both hooks live in `hooks.js` with their contracts in comments; `app.js` only talks to them.
 For the call, run `python3 call/server.py` first (needs the keys in `.env`).
 
-- `COUNTDOWN_S` in `app.js`: seconds to tap the screen before the friend is phoned (15).
+- `COUNTDOWN_S` in `app.js`: seconds to tap the screen before the friend is phoned (6).
 - Contact details are kept in this browser's localStorage only. "Forget these details" clears them.
