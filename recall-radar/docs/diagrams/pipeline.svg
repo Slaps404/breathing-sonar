@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="330" viewBox="0 0 1100 330" font-family="system-ui, -apple-system, sans-serif">
+  <rect width="1100" height="330" fill="#0d1117"/>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker>
+  </defs>
+  <text x="20" y="32" fill="#e6edf3" font-size="18" font-weight="700">RecallRadar sweep: one area, every listing, every recall</text>
+  <!-- boxes -->
+  <g font-size="13" fill="#e6edf3">
+    <rect x="20" y="70" width="170" height="120" rx="10" fill="#161b22" stroke="#3d7eff" stroke-width="2"/>
+    <text x="35" y="95" font-weight="700">1. Search</text>
+    <text x="35" y="117" fill="#8b949e">OfferUp API, any</text>
+    <text x="35" y="135" fill="#8b949e">location + radius</text>
+    <text x="35" y="160" fill="#8fb4ff" font-weight="700">via Bright Data</text>
+    <text x="35" y="178" fill="#8b949e">~500 listings</text>
+
+    <rect x="230" y="70" width="170" height="120" rx="10" fill="#161b22" stroke="#a371f7" stroke-width="2"/>
+    <text x="245" y="95" font-weight="700">2. Read photos</text>
+    <text x="245" y="117" fill="#8b949e">brand, product,</text>
+    <text x="245" y="135" fill="#8b949e">model on the label</text>
+    <text x="245" y="160" fill="#d2a8ff" font-weight="700">Gemini, 8 per call</text>
+    <text x="245" y="178" fill="#8b949e">every listing</text>
+
+    <rect x="440" y="70" width="170" height="120" rx="10" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="455" y="95" font-weight="700">3. Shortlist</text>
+    <text x="455" y="117" fill="#8b949e">same brand + type,</text>
+    <text x="455" y="135" fill="#8b949e">or exact model no.</text>
+    <text x="455" y="160" fill="#e6edf3" font-weight="700">SQLite full-text</text>
+    <text x="455" y="178" fill="#8b949e">~500 to ~30</text>
+
+    <rect x="650" y="70" width="170" height="120" rx="10" fill="#161b22" stroke="#3d7eff" stroke-width="2"/>
+    <text x="665" y="95" font-weight="700">4. Full listing</text>
+    <text x="665" y="117" fill="#8b949e">description, all</text>
+    <text x="665" y="135" fill="#8b949e">photos, location</text>
+    <text x="665" y="160" fill="#8fb4ff" font-weight="700">via Bright Data</text>
+
+    <rect x="860" y="70" width="220" height="120" rx="10" fill="#161b22" stroke="#a371f7" stroke-width="2"/>
+    <text x="875" y="95" font-weight="700">5. Judge + rules</text>
+    <text x="875" y="117" fill="#8b949e">seller photos vs recall</text>
+    <text x="875" y="135" fill="#8b949e">text and photo (Gemini)</text>
+    <text x="875" y="160" fill="#e6edf3" font-weight="700">code checks model nos.,</text>
+    <text x="875" y="178" fill="#e6edf3" font-weight="700">brand, repair remedy</text>
+  </g>
+  <g stroke="#8b949e" stroke-width="2" marker-end="url(#a)">
+    <line x1="190" y1="130" x2="228" y2="130"/><line x1="400" y1="130" x2="438" y2="130"/>
+    <line x1="610" y1="130" x2="648" y2="130"/><line x1="820" y1="130" x2="858" y2="130"/>
+  </g>
+  <!-- recall index -->
+  <rect x="440" y="230" width="170" height="70" rx="10" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="455" y="255" fill="#e6edf3" font-size="13" font-weight="700">Recall index</text>
+  <text x="455" y="275" fill="#8b949e" font-size="13">9,511 CPSC recalls</text>
+  <text x="455" y="292" fill="#8b949e" font-size="13">saferproducts.gov</text>
+  <line x1="525" y1="230" x2="525" y2="192" stroke="#3fb950" stroke-width="2" marker-end="url(#a)"/>
+  <!-- outputs -->
+  <g font-size="13">
+    <text x="875" y="230" fill="#f85149" font-weight="700">● matches a recall</text>
+    <text x="875" y="252" fill="#d29922" font-weight="700">● needs a closer look</text>
+    <text x="875" y="274" fill="#3fb950" font-weight="700">● cleared</text>
+    <text x="875" y="300" fill="#8b949e">card, map, report, voice</text>
+  </g>
+  <line x1="970" y1="190" x2="970" y2="214" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+</svg>

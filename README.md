@@ -35,3 +35,10 @@ Each take is a `.wav` and a `.json`. The JSON holds the labels as `{label, sampl
 
 ## Friend kit (collect takes on other Macs)
 `tools/make-kit.sh` builds `dist/sonar-recorder-kit.zip`: the menu bar recorder, a double-click `Start Recorder.command` (installs on first run, asks the person's name, warns if muted), and `READ ME FIRST.txt`. Quitting packs their takes into `~/Desktop/sonar-takes-<name>.zip` to send back. Takes are named `<name>-take-...` and their JSON records `who` and `machine`. The launcher also asks how much they want to help (Quick 2 takes, Helpful 5, Extra mile 8; steps defined in `collect/tracks.py`). The menu's Next take walks through them with set-up instructions, sets distance and intervals itself, and repeats a take that had dropouts or no echo. Each take's JSON records its `track` step.
+
+---
+
+## Also in this repo: RecallRadar
+
+A second SanD Hacks 2026 project lives in [`recall-radar/`](recall-radar/): it sweeps local resale listings and finds
+products under a federal safety recall, with the evidence for each match. See [`recall-radar/README.md`](recall-radar/README.md).

@@ -1,0 +1,8 @@
+httpx
+fastapi
+uvicorn[standard]
+google-genai
+python-dotenv
+pillow
+python-multipart
+scikit-learn
