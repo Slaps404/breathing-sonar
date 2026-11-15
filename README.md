@@ -22,6 +22,17 @@ Texting is off (`SEND_SMS = False` in `call/server.py`): carriers block texts fr
 
 What to expect: enter a friend's name and number, your name, and where you are. Sit 30-40 cm from the laptop, sound on, no headphones, and press Start. It says "Finding your breathing" for roughly half a minute, then "Watching your breathing". Hold your breath and stay still: after about 7-8 s it shows "Are you okay?" with a countdown and beeps. Tap or press any key to cancel. If not, the screen says the friend is being called and their phone rings with a voice alert. If the call server is not running, the screen shows the friend's number to dial by hand.
 
+## Hosted app (phone)
+`https://slaps404.github.io/breathing-sonar/app/` (GitHub Pages, serves `main`). It installs to the home screen (`app/manifest.webmanifest`, `app/sw.js`).
+
+```
+phone: app on GitHub Pages --POST /call + passcode--> Vultr machine: Caddy (https) --> call/server.py --> ElevenLabs + Twilio
+```
+
+- The call server runs on the Vultr machine as the `sonar-call` service (code in `/opt/sonar-call`, keys in `/etc/sonar-call.env`). The `sonar-caddy` container gives it https at `207-246-99-169.sslip.io`.
+- It only places calls for apps that send the passcode. Open the app once as `.../app/?key=<passcode>` and the phone remembers it. The passcode is `HOSTED_CALL_PASSCODE` in your local `.env`.
+- Update the server after changing `call/server.py`: `scp call/server.py root@207.246.99.169:/opt/sonar-call/call/ && ssh root@207.246.99.169 systemctl restart sonar-call`. Logs: `journalctl -u sonar-call -f` there.
+
 ## How it works
 1. The speaker plays sound at 20-22 kHz, which most adults cannot hear.
 2. The sound bounces off your chest and the mic records the echo.

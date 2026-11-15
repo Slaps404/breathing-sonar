@@ -155,7 +155,8 @@ window.SonarHooks = {
   // Where the call server is. On this laptop (localhost) it is call/server.py on port 8788.
   // On the hosted app (phone) it is HOSTED_CALL_URL, and the server wants a passcode: open the app once as
   // .../app/?key=<passcode> and it is kept in this browser (see below), so it is never in the public code.
-  HOSTED_CALL_URL: '',   // e.g. 'https://your-server.example.com/call'. Empty: the hosted app shows the number to dial.
+  // call/server.py on the Vultr machine, behind Caddy for https. Empty string: the hosted app shows the number to dial.
+  HOSTED_CALL_URL: 'https://207-246-99-169.sslip.io/call',
   async callFriend(contact) {
     const local = ['localhost', '127.0.0.1'].includes(location.hostname);
     const url = local ? 'http://127.0.0.1:8788/call' : this.HOSTED_CALL_URL;
