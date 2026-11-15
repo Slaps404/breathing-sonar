@@ -51,8 +51,9 @@ If the call fails, the screen shows the friend's number in large text so anyone 
 
 ## Accomplishments that we're proud of
 
-<!-- RESULTS: pending re-replay -->
 Results from replaying two labeled recordings through the live detector (`node tools/replay-take.js`), one person at a MacBook, breath holds of 20 seconds:
+
+<!-- RESULTS: pending re-replay -->
 
 | Take | Holds caught | False alarms | Time to alert |
 |---|---|---|---|
