@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" font-family="Helvetica, Arial, sans-serif">
+  <rect width="1200" height="560" fill="#ffffff"/>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#52606d"/>
+    </marker>
+  </defs>
+
+  <!-- Row 1: sound out, echo back -->
+  <text x="30" y="36" font-size="18" font-weight="600" fill="#1f2933">1. Sound out, echo back</text>
+
+  <!-- Laptop -->
+  <rect x="60" y="80" width="170" height="110" rx="8" fill="#e4e7eb" stroke="#52606d" stroke-width="2"/>
+  <rect x="72" y="92" width="146" height="86" rx="3" fill="#f5f7fa"/>
+  <path d="M40 190 H250 L236 206 H54 Z" fill="#cbd2d9" stroke="#52606d" stroke-width="2"/>
+  <circle cx="200" cy="198" r="4" fill="#1f2933"/>
+  <text x="145" y="230" font-size="13" fill="#52606d" text-anchor="middle">laptop speaker + mic</text>
+
+  <!-- outgoing waves -->
+  <g fill="none" stroke="#2f80c3" stroke-width="2.5">
+    <path d="M270 110 q8 15 0 30"/><path d="M285 102 q12 23 0 46"/><path d="M300 94 q16 31 0 62"/>
+  </g>
+  <line x1="320" y1="125" x2="560" y2="125" stroke="#2f80c3" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="450" y="110" font-size="13" fill="#2f80c3" text-anchor="middle">probe, 20-22 kHz (too high for most adults)</text>
+
+  <!-- echo back -->
+  <line x1="560" y1="165" x2="320" y2="165" stroke="#e07a1f" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arr)"/>
+  <text x="440" y="190" font-size="14" fill="#e07a1f" text-anchor="middle">echo, recorded by the mic</text>
+
+  <!-- person -->
+  <circle cx="650" cy="78" r="26" fill="#f5f7fa" stroke="#1f2933" stroke-width="2"/>
+  <path d="M600 210 q0 -95 50 -102 q50 7 50 102 z" fill="#f5f7fa" stroke="#1f2933" stroke-width="2"/>
+  <path d="M598 140 q-8 0 -8 8 M598 158 q-12 0 -12 12" fill="none" stroke="#e07a1f" stroke-width="2"/>
+  <text x="650" y="236" font-size="13" fill="#52606d" text-anchor="middle">chest moves a few mm</text>
+  <text x="650" y="253" font-size="13" fill="#52606d" text-anchor="middle">with each breath</text>
+
+  <!-- Row 1 right: what the app does with it -->
+  <text x="780" y="36" font-size="18" font-weight="600" fill="#1f2933">2. Echo by distance (23 times a second)</text>
+  <text x="780" y="62" font-size="13" fill="#52606d">Received spectrum / probe spectrum = echo strength at each delay.</text>
+  <text x="780" y="80" font-size="13" fill="#52606d">Delay is distance, so each frame is a row of ~6 cm slices.</text>
+  <g stroke="#ffffff" stroke-width="2">
+    <rect x="780" y="100" width="40" height="60" fill="#d9e2ec"/>
+    <rect x="820" y="100" width="40" height="60" fill="#bcccdc"/>
+    <rect x="860" y="100" width="40" height="60" fill="#e07a1f"/>
+    <rect x="900" y="100" width="40" height="60" fill="#f0b47a"/>
+    <rect x="940" y="100" width="40" height="60" fill="#d9e2ec"/>
+    <rect x="980" y="100" width="40" height="60" fill="#e4e7eb"/>
+    <rect x="1020" y="100" width="40" height="60" fill="#d9e2ec"/>
+    <rect x="1060" y="100" width="40" height="60" fill="#e4e7eb"/>
+    <rect x="1100" y="100" width="40" height="60" fill="#eef1f4"/>
+  </g>
+  <rect x="860" y="100" width="80" height="60" fill="none" stroke="#1f2933" stroke-width="2.5"/>
+  <text x="780" y="180" font-size="12" fill="#7b8794">20 cm</text>
+  <text x="1140" y="180" font-size="12" fill="#7b8794" text-anchor="end">80 cm</text>
+  <text x="900" y="200" font-size="13" fill="#1f2933" text-anchor="middle">chest slices: the closest group</text>
+  <text x="900" y="217" font-size="13" fill="#1f2933" text-anchor="middle">with a repeating breathing rhythm</text>
+
+  <line x1="30" y1="285" x2="1170" y2="285" stroke="#e4e7eb" stroke-width="2"/>
+
+  <!-- Row 2: breathing line and the hold -->
+  <text x="30" y="320" font-size="18" font-weight="600" fill="#1f2933">3. Watch the chest slices</text>
+  <text x="30" y="342" font-size="13" fill="#52606d">Echo phase moves at breathing speed (0.15-0.6 Hz).</text>
+  <rect x="30" y="360" width="560" height="160" fill="#f5f7fa"/>
+  <!-- breathing line: steady, then flat during hold -->
+  <path d="M40 440 q15 -40 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 L340 440 L560 441" fill="none" stroke="#2f80c3" stroke-width="2.5"/>
+  <rect x="340" y="365" width="220" height="150" fill="#e07a1f" opacity="0.10"/>
+  <text x="450" y="385" font-size="13" fill="#b35c0e" text-anchor="middle">breath hold</text>
+  <line x1="410" y1="365" x2="410" y2="515" stroke="#c0392b" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="416" y="490" font-size="12" fill="#c0392b">alarm: movement under 1/4</text>
+  <text x="416" y="506" font-size="12" fill="#c0392b">of this person's normal, 2 s</text>
+  <text x="40" y="378" font-size="12" fill="#7b8794">normal breathing</text>
+
+  <line x1="605" y1="440" x2="660" y2="440" stroke="#52606d" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Alarm -->
+  <text x="680" y="320" font-size="18" font-weight="600" fill="#1f2933">4. Ask, then call</text>
+  <rect x="680" y="360" width="200" height="160" rx="14" fill="#8e2533"/>
+  <text x="780" y="415" font-size="40" font-weight="700" fill="#ffffff" text-anchor="middle">6</text>
+  <text x="780" y="452" font-size="19" font-weight="700" fill="#ffffff" text-anchor="middle">Are you okay?</text>
+  <text x="780" y="478" font-size="12" fill="#f3d6da" text-anchor="middle">said out loud;</text>
+  <text x="780" y="495" font-size="12" fill="#f3d6da" text-anchor="middle">any tap or key cancels</text>
+
+  <line x1="890" y1="440" x2="945" y2="440" stroke="#52606d" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="917" y="430" font-size="11" fill="#52606d" text-anchor="middle">no answer</text>
+
+  <!-- Phone -->
+  <rect x="960" y="345" width="96" height="180" rx="14" fill="#f5f7fa" stroke="#1f2933" stroke-width="2"/>
+  <path d="M992 420 c0 -8 8 -12 12 -8 l6 8 c2 4 0 6 -4 8 c2 8 8 14 16 16 c2 -4 4 -6 8 -4 l8 6 c4 4 0 12 -8 12 c-20 0 -38 -18 -38 -38 z" fill="#1d8a74"/>
+  <text x="1008" y="490" font-size="12" fill="#1f2933" text-anchor="middle">friend's</text>
+  <text x="1008" y="505" font-size="12" fill="#1f2933" text-anchor="middle">phone rings</text>
+  <text x="1070" y="390" font-size="12" fill="#52606d">Voice agent says</text>
+  <text x="1070" y="406" font-size="12" fill="#52606d">who, where, and</text>
+  <text x="1070" y="422" font-size="12" fill="#52606d">to call 911 if they</text>
+  <text x="1070" y="438" font-size="12" fill="#52606d">cannot reach them.</text>
+  <text x="1070" y="460" font-size="12" fill="#7b8794">Twilio + ElevenLabs,</text>
+  <text x="1070" y="476" font-size="12" fill="#7b8794">server on Vultr</text>
+</svg>
