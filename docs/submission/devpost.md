@@ -4,7 +4,7 @@ A browser tab that watches your breathing with sound, and phones a friend if it 
 
 ## Inspiration
 
-Most people who die of an opioid overdose are alone when it happens. An overdose slows breathing and then stops it. If someone is there, they can give naloxone or call 911. If no one is there, no one knows.
+Many people who die of an opioid overdose are alone when it happens. An overdose slows breathing and then stops it. If someone is there, they can give naloxone or call 911. If no one is there, no one knows.
 
 We wanted something a person could turn on in a few seconds, with what they already have: a laptop. No wearable, no app store, no account.
 
