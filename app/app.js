@@ -127,7 +127,7 @@
       place: $('place').value.trim(),
     };
     save(contact);
-    // Ask for GPS now, while the person is here to allow it; the text to the friend gets a map link.
+    // Ask for GPS now, while the person is here to allow it; the call says its street address (and the text, when on, gets a map link).
     // Not saved with the contact, so it is fresh each session. Fails quietly (the typed place still goes).
     if (navigator.geolocation) navigator.geolocation.getCurrentPosition(
       pos => { contact.lat = pos.coords.latitude; contact.lng = pos.coords.longitude; },

@@ -1,8 +1,9 @@
 """Phone alert: when breathing stops, every friend gets a text with the location and an ElevenLabs call,
-both from your Twilio number.
+both from your Twilio number. The voice says the location: the typed place plus the street address of the GPS fix.
 
 Run:   python3 call/server.py                      (listens on http://127.0.0.1:8788, the app POSTs /call)
-Test:  python3 call/server.py --test +16195550123 [--name Sam] [--user Alex] [--place "the library"]
+Test:  python3 call/server.py --test +16195550123 [--name Sam] [--user Alex] [--place "the library"] [--lat 32.88 --lng -117.23]
+       python3 call/server.py --where 32.8811 -117.2376 ["the library"]     (prints what the voice would say, no call)
 
 Keys come from .env in the repo root (never committed). First run sets up ElevenLabs once:
 it imports your Twilio number and creates the voice agent, then saves their ids in call/state.json.
@@ -22,6 +23,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parent.parent
 STATE = Path(__file__).with_name("state.json")
 API = "https://api.elevenlabs.io/v1/convai"
+GEOCODER = "https://nominatim.openstreetmap.org/reverse"   # OpenStreetMap: free, no key, coordinates in, address out
 PORT = 8788
 
 FIRST = ("Hi {{friend_name}}. This is an automated safety alert for {{user_name}}. "
@@ -31,9 +33,9 @@ FIRST = ("Hi {{friend_name}}. This is an automated safety alert for {{user_name}
 PROMPT = """You are an automated safety alert calling on behalf of {{user_name}}.
 A laptop breathing monitor saw their breathing stop{{place_phrase}}, and they did not press "I'm okay" on screen.
 You already told {{friend_name}} this. Your only job: make sure they understood and will check on {{user_name}} now.
-Facts you know: the person is {{user_name}}; the place is "{{place}}" (empty means unknown); {{text_phrase}}{{others_phrase}}
+Facts you know: the person is {{user_name}}; their location is "{{place}}" (empty means unknown); {{text_phrase}}{{others_phrase}}
 Answer questions in one short sentence using only those facts. Never guess anything else (no medical advice, no
-cause, no other location). If asked, say you are an automated alert and they should call 911 if they cannot reach
+cause, no other location). If asked where they are, repeat that location word for word. If asked, say you are an automated alert and they should call 911 if they cannot reach
 {{user_name}}. Once they say they will check, say thank you and use the end_call tool.
 If you reach voicemail, a call screener, or get no answer after asking twice, repeat the alert once and use end_call.
 Never say goodbye without using end_call in the same turn."""
@@ -100,6 +102,37 @@ def where(place, lat, lng):
     return "\n".join(x for x in (place, link) if x)
 
 
+def address(lat, lng):
+    """Street address for a GPS fix, in words a voice can say. "" if there is no fix or the lookup fails."""
+    if lat is None or lng is None:
+        return ""
+    url = GEOCODER + "?" + urlencode({"format": "jsonv2", "lat": f"{lat:.6f}", "lon": f"{lng:.6f}", "zoom": 18})
+    try:   # short timeout: a slow lookup must not hold up the call
+        with urlopen(Request(url, headers={"User-Agent": "sonar-breathing-alert"}), timeout=3) as r:
+            found = json.load(r)
+    except Exception as err:
+        print("address lookup failed:", err, flush=True)
+        return ""
+    a = found.get("address") or {}
+    street = " ".join(x for x in (a.get("house_number"), a.get("road")) if x)
+    area = a.get("neighbourhood") or a.get("suburb")
+    city = a.get("city") or a.get("town") or a.get("village")
+    parts = []
+    for x in (found.get("name"), street, area, city):   # building name, street, neighborhood, city
+        if x and x not in parts and x != a.get("road"):
+            parts.append(x)
+    return ", ".join(parts)
+
+
+def spoken_place(place, lat, lng):
+    """What the voice says after "breathing appears to have stopped": typed place, then the GPS address.
+    "near", not "at": a laptop's fix comes from Wi-Fi and can be off by a building."""
+    addr = address(lat, lng)
+    if place and addr:
+        return f"at {place}, near {addr}"
+    return f"at {place}" if place else f"near {addr}" if addr else ""
+
+
 def setup(keys):
     """Import the Twilio number and create the agent once; reuse their ids after that."""
     state = json.loads(STATE.read_text()) if STATE.exists() else {}
@@ -123,6 +156,9 @@ def setup(keys):
 
 def call_all(keys, state, friends, user_name, place, voice_id=None, lat=None, lng=None):
     """Text then ring every friend, all friends at the same time. Returns one result per friend."""
+    said = spoken_place(place.strip(), lat, lng)   # looked up once, shared by every friend's call
+    print("location said on the call:", said or "(none)", flush=True)
+
     def one(f):
         others = [g["name"] for g in friends if g is not f]
         others_phrase = ("I am also calling " + " and ".join(others) + ".") if others else ""
@@ -133,8 +169,8 @@ def call_all(keys, state, friends, user_name, place, voice_id=None, lat=None, ln
             r = post(keys, "/twilio/outbound-call", {
                 "agent_id": state["agent_id"], "agent_phone_number_id": state["phone_number_id"], "to_number": f["phone"],
                 "conversation_initiation_client_data": {"dynamic_variables": {
-                    "friend_name": f["name"], "user_name": user_name, "place": place,
-                    "place_phrase": f" at {place}" if place else "", "others_phrase": others_phrase,
+                    "friend_name": f["name"], "user_name": user_name, "place": said,
+                    "place_phrase": " " + said if said else "", "others_phrase": others_phrase,
                     "text_phrase": text_phrase},
                     **({"conversation_config_override": {"tts": {"voice_id": voice_id}}} if voice_id else {})}})
             return {"name": f["name"], "phone": f["phone"], "ok": bool(r.get("success")), "detail": r.get("message"),
@@ -183,13 +219,17 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    args = sys.argv[1:]
+    if args and args[0] == "--where":   # no keys needed, nothing is called
+        print(spoken_place(args[3] if len(args) > 3 else "", float(args[1]), float(args[2])) or "(nothing)")
+        return
     keys = env()
     state = setup(keys)
-    args = sys.argv[1:]
     if args and args[0] == "--test":
         opt = dict(zip(args[2::2], args[3::2]))
+        gps = [float(opt[k]) if k in opt else None for k in ("--lat", "--lng")]
         res = call_all(keys, state, [{"name": opt.get("--name", "friend"), "phone": args[1]}],
-                       opt.get("--user", "your friend"), opt.get("--place", ""))
+                       opt.get("--user", "your friend"), opt.get("--place", ""), None, *gps)
         print(json.dumps(res, indent=1))
         return
     Handler.keys, Handler.state = keys, state
