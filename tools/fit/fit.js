@@ -47,10 +47,16 @@ function loss(target, got) {
     detail.rhythm = +Math.sqrt(cs / cc).toFixed(2); s += 2 * cs; c += 2 * cc; }
   return { rms: Math.sqrt(s / c), detail };
 }
+// Breathing rate of the simulated person: fixed at 15 breaths/min (typical at rest), an ASSUMPTION.
+// No tool here measures the rate of these takes reliably. Two things were tried and were wrong:
+//   the detector's rate readout: about 4/min on four of five takes (docs/sim/README.md finding 7). Twins breathing
+//     at 4/min move below the 0.15-0.6 Hz band the hold check measures, so they missed holds (rounds 1-7).
+//   best self-match lag of the breathing-band signal: pegs at the shortest lag allowed (34-38/min, round 8).
+const BPM = 15;
 function fitOne(id, iters, room) {
   const fr = T.load(id), end = TRAIN_END[id], train = fr.m.segs.filter(x => x.b <= end + 1e-6);
-  const target = M.measureFrames(fr, train), tr = T.detect(fr, { trace: true }).trace.filter(x => x.t <= end);
-  const bpm = med(tr.filter(x => x.q > 0.5 && !x.alert).map(x => x.bpm)) || 15, segs = train, Tsec = end;
+  const target = M.measureFrames(fr, train), segs = train, Tsec = end;
+  const bpm = BPM;
   // 1. the modelled chest alone (silent room)  2. excess = measured normal - measured hold - chest alone
   // 3. full scene = hold background + excess (off during holds) + chest
   const SILENT = { still: target.cls.hold.still.map(() => -200), bands: Object.fromEntries(Object.keys(BANDS).map(k => [k, target.cls.hold.still.map(() => -200)])) };
