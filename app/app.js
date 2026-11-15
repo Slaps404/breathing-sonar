@@ -203,6 +203,7 @@
   function startAlarm() {
     if (!session || countTimer) return;
     let left = COUNTDOWN_S;
+    session.mark('alarm: countdown');
     $('count').textContent = left;
     show('alarm');
     startAlarmNoise();
@@ -213,8 +214,9 @@
     }, 1000);
   }
 
-  function cancelAlarm() {
+  function cancelAlarm(e) {
     if (!countTimer) return;
+    if (session) session.mark(e ? "user: I'm okay" : 'alarm cleared');
     stopAlarmNoise();
     show('watch');
   }
@@ -252,6 +254,7 @@
   // ---------- Called ----------
 
   async function placeCall() {
+    if (session) session.mark('call: friend phoned');
     stopAlarmNoise();
     $('calledTitle').textContent = `Calling ${contact.friendName}.`;
     $('calledSub').textContent = '';
@@ -281,7 +284,7 @@
   $('s-alarm').addEventListener('click', cancelAlarm);          // tap anywhere
   // During the countdown any key means "I'm okay", so "s" must not also toggle the judge view there.
   document.addEventListener('keydown', e => {
-    if (countTimer) { cancelAlarm(); return; }
+    if (countTimer) { cancelAlarm(e); return; }
     if (e.key === 's' && !e.metaKey && !e.ctrlKey && !e.altKey && !$('s-watch').hidden) toggleJudge();
   });
   $('judgeBtn').addEventListener('click', toggleJudge);

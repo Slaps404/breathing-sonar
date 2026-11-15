@@ -19,7 +19,9 @@ window.SonarHooks = {
   //   onWave(mm, rate)        optional. Chest movement in mm over the last 20 s (rate samples/s),
   //                           the same signal the test page draws (sonar.analyze(...).ch.disp)
   //   onDebug(snapshot)       optional. Everything the judge view draws, ~5 times a second (see snapshot below)
-  // Returns { stop() }. Throws if the mic is refused: the UI shows the message.
+  // Returns { stop(), mark(label) }. Throws if the mic is refused: the UI shows the message.
+  // Records the run: every mic frame plus labels (detector events and mark() calls). stop() downloads
+  // take-<time>.wav + .json in the collectors' format, so `node tools/replay-take.js <path>` replays it.
   async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug }) {
     const LOST_MS = 3000, VOLUME = 0.7;
     // Browsers hide the mic API on plain http pages that are not localhost (e.g. http://192.168.x.x).
@@ -35,18 +37,19 @@ window.SonarHooks = {
     const sonar = new DSP.RangeSonar();
     const node = new AudioWorkletNode(ctx, 'probe', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
       processorOptions: { signal: sonar.p.sig, amp: VOLUME } });
-    node.port.onmessage = e => sonar.ingestFrame(e.data);
+    const take = window.SonarHooks.makeTake(sonar.p, VOLUME);
+    node.port.onmessage = e => { take.push(e.data); sonar.ingestFrame(e.data); };
     ctx.createMediaStreamSource(stream).connect(node);
     node.connect(ctx.destination);
 
     let status = null, movingSince = null;
-    const setStatus = s => { if (s !== status) { status = s; onStatus(s); } };
+    const setStatus = s => { if (s !== status) { status = s; take.mark('status: ' + s); onStatus(s); } };
     setStatus('searching');
     const timer = setInterval(() => {
       const now = performance.now();
       const res = sonar.analyze(now);
-      if (res && res.event === 'start') onBreathingStopped();
-      if (res && res.event === 'end') onBreathingResumed();
+      if (res && res.event === 'start') { take.mark('detector: stopped (' + res.why + ')'); onBreathingStopped(); }
+      if (res && res.event === 'end') { take.mark('detector: resumed'); onBreathingResumed(); }
       if (res && onWave) onWave(res.ch.disp, sonar.rate);
       if (onDebug) onDebug(window.SonarHooks.snapshot(sonar, res));
       movingSince = sonar.apnea.moving === true ? (movingSince ?? now) : null;
@@ -56,11 +59,47 @@ window.SonarHooks = {
     }, 200);
 
     return {
+      mark: take.mark,
       stop() {
         clearInterval(timer);
         node.disconnect();
         stream.getTracks().forEach(t => t.stop());
         ctx.close();
+        take.download();
+      },
+    };
+  },
+
+  // Recording of one run. Frames arrive one probe period (P samples) at a time, starting at probe[0],
+  // so WAV sample n lines up with probe[n % P], as in collect/recorder.py.
+  makeTake(p, amp) {
+    const SR = DSP.SR, P = p.P, started = new Date(), frames = [], labels = [];
+    const id = 'take-' + started.toISOString().replace(/[:.]/g, '-');
+    let peak = 0;
+    const samples = () => frames.length * P;
+    return {
+      push(f) {
+        const q = new Int16Array(P);
+        for (let i = 0; i < P; i++) { const v = f[i]; if (Math.abs(v) > peak) peak = Math.abs(v); q[i] = Math.max(-1, Math.min(1, v)) * 32767; }
+        frames.push(q);
+      },
+      mark(label) { labels.push({ label, sample: samples(), t: +(samples() / SR).toFixed(3) }); },
+      download() {
+        const n = samples(), wav = new DataView(new ArrayBuffer(44));
+        const str = (o, t) => { for (let i = 0; i < t.length; i++) wav.setUint8(o + i, t.charCodeAt(i)); };
+        str(0, 'RIFF'); wav.setUint32(4, 36 + 2 * n, true); str(8, 'WAVEfmt ');
+        wav.setUint32(16, 16, true); wav.setUint16(20, 1, true); wav.setUint16(22, 1, true);
+        wav.setUint32(24, SR, true); wav.setUint32(28, 2 * SR, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true);
+        str(36, 'data'); wav.setUint32(40, 2 * n, true);
+        const meta = { id, source: 'app', started: started.toISOString(), sampleRate: SR, P, f0: p.f0, f1: p.f1, amp,
+          samples: n, seconds: +(n / SR).toFixed(2), labels, peak: +peak.toFixed(4), userAgent: navigator.userAgent };
+        const save = (blob, name) => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob); a.download = name; a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+        };
+        save(new Blob([wav, ...frames], { type: 'audio/wav' }), id + '.wav');
+        save(new Blob([JSON.stringify(meta)], { type: 'application/json' }), id + '.json');
       },
     };
   },
