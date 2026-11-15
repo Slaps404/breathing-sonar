@@ -6,7 +6,7 @@
 //   RangeSonar: a repeating 18-20 kHz probe. Each frame is turned into ~6 cm range slices
 //               ("taps"); each tap is its own I/Q channel, so we can watch only the chest's slice.
 // Channel pipeline: I/Q history -> fit circle -> angle around center -> displacement in mm
-//                   -> breathing rate (DFT 6-42/min) + breath-hold detector.
+//                   -> breathing rate (DFT 3-42/min, 30 s) + breath-hold detector.
 (function () {
 const C = 343;     // speed of sound, m/s
 const SR = 48000;  // audio sample rate
@@ -155,24 +155,53 @@ function fitCircle(xs, ys) {
   return { cx: cx + mx, cy: cy + my, R, fit: Math.sqrt(rr / n) / R }; // fit = ring thickness / radius
 }
 
-// Strongest rhythm between 0.1 and 0.7 Hz, plus the share of signal power in that band.
+// Remove the best-fit cubic (slow drift: posture, sway). A straight line left enough drift that it
+// won the spectrum at its low edge on real takes; a cubic keeps a 4/min breath (2 cycles in 30 s).
+function detrend3(x) {
+  const n = x.length, m = 4, A = Array.from({ length: m }, () => new Float64Array(m)), y = new Float64Array(m);
+  const pw = t => [1, t, t * t, t * t * t];
+  for (let i = 0; i < n; i++) {
+    const p = pw(2 * i / (n - 1) - 1);
+    for (let a = 0; a < m; a++) { y[a] += p[a] * x[i]; for (let b = 0; b < m; b++) A[a][b] += p[a] * p[b]; }
+  }
+  for (let c = 0; c < m; c++) for (let r = c + 1; r < m; r++) {   // solve A co = y (Gaussian elimination)
+    const f = A[r][c] / A[c][c]; for (let k = c; k < m; k++) A[r][k] -= f * A[c][k]; y[r] -= f * y[c];
+  }
+  const co = new Float64Array(m);
+  for (let r = m - 1; r >= 0; r--) { let s = y[r]; for (let k = r + 1; k < m; k++) s -= A[r][k] * co[k]; co[r] = s / A[r][r]; }
+  return x.map((v, i) => { const p = pw(2 * i / (n - 1) - 1); return v - co[0] - co[1] * p[1] - co[2] * p[2] - co[3] * p[3]; });
+}
+// Strongest rhythm between 3 and 42 /min (0.05-0.7 Hz), refined between DFT steps by a parabola
+// through the peak and its neighbours. edge = the peak sits on a band end (not a real rhythm).
 function breathingSpectrum(x, rate) {
-  const n = x.length, df = 0.01;
-  let best = 0, bestF = 0, band = 0, total = 0;
-  for (const v of x) total += v * v;
-  for (let f = 0.1; f <= 0.7001; f += df) {
+  const n = x.length, df = 0.01, P = [];
+  for (let f = 0.05; f <= 0.7001; f += df) {
     const w = 2 * Math.PI * f / rate, cw = Math.cos(w), sw = Math.sin(w);
     let c = 1, s = 0, re = 0, im = 0;
     for (let i = 0; i < n; i++) {
       re += x[i] * c; im -= x[i] * s;
       const t = c * cw - s * sw; s = c * sw + s * cw; c = t;
     }
-    const p = re * re + im * im;
-    band += p;
-    if (p > best) { best = p; bestF = f; }
+    P.push(re * re + im * im);
   }
-  band *= 2 * df / rate; // Parseval: convert summed DFT power to time-domain power
-  return { bestF, quality: total > 0 ? Math.min(1, band / total) : 0 };
+  let b = 0; for (let k = 1; k < P.length; k++) if (P[k] > P[b]) b = k;
+  const edge = b === 0 || b === P.length - 1;
+  let bestF = 0.05 + b * df;
+  if (!edge) { const den = P[b - 1] - 2 * P[b] + P[b + 1]; if (den < 0) bestF += 0.5 * (P[b - 1] - P[b + 1]) / den * df; }
+  return { bestF, edge };
+}
+// How clearly x repeats at the rhythm f: (correlation one period apart - correlation half a period
+// apart) / 2. A breath scores near 1 (alike one breath later, opposite half a breath later). Slow
+// wander scores near 0: it looks alike at both lags. Real "normal" takes: wander that read under
+// 8.5/min scored mostly under 0.5; simulated 4-20/min breathing with 3 mm drift scored 0.7-0.8.
+function rhythm(x, rate, f) {
+  const corr = L => { let a = 0, b = 0, c = 0; for (let i = 0; i + L < x.length; i++) { a += x[i] * x[i + L]; b += x[i] * x[i]; c += x[i + L] * x[i + L]; } return b > 0 && c > 0 ? a / Math.sqrt(b * c) : 0; };
+  const L0 = rate / f; let best = -1, bL = 0;
+  for (let L = Math.round(0.85 * L0); L <= Math.round(1.15 * L0); L++) {   // rate drifts a little within the window
+    if (L > x.length - 4 * rate) break;                                    // need 4 s of overlap at least
+    const v = corr(L); if (v > best) { best = v; bL = L; }
+  }
+  return bL ? Math.max(0, (best - corr(Math.round(bL / 2))) / 2) : 0;
 }
 
 function makeChannel(lambda, rate, histSec = 30) {
@@ -183,21 +212,24 @@ function pushIQ(ch, i, q) {
   if (ch.I.length > ch.hist) { ch.I.shift(); ch.Q.shift(); }
 }
 
-// Turn the last winSec of I/Q into a displacement waveform (mm), rate and quality.
-function analyzeChannel(ch, winSec = 20) {
+// Turn the last winSec of I/Q into a displacement waveform (mm, ch.disp), and the last rateSec into a
+// breathing rate (ch.bpm) and how clearly it repeats (ch.quality, 0-1, see rhythm()).
+// 30 s for the rate: 4/min is one breath every 15 s, so 20 s held barely one.
+function analyzeChannel(ch, winSec = 20, rateSec = 30) {
   const rate = ch.rate, n = Math.min(ch.I.length, Math.round(winSec * rate));
   if (n < 8 * rate) return false;
-  const xs = ch.I.slice(-n), ys = ch.Q.slice(-n);
-  const c = fitCircle(xs, ys);
+  const N = Math.max(n, Math.min(ch.I.length, Math.round(rateSec * rate))), s0 = N - n;
+  const xs = ch.I.slice(-N), ys = ch.Q.slice(-N);                    // ring fit uses only the last n
+  const c = fitCircle(xs.slice(s0), ys.slice(s0));
   // Accept a new center only when the points really form a clean ring. During a long
   // breath hold the points are just a noise blob, so we keep the last good center.
   if (c && c.fit < 0.25) ch.center = c;
   const k = -ch.lambda / (4 * Math.PI) * 1000; // radians -> mm (path gets longer = phase falls)
-  let disp = new Array(n);
+  let disp = new Array(N);
   if (ch.center) {
     const { cx, cy } = ch.center;
     let prev = 0, off = 0;
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < N; i++) {
       const a = Math.atan2(ys[i] - cy, xs[i] - cx);
       if (i) { const d = a - prev; if (d > Math.PI) off -= 2 * Math.PI; else if (d < -Math.PI) off += 2 * Math.PI; }
       prev = a; disp[i] = (a + off) * k;
@@ -206,15 +238,17 @@ function analyzeChannel(ch, winSec = 20) {
     // No clean ring yet: straight-line (PCA) projection, converted to an angle relative to the
     // whole echo in this channel (|mean|). A small wobble on a big still echo is a small angle,
     // so noise reads as ~0 mm instead of being blown up to a fixed size.
-    let mx = 0, my = 0; for (let i = 0; i < n; i++) { mx += xs[i]; my += ys[i]; } mx /= n; my /= n;
+    let mx = 0, my = 0; for (let i = s0; i < N; i++) { mx += xs[i]; my += ys[i]; } mx /= n; my /= n;
     let cxx = 0, cxy = 0, cyy = 0;
-    for (let i = 0; i < n; i++) { const dx = xs[i] - mx, dy = ys[i] - my; cxx += dx * dx; cxy += dx * dy; cyy += dy * dy; }
+    for (let i = s0; i < N; i++) { const dx = xs[i] - mx, dy = ys[i] - my; cxx += dx * dx; cxy += dx * dy; cyy += dy * dy; }
     const th = 0.5 * Math.atan2(2 * cxy, cxx - cyy), R = Math.hypot(mx, my) || 1;
-    for (let i = 0; i < n; i++) disp[i] = ((xs[i] - mx) * Math.cos(th) + (ys[i] - my) * Math.sin(th)) / R * k;
+    for (let i = 0; i < N; i++) disp[i] = ((xs[i] - mx) * Math.cos(th) + (ys[i] - my) * Math.sin(th)) / R * k;
   }
-  disp = detrend(movingAvg(disp, Math.max(1, Math.round(rate / 4)))); // drop jitter faster than ~4 Hz
-  const spec = breathingSpectrum(disp, rate);
-  ch.disp = disp; ch.quality = spec.quality; ch.bpm = spec.bestF * 60;
+  const smooth = movingAvg(disp, Math.max(1, Math.round(rate / 4))); // drop jitter faster than ~4 Hz
+  ch.disp = detrend(smooth.slice(s0));                                  // last winSec, for the wave + hold check
+  const r = detrend3(smooth), spec = breathingSpectrum(r, rate);        // last rateSec, for the rate
+  ch.bpm = spec.bestF * 60;
+  ch.quality = spec.edge ? 0 : rhythm(r, rate, spec.bestF);
   return true;
 }
 
@@ -297,17 +331,15 @@ function holdStep(st, feat, nowMs) {
 
 // ---------- slow-breathing detector ----------
 // Opioid overdose usually slows breathing before it stops, and the hold detector above only sees a near-stop.
-// Each analyze tick while the person is still counts as "slow" if the measured rate is under SLOW.bpm,
-// or if there is no clear rhythm at all (quality <= SLOW.q; below ~5/min the rate cannot be read).
-// Alert when SLOW.on of the last SLOW.winSec is slow; clear when it falls under SLOW.off. Ticks while
-// moving count as not slow. Simulation: true 6/8/10/15 per min reads 6.0/7.8/10.2/15.0.
-// enabled: false = still measured (judge view, takes) but never raises the alarm. Off until the rate is
-// trustworthy: on real takes it read 6-9/min during normal breathing (drift wins the spectrum at its 6/min
-// edge), and 'no clear rhythm' while fidgeting counted as slow (false alarm on take 2026-11-15T01-56).
-const SLOW = { enabled: false, bpm: 8.5, q: 0.25, winSec: 30, on: 0.8, off: 0.5 };
+// Each analyze tick counts as "slow" only if the person is still, the rhythm is clear (quality > SLOW.q,
+// see rhythm()) and its rate is under SLOW.bpm. No clear rhythm is NOT slow: on real takes it mostly meant
+// shallow or hidden breathing, not slow breathing, and a near-stop is the hold detector's job.
+// Alert when SLOW.on of the last SLOW.winSec is slow; clear when it falls under SLOW.off.
+// enabled: false = still measured (judge view, takes) but never raises the alarm.
+const SLOW = { enabled: false, bpm: 8.5, q: 0.6, winSec: 30, on: 0.6, off: 0.4 };
 function makeSlow() { return { alerting: false, log: [] }; }
 function slowStep(st, ch, moving, nowMs) {
-  st.log.push([nowMs, !moving && (ch.quality <= SLOW.q || ch.bpm < SLOW.bpm)]);
+  st.log.push([nowMs, !moving && ch.quality > SLOW.q && ch.bpm < SLOW.bpm]);
   while (st.log[0][0] < nowMs - SLOW.winSec * 1000) st.log.shift();
   if (nowMs - st.log[0][0] < (SLOW.winSec - 1) * 1000) return null;   // need a full window first
   const frac = st.log.filter(x => x[1]).length / st.log.length;
