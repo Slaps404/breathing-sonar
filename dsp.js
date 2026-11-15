@@ -485,7 +485,7 @@ function cir(p, frame) {
   for (let k = p.k1 + 10; k < p.k1 + 60 && k < p.P / 2; k++) { noise += re[k] ** 2 + im[k] ** 2; nn++; }
   fft(hr, hi);
   for (let m = 0; m < p.L; m++) hi[m] = -hi[m];
-  return { re: hr, im: hi, snr: 10 * Math.log10((sig / p.K) / (noise / nn || 1e-30)) };
+  return { re: hr, im: hi, snr: 10 * Math.log10((sig / p.K + 1e-30) / (noise / nn || 1e-30)) };   // + 1e-30: a silent frame gave -Infinity, which turned the running SNR into NaN for good
 }
 
 class RangeSonar {

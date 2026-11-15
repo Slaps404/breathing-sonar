@@ -26,7 +26,7 @@ window.SonarHooks = {
   // label(); starts 'normal') and events (status, detector, alarm, taps; set with mark()). stop() downloads
   // take-<time>.wav + .json in the collectors' format, so `node tools/replay-take.js <path>` replays it.
   async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug, onWarmup }) {
-    const LOST_MS = 3000, VOLUME = 0.7;
+    const LOST_MS = 3000, VOLUME = 0.7, DEAF_DB = 20;
     // Browsers hide the mic API on plain http pages that are not localhost (e.g. http://192.168.x.x).
     if (!navigator.mediaDevices) {
       throw new Error('this browser blocks the mic on ' + location.origin +
@@ -59,7 +59,10 @@ window.SonarHooks = {
       // Warm-up: analyze() returns nothing until it has 15 s of echoes (dsp.js), so report how far along that is.
       if (onWarmup) onWarmup(Math.min(1, sonar.frames / (15 * sonar.rate)));
       movingSince = sonar.apnea.moving === true ? (movingSince ?? now) : null;
-      if (movingSince !== null && now - movingSince > LOST_MS) setStatus('lost');
+      // The mic must hear the speaker's own 20-22 kHz sound, or nothing below means anything. Working takes
+      // read 43-72 dB; a run with no probe in the mic read -2 dB and still said "watching" (take 05-44-51).
+      if (sonar.frames > 2 * sonar.rate && sonar.snr < DEAF_DB) setStatus('deaf');
+      else if (movingSince !== null && now - movingSince > LOST_MS) setStatus('lost');
       else if (res) setStatus('watching');
       else if (status !== 'watching') setStatus('searching');
     }, 200);
