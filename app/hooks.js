@@ -34,9 +34,20 @@ window.SonarHooks = {
   //   place may be an empty string.
   // Returns a promise. Reject (throw) if the call could not be placed: the UI then
   // shows the friend's number so anyone nearby can dial it.
+  // Real: call/server.py (run `python3 call/server.py`) has ElevenLabs ring the friend through Twilio.
+  // The server takes a list of friends and rings them all at once; the UI has one friend for now.
   async callFriend(contact) {
-    console.log('[stub] callFriend', contact);
-    await new Promise(r => setTimeout(r, 800));
-    return { ok: true, stub: true };
+    const res = await fetch('http://127.0.0.1:8787/call', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        friends: [{ name: contact.friendName, phone: contact.friendPhone }],
+        userName: contact.userName,
+        place: contact.place,
+      }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error('Call failed: ' + JSON.stringify(body.results || body.error || res.status));
+    return body;
   },
 };

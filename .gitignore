@@ -2,3 +2,5 @@ data/
 __pycache__/
 .venv/
 dist/
+.env
+call/state.json
