@@ -8,8 +8,8 @@ const PARTS = [{ sec: 100, cycle: 4, name: '15 per minute (2 s in, 2 s out)' }, 
 let t0 = null;
 const start = () => { if (t0 === null) { t0 = performance.now(); requestAnimationFrame(tick); } };
 onclick = start;
-// pacer.html?auto : 15 s of 'get ready', then starts by itself (used when a script starts the recording)
-if (location.search.includes('auto')) { let n = 15; const id = setInterval(() => { s.textContent = 'Sit still. Starts in ' + n; if (n-- <= 0) { clearInterval(id); start(); } }, 1000); }
+// pacer.html?auto : 30 s of get ready, then starts by itself (used when a script starts the recording)
+if (location.search.includes('auto')) { let n = 30; const id = setInterval(() => { s.textContent = 'Sit still. Starts in ' + n; if (n-- <= 0) { clearInterval(id); start(); } }, 1000); }
 function tick() {
   let t = (performance.now() - t0) / 1000, part = PARTS[0];
   if (t >= PARTS[0].sec) { t -= PARTS[0].sec; part = PARTS[1]; }
