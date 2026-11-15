@@ -136,10 +136,11 @@ window.SonarHooks = {
   // HOOK 2. Called when the friend should be phoned: breathing stopped and the person
   // did not press "I'm okay" before the countdown ran out.
   //   contact = { friendName, friendPhone (E.164, e.g. "+16195550123"), userName, place }
-  //   place may be an empty string.
+  //   place may be an empty string; lat/lng are set only if the browser gave GPS.
   // Returns a promise. Reject (throw) if the call could not be placed: the UI then
   // shows the friend's number so anyone nearby can dial it.
-  // Real: call/server.py (run `python3 call/server.py`) has ElevenLabs ring the friend through Twilio.
+  // Real: call/server.py (run `python3 call/server.py`) texts the friend the location, then ElevenLabs
+  // rings them through Twilio.
   // The server takes a list of friends and rings them all at once; the UI has one friend for now.
   async callFriend(contact) {
     const res = await fetch('http://127.0.0.1:8788/call', {
@@ -150,6 +151,7 @@ window.SonarHooks = {
         userName: contact.userName,
         place: contact.place,
         voiceId: contact.voiceId,
+        lat: contact.lat, lng: contact.lng,
       }),
     });
     const body = await res.json().catch(() => ({}));
