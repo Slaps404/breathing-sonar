@@ -336,7 +336,13 @@ function holdStep(st, feat, nowMs) {
 // shallow or hidden breathing, not slow breathing, and a near-stop is the hold detector's job.
 // Alert when SLOW.on of the last SLOW.winSec is slow; clear when it falls under SLOW.off.
 // enabled: false = still measured (judge view, takes) but never raises the alarm.
-const SLOW = { enabled: false, bpm: 8.5, q: 0.6, winSec: 30, on: 0.6, off: 0.4 };
+// Evidence (2026-11-14, tools/replay-take.js on all 10 takes; sim = tools/simlib, chest 0.5 m, 3 mm):
+//   sim, true 4/6/8/10/15/20 per min, with and without 3 mm drift: median error <= +0.3/min, >= 97% of
+//   ticks within 1/min; alarm fires on every 4/6/8 run (44-66 s in), never on 10/15/20.
+//   real takes: 0 slow alarms (old rule: 3 false); hold catches and hold false alarms identical to SLOW off.
+//   q and on have margin: q 0.6 with on 0.5, or on 0.6 with q 0.5 -> 0 and 1 real false alarms.
+//   Not yet tested on a real slow-breathing recording.
+const SLOW = { enabled: true, bpm: 8.5, q: 0.6, winSec: 30, on: 0.6, off: 0.4 };
 function makeSlow() { return { alerting: false, log: [] }; }
 function slowStep(st, ch, moving, nowMs) {
   st.log.push([nowMs, !moving && ch.quality > SLOW.q && ch.bpm < SLOW.bpm]);
