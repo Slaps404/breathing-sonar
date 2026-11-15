@@ -16,6 +16,8 @@ The app watches your breathing and, if it stops and you do not tap "I'm okay", p
    ```
    Then run `python3 call/server.py`. No install needed (standard library only). It prints `Ready: POST http://127.0.0.1:8788/call`. The first run registers your Twilio number with ElevenLabs and creates the voice agent, then saves their ids in `call/state.json`. To test a call by itself: `python3 call/server.py --test +16195550123 --name Sam --user Alex --place "the library"`.
 2. **Serve the repo.** In another terminal, in the repo root: `python3 -m http.server`. Ignore the `http://[::]:8000/` link it prints: Chrome blocks the mic there. Use the localhost link below.
+SMS alerts include a Google Maps link: coordinates when location permission is allowed, otherwise a search for the typed place. With neither, the text says `unknown`. The sender must be approved for SMS (US local numbers need A2P registration). A `submitted` result means Twilio accepted the request, not that the phone received it. Restart the call server after changing its code.
+
 3. **Open the app.** `http://localhost:8000/app/` in Chrome. Allow the mic.
 
 What to expect: enter a friend's name and number, your name, and where you are. Sit 30-40 cm from the laptop, sound on, no headphones, and press Start. It says "Finding your breathing" for roughly half a minute, then "Watching your breathing". Hold your breath and stay still: after about 7-8 s it shows "Are you okay?" with a countdown and beeps. Tap or press any key to cancel. If not, the screen says the friend is being called and their phone rings with a voice alert. If the call server is not running, the screen shows the friend's number to dial by hand.

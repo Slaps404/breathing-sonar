@@ -37,9 +37,8 @@ cause, no other location). If asked, say you are an automated alert and they sho
 {{user_name}}. Once they say they will check, say thank you and use the end_call tool.
 If you reach voicemail, a call screener, or get no answer after asking twice, repeat the alert once and use end_call.
 Never say goodbye without using end_call in the same turn."""
-# Off: US carriers block texts from a number without A2P 10DLC registration (Twilio error 30034),
-# and Twilio only reports that after the call has started, so the agent would say "I'm texting you" falsely.
-SEND_SMS = False
+# Carrier delivery requires a registered SMS sender. API acceptance does not confirm delivery.
+SEND_SMS = True
 SMS = ("Sonar safety alert: {user}'s breathing appears to have stopped and they did not respond. "
        "Check on them now. If you cannot reach them, call 911.\nLocation: {where}")
 
@@ -93,9 +92,12 @@ def send_sms(keys, to, body):
 
 
 def where(place, lat, lng):
-    """Location line for the text: the typed place plus a map link when the browser gave coordinates."""
-    link = f"https://maps.google.com/?q={lat:.6f},{lng:.6f}" if lat is not None and lng is not None else ""
-    return " ".join(x for x in (place, link) if x) or "unknown"
+    """Prefer coordinates for the map pin; fall back to searching the typed place."""
+    query = f"{lat:.6f},{lng:.6f}" if lat is not None and lng is not None else place.strip()
+    if not query:
+        return "unknown"
+    link = "https://www.google.com/maps/search/?" + urlencode({"api": 1, "query": query})
+    return "\n".join(x for x in (place, link) if x)
 
 
 def setup(keys):
@@ -126,7 +128,7 @@ def call_all(keys, state, friends, user_name, place, voice_id=None, lat=None, ln
         others_phrase = ("I am also calling " + " and ".join(others) + ".") if others else ""
         sms_err = (send_sms(keys, f["phone"], SMS.format(user=user_name, where=where(place, lat, lng)))
                    if SEND_SMS else "off (SEND_SMS = False)")
-        text_phrase = "" if sms_err else "I'm texting you their location now. "
+        text_phrase = "" if sms_err else "I requested a text with their location. "
         try:
             r = post(keys, "/twilio/outbound-call", {
                 "agent_id": state["agent_id"], "agent_phone_number_id": state["phone_number_id"], "to_number": f["phone"],
@@ -136,9 +138,9 @@ def call_all(keys, state, friends, user_name, place, voice_id=None, lat=None, ln
                     "text_phrase": text_phrase},
                     **({"conversation_config_override": {"tts": {"voice_id": voice_id}}} if voice_id else {})}})
             return {"name": f["name"], "phone": f["phone"], "ok": bool(r.get("success")), "detail": r.get("message"),
-                    "sms": sms_err or "sent"}
+                    "sms": sms_err or "submitted"}
         except Exception as err:
-            return {"name": f["name"], "phone": f["phone"], "ok": False, "detail": str(err), "sms": sms_err or "sent"}
+            return {"name": f["name"], "phone": f["phone"], "ok": False, "detail": str(err), "sms": sms_err or "submitted"}
     with ThreadPoolExecutor(len(friends)) as pool:
         return list(pool.map(one, friends))
 
