@@ -13,6 +13,16 @@
   let beeper = null;
   let voice = null;         // the alarm voice clip while it plays
   let wakeLock = null;
+  // Quiet mode: the alarm only shows on screen (no beep, no voice), so a demo room is not disturbed.
+  const QUIET_KEY = 'breathing-sonar.quiet';
+  let quiet = false;
+  try { quiet = localStorage.getItem(QUIET_KEY) === '1'; } catch (e) { /* no storage */ }
+  function setQuiet(on) {
+    quiet = on;
+    try { localStorage.setItem(QUIET_KEY, on ? '1' : '0'); } catch (e) { /* no storage */ }
+    $('soundBtn').setAttribute('aria-pressed', !on);
+    $('soundBtn').textContent = on ? 'Sound off (m)' : 'Sound on (m)';
+  }
   let judgeOpen = false;    // judge view (judge.js) toggled on from the watch screen
 
   // Wording and the sit picture follow the device.
@@ -235,6 +245,7 @@
 
   // Loud on purpose: the first job of the alarm is to wake the person up.
   function startAlarmNoise() {
+    if (quiet) return;                        // screen-only alarm
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const beep = () => {
@@ -298,9 +309,12 @@
   document.addEventListener('keydown', e => {
     if (countTimer) { cancelAlarm(e); return; }
     if (e.key === 'h' && !e.metaKey && !e.ctrlKey && !e.altKey && !$('s-watch').hidden) setHolding(!holding);
+    if (e.key === 'm' && !e.metaKey && !e.ctrlKey && !e.altKey && !$('s-watch').hidden) setQuiet(!quiet);
     if (e.key === 's' && !e.metaKey && !e.ctrlKey && !e.altKey && !$('s-watch').hidden) toggleJudge();
   });
   $('judgeBtn').addEventListener('click', toggleJudge);
+  $('soundBtn').addEventListener('click', () => setQuiet(!quiet));
+  setQuiet(quiet);
   $('holdBtn').addEventListener('click', () => setHolding(!holding));
   $('resume').addEventListener('click', () => show('watch'));
   for (const el of document.querySelectorAll('[data-go]')) {
