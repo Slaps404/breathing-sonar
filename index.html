@@ -68,7 +68,7 @@
   <p class="hint">SNR = reflected tone vs background noise at a nearby silent frequency. Under ~20 dB the speaker or mic can't handle that frequency.</p>
   <table id="toneTable"></table>
 </div>
-<p class="hint">Quality = share of the motion that looks like breathing (6-42 /min). Rate shows once quality is over 0.25 and 15 s of data exist.
+<p class="hint">Quality = how clearly the motion repeats like breathing (0-1, 3-42 /min). Rate shows once quality is over the slow alarm's clarity bar (DSP.SLOW.q) and 15 s of data exist.
 Stop downloads the run as JSON for <code>node tools/replay.js</code>.</p>
 
 <script src="dsp.js"></script>
@@ -177,8 +177,8 @@ function tick() {
   if (res && res.event === 'end') $('alert').style.display = 'none';
   if (ch) {
     $('quality').textContent = ch.quality.toFixed(2);
-    $('quality').className = ch.quality > 0.5 ? 'good' : ch.quality > 0.25 ? 'meh' : 'bad';
-    $('bpm').textContent = ch.quality > 0.25 && ch.disp.length >= 15 * sonar.rate ? ch.bpm.toFixed(0) : '--';
+    $('quality').className = ch.quality > DSP.SLOW.q ? 'good' : ch.quality > 0.25 ? 'meh' : 'bad';
+    $('bpm').textContent = ch.quality > DSP.SLOW.q && ch.disp.length >= 15 * sonar.rate ? ch.bpm.toFixed(0) : '--';
   }
   if (sonar.mode === 'range') {
     $('where').textContent = sonar.lock !== null ? (sonar.lock * sonar.dr).toFixed(2) + ' m' : '--';

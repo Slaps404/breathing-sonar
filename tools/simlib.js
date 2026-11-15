@@ -160,7 +160,7 @@ function run(mode, scene, { T = 100, lat = 0.004 } = {}) {
       if (res && res.event) events.push([+t1.toFixed(1), res.event]);
       const ch = res && res.ch;
       timeline.push({ t: +t1.toFixed(1),
-        bpm: ch && ch.quality > 0.25 && ch.disp.length >= 15 * sonar.rate ? ch.bpm : null,
+        bpm: ch && ch.quality > D.SLOW.q && ch.disp.length >= 15 * sonar.rate ? ch.bpm : null,
         q: ch ? ch.quality : 0, alert: sonar.apnea.alerting,
         lock: mode === 'range' && sonar.lock !== null ? +(sonar.lock * sonar.dr).toFixed(2) : null,
         snr: mode === 'tones' ? sonar.snr(1) : sonar.snr });

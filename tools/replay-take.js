@@ -36,7 +36,7 @@ for (let f = 0; f < nF; f++) {
   if (res && res.event) events.push({ t, type: res.event, why: res.why, label: labelAt(t) });
   if (res && Math.floor(t) % 5 === 0 && Math.floor(t) !== Math.floor(t - 5 / rate)) {
     const ch = res.ch, n = ch.disp.length, k = Math.round(4 * rate);
-    rows.push(`${String(Math.floor(t)).padStart(4)}  ${(labelAt(t) || '').padEnd(7)} ${(s.lock * s.dr * 100).toFixed(0).padStart(4)} cm  q ${ch.quality.toFixed(2)}  ${ch.quality > 0.25 ? ch.bpm.toFixed(0).padStart(3) : ' --'} bpm  move4s ${D.std(ch.disp, Math.max(0, n - k), n).toFixed(2).padStart(6)} mm  ${s.alerting ? 'ALERT ' + s.why : ''}`);
+    rows.push(`${String(Math.floor(t)).padStart(4)}  ${(labelAt(t) || '').padEnd(7)} ${(s.lock * s.dr * 100).toFixed(0).padStart(4)} cm  q ${ch.quality.toFixed(2)}  ${ch.quality > D.SLOW.q ? ch.bpm.toFixed(0).padStart(3) : ' --'} bpm  move4s ${D.std(ch.disp, Math.max(0, n - k), n).toFixed(2).padStart(6)} mm  ${s.alerting ? 'ALERT ' + s.why : ''}`);
   }
 }
 console.log(`${meta.id}: ${meta.seconds} s, plan "${meta.plan || ''}", skipped ${skip.size} dropout frames`);
