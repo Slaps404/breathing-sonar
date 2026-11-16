@@ -348,7 +348,7 @@
   // ---------- Watching ----------
 
   const STATUS = {
-    searching: ['Getting to know your breathing.', 'Sit still for a few seconds.', ''],
+    searching: ['Take slow, deep breaths with me.', 'Breathe in as I grow, out as I shrink. Keep your body still.', ''],
     watching: ['Breathing with you.', () => `I'm right here. ${contact.friendName} gets a call only if your breathing stops.`, 'on'],
     lost: ['Where did you go?', 'Sit back in front of the screen, chest facing it, so I can see you.', 'lost'],
     deaf: ["Can't hear my own sound.", 'Not watching. Unmute the speaker and turn it up. No headphones. Mic Mode: Standard.', 'lost'],
@@ -381,7 +381,7 @@
   function setWarmup(f, total = 15) {
     warm = f; warmTotal = total;
     if (status !== 'searching') return;
-    $('watchSub').textContent = f < 1 ? 'Sit still while I listen.' : 'Almost there. Keep still.';
+    $('watchSub').textContent = f < 1 ? 'Breathe in as I grow, out as I shrink. Keep your body still.' : 'Almost there. Keep taking deep breaths.';
   }
 
   // The cloud breathes with you: its size follows the newest chest position, 0.95 at the middle of a

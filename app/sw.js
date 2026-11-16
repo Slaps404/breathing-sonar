@@ -1,7 +1,7 @@
 // Service worker: lets the app be installed to the home screen and open with no network.
 // Network first, cache as a fallback, so a new deploy shows up on the next load (no stale code).
 // Only this site's own GET requests are cached. The call request (POST, another origin) is left alone.
-const CACHE = 'breathing-watch-v27';
+const CACHE = 'breathing-watch-v28';
 // Fetched at install so the app opens offline even if it was only ever loaded once.
 const SHELL = ['./', 'style.css', 'app.js', 'hooks.js', 'judge.js', 'dev.js', '../dsp.js', 'manifest.webmanifest', 'icon-192.png'];
 
