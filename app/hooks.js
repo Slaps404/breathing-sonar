@@ -91,7 +91,8 @@ window.SonarHooks = {
       if (onWarmup) onWarmup(Math.min(1, sonar.frames / (15 * sonar.rate)));
       movingSince = sonar.apnea.moving === true ? (movingSince ?? now) : null;
       if (deaf) setStatus('deaf');
-      else if (movingSince !== null && now - movingSince > LOST_MS) setStatus('lost');
+      // Not during calibration (no lock yet): the cloud keeps pacing breaths instead of 'Where did you go?'.
+      else if (movingSince !== null && now - movingSince > LOST_MS && sonar.lock !== null) setStatus('lost');
       else if (res) setStatus('watching');
       else if (status !== 'watching') setStatus('searching');
     }, 200);

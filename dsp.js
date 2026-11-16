@@ -575,7 +575,10 @@ class RangeSonar {
     this.stir(nowMs);
     if (this.apnea.moving === true) {
       this.lastMove = nowMs;
-      this.zs = null; this.zscore = null; // the previous position is no longer a useful prior
+      // After a lock, the previous position is no longer a useful prior. Before the first lock (calibration)
+      // keep the scores: moving seconds already count less (w below), and wiping them made a shift at 22 s
+      // lock on 4 s of data (take 2026-11-14T22-13-48), so movement cannot restart calibration.
+      if (this.lock !== null) { this.zs = null; this.zscore = null; }
     }
     const reacquiring = this.reacquiring();
     // A full fresh rhythm window keeps the movement itself out of the new ranking.
