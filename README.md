@@ -40,6 +40,7 @@ Other details:
 What I measured, with its limits:
 
 - **Live in the app this morning: 11 of 11 breath holds raised the alarm and placed the call.** Where the hold was marked, the alarm came 5 to 12 seconds into it. One person, one MacBook, a quiet room, deliberate breath holds.
+- **A second person on their own MacBook: it worked as intended.** Their breath holds raised the alarm. This is what they reported; I have no recording or count from that run, so it is not in the numbers above.
 - **Replay of older labelled recordings that include moving and fidgeting: 23 of 29 holds caught, 12 false alarms.** Same person and laptop. I adjusted the detector on these same recordings, so this is not a held-out result.
 - **Lock-on takes about 26 seconds.** Movement makes it start over.
 
@@ -60,7 +61,7 @@ I also built a simulator calibrated from these recordings (`tools/fit`, write-up
 ## Limits
 
 - Prototype, not a medical device. Never tested on a real overdose or during sleep.
-- Tested on one person and one laptop only.
+- Measured on one person and one laptop; one more person checked it on their own MacBook.
 - Cannot read breathing rate reliably, so it cannot catch breathing that is only slowing.
 - Phones cut the probe band. An 18-20 kHz option (`app/?band=18`) exists but is unproven.
 - A person or pet breathing closer than the user can be picked instead.

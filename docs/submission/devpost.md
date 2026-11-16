@@ -35,7 +35,7 @@ All signal processing is plain JavaScript in the browser (AudioWorklet). No ML m
 
 ## Accomplishments that we're proud of
 
-This morning in the live app, 11 of 11 breath holds raised the alarm and placed the call. Where the hold was marked, the alarm came 5 to 12 seconds in. One person, one MacBook, a quiet room, deliberate holds.
+This morning in the live app, 11 of 11 breath holds raised the alarm and placed the call. Where the hold was marked, the alarm came 5 to 12 seconds in. One person, one MacBook, a quiet room, deliberate holds. A friend also tried it on their own MacBook and it worked for them too; that run was not recorded, so it is not counted.
 
 On older labelled recordings that include moving and fidgeting, replay caught 23 of 29 holds with 12 false alarms. I tuned the detector on those same recordings, so this is not a held-out result.
 
@@ -49,7 +49,7 @@ The whole chain works: a held breath at a laptop ends with a real phone ringing 
 
 ## Limits
 
-This is a prototype, not a medical device. It was tested on one person and one laptop, never on a real overdose or during sleep. It cannot reliably catch breathing that only slows. Phones cut the probe band; an 18-20 kHz option exists but is unproven. A person or pet breathing closer than the user can be picked instead. Lock-on takes about 26 seconds, and movement makes it start over.
+This is a prototype, not a medical device. It was measured on one person and one laptop, plus one friend's MacBook, never on a real overdose or during sleep. It cannot reliably catch breathing that only slows. Phones cut the probe band; an 18-20 kHz option exists but is unproven. A person or pet breathing closer than the user can be picked instead. Lock-on takes about 26 seconds, and movement makes it start over.
 
 ## What's next for BreathBuddy
 
