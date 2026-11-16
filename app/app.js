@@ -46,6 +46,14 @@
   const savedVoice = store.get(VOICE_KEY);
   if (savedVoice && $('voice').querySelector(`option[value="${savedVoice}"]`)) $('voice').value = savedVoice;
   $('voice').addEventListener('change', () => store.set(VOICE_KEY, $('voice').value));
+  // How far the chest search looks (read by hooks.js when a run starts). Past 80 cm it can lock onto someone
+  // else breathing, e.g. a dog at 114 cm (take 15-46-24), so the default stays 80 cm and the choice explains that.
+  const REACH_KEY = 'breathing-sonar.reach';
+  const savedReach = store.get(REACH_KEY);
+  if (savedReach && $('reach').querySelector(`option[value="${savedReach}"]`)) $('reach').value = savedReach;
+  const reachNote = () => { $('reachNote').hidden = $('reach').value === '0.8'; };
+  reachNote();
+  $('reach').addEventListener('change', () => { store.set(REACH_KEY, $('reach').value === '0.8' ? null : $('reach').value); reachNote(); });
   $('hearVoice').addEventListener('click', () => { try { new Audio(`voices/${$('voice').value}.mp3`).play(); } catch (e) { /* no audio */ } });
 
   // Wording and the sit picture follow the device.

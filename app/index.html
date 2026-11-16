@@ -362,6 +362,17 @@
         <button type="button" class="smallbtn" id="hearVoice">Play</button>
       </span>
     </div>
+    <div class="row rowwrap">
+      <span>How far away you sit</span>
+      <span class="rowctl">
+        <select id="reach" aria-label="How far away you sit">
+          <option value="0.8">Up to 80 cm</option>
+          <option value="1.2">Up to 1.2 m</option>
+          <option value="1.5">Up to 1.5 m</option>
+        </select>
+      </span>
+      <small class="rownote" id="reachNote" hidden>Looking farther may degrade quality: it can pick up someone else or a pet nearby, so alarms are less reliable. Up to 80 cm works best.</small>
+    </div>
     <button type="button" class="row installbtn" data-sheet="sh-install" hidden><span>Add to home screen</span><b>Optional</b></button>
     <button type="button" class="pill ghost danger" id="forget">Forget my details</button>
     <button type="button" class="pill" data-close>Done</button>

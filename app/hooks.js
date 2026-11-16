@@ -50,7 +50,10 @@ window.SonarHooks = {
     // app/?band=18 plays 18-20 kHz instead of 20-22. An iPhone take at 20-22 kHz heard the probe ~74 dB weaker
     // than the Mac (speaker or mic cuts above 20 kHz). 18-19 kHz can be faintly audible to young listeners.
     const band = +new URLSearchParams(location.search).get('band');
-    const sonar = new DSP.RangeSonar(band ? { probe: { f0: band * 1000, f1: band * 1000 + 2000 } } : {});
+    // Settings > "How far away you sit" (app.js). Unset = the detector's 80 cm default.
+    let reach = null; try { reach = +localStorage.getItem('breathing-sonar.reach') || null; } catch (e) { /* storage blocked */ }
+    const opts = {}; if (band) opts.probe = { f0: band * 1000, f1: band * 1000 + 2000 }; if (reach) opts.maxR = reach;
+    const sonar = new DSP.RangeSonar(opts);
     const node = new AudioWorkletNode(ctx, 'probe', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
       processorOptions: { signal: sonar.p.sig, amp: VOLUME } });
     const take = record ? window.SonarHooks.makeTake(sonar.p, VOLUME, stream.getAudioTracks()[0]?.label || '') : null;
@@ -61,6 +64,7 @@ window.SonarHooks = {
 
     let status = null, movingSince = null, level = 0, levelAt = performance.now(), tuned = false, deaf = false, alarmUp = false;
     const setStatus = s => { if (s !== status) { status = s; mark('status: ' + s); onStatus(s); } };
+    if (reach) mark(`reach: ${reach} m`);
     setStatus('searching');
     const timer = setInterval(() => {
       const now = performance.now();

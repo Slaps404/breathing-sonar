@@ -292,6 +292,8 @@ body.alarming .sbar { color: #f3f8f8; }
 }
 .row b { color: var(--soft); font-weight: 600; }
 .rowctl { display: flex; gap: 8px; align-items: center; }
+.rowwrap { flex-wrap: wrap; }
+.rownote { flex-basis: 100%; font-size: 14px; line-height: 1.4; color: var(--soft); }
 .row select { font: inherit; font-size: 15px; padding: 6px 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--text); }
 
 @media (max-height: 680px) {
