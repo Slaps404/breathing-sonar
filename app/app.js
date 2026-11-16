@@ -39,7 +39,11 @@
   // Quiet mode: the alarm only shows on screen (no beep, no voice), so a demo room is not disturbed.
   const QUIET_KEY = 'breathing-sonar.quiet';
   let quiet = store.get(QUIET_KEY) === '1' || params.has('quiet');   // app/?quiet opens with sound off
-  function setQuiet(on) { quiet = on; store.set(QUIET_KEY, on ? '1' : '0'); emit('quiet', on); }
+  function setQuiet(on) { quiet = on; store.set(QUIET_KEY, on ? '1' : '0'); paintSound(); emit('quiet', on); }
+  // Settings > "Alarm sound": the same switch as the dev dashboard's sound toggle.
+  function paintSound() { $('alarmSound').value = quiet ? 'off' : 'on'; $('alarmSoundNote').hidden = !quiet; }
+  paintSound();
+  $('alarmSound').addEventListener('change', () => setQuiet($('alarmSound').value === 'off'));
 
   // ElevenLabs voice for both the alarm on this screen and the phone call. One clip per voice in voices/<id>.mp3.
   const VOICE_KEY = 'breathing-sonar.voice';
