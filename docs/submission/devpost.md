@@ -35,7 +35,7 @@ All signal processing is plain JavaScript in the browser (AudioWorklet). No ML m
 
 ## Accomplishments that we're proud of
 
-This morning in the live app, 11 of 11 breath holds raised the alarm and placed the call. Where the hold was marked, the alarm came 5 to 12 seconds in. One person, one MacBook, a quiet room, deliberate holds. A friend also tried it on their own MacBook and it worked for them too; that run was not recorded, so it is not counted.
+Over two days in the live app, all 29 runs where I held my breath raised the alarm, and 22 went on to place the call (in the rest the countdown was cancelled or the run stopped first). In one run I held twice and the second hold was missed; that led to a fix. Most holds were not timed, so this count comes from my notes of each run. Where the hold was marked, the alarm came 5 to 12 seconds in. One person, one MacBook, a quiet room, deliberate holds. A friend also tried it on their own MacBook and it worked for them too; that run was not recorded, so it is not counted.
 
 On older labelled recordings that include moving and fidgeting, replay caught 23 of 29 holds with 12 false alarms. I tuned the detector on those same recordings, so this is not a held-out result.
 
