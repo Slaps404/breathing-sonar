@@ -298,7 +298,7 @@ function apneaStep(st, disp, rate, nowMs) {
 // sustainDb (3 dB, like the level) of its own normal. Chosen by replaying all takes, then checked on a take
 // recorded afterwards, simulated twitches and transplanted bursts (docs/diagnostics/sustained-recovery.md).
 const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120, stirDb: 15, stirSec: 10,
-  stepSec: 1, smoothSec: 0.5, sustainQ: 0.25, sustainDb: 3 };
+  stepSec: 1, smoothSec: 0.5, sustainQ: 0.25, sustainDb: 3, baseN: 45 };
 function makeHold() { return { alerting: false, holdStart: null, below: 0, quiet: 0, last: null, B: [], S: [], M: [], moving: [] }; }
 // IQ = list of channels (each with .I/.Q history) in the zone; fast = channels for movement.
 function holdFeatures(zone, fast, rate) {
@@ -350,7 +350,7 @@ function holdStep(st, feat, nowMs, blocked = false) {   // blocked: do not start
   if (!moving) { st.B.push([nowMs, feat.B]); st.S.push(feat.S); }
   while (st.B.length && st.B[0][0] < nowMs - HOLD.baseSec * 1000) { st.B.shift(); st.S.shift(); }
   if (moving) { st.quiet = 0; st.below = 0; } else st.quiet += dt;
-  if (st.B.length < 45) return null;   // need ~10 s of still history (analyze runs ~5 times a second)
+  if (st.B.length < HOLD.baseN) return null;   // still history needed first (analyze runs ~5 times a second)
   const base = pct(st.B.map(x => x[1]), 0.75);
   st.base = base; st.level = feat.B;
   if (!st.alerting) {
@@ -374,6 +374,9 @@ function holdStep(st, feat, nowMs, blocked = false) {   // blocked: do not start
 //   real takes: 0 slow alarms (old rule: 3 false); hold catches and hold false alarms identical to SLOW off.
 //   q and on have margin: q 0.6 with on 0.5, or on 0.6 with q 0.5 -> 0 and 1 real false alarms.
 //   Not yet tested on a real slow-breathing recording.
+// After a body movement the locked slice is stale until the next pick: while someone stirs elsewhere in range
+// (see HOLD.stirDb) ticks do not count as slow, and a new pick starts a fresh window. Without this, move-back
+// take 03-06-03 read a slow rhythm at the old 29 cm slice and alarmed at 122 s; all other takes unchanged.
 const SLOW = { enabled: true, bpm: 8.5, q: 0.6, winSec: 30, on: 0.6, off: 0.4 };
 function makeSlow() { return { alerting: false, log: [] }; }
 function slowStep(st, ch, moving, nowMs) {
@@ -544,6 +547,7 @@ class RangeSonar {
     this.zoneMove = this.lastMove ?? -Infinity;
     this.zone = [Math.max(0.2, rangeM - ZONE.back), rangeM + ZONE.ahead];   // chest echoes plus their later bounces
     const M = this.apnea.M; this.apnea = makeHold(); this.apnea.M = M;     // new zone = new level; keep movement floor
+    this.slow = makeSlow();                                                  // and a new slice for the rate
   }
   // True while the zone predates the latest body movement and the fresh pick has not happened yet.
   reacquiring() { return !this.manual && this.lock !== null && (this.lastMove ?? -Infinity) > this.zoneMove; }
@@ -642,7 +646,7 @@ class RangeSonar {
     const ch = this.chs[this.tap(this.lock)];
     if (!analyzeChannel(ch)) return null;
     this.best = ch;
-    slowStep(this.slow, ch, this.apnea.moving === true, nowMs);
+    slowStep(this.slow, ch, this.apnea.moving === true || elsewhere, nowMs);   // stale slice after a move: not slow
     // one alarm for both detectors: 'start' when the first one fires, 'end' when both have cleared
     const was = this.alerting;
     this.alerting = this.apnea.alerting || (SLOW.enabled && this.slow.alerting);
