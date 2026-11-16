@@ -287,6 +287,9 @@ function apneaStep(st, disp, rate, nowMs) {
 // whether anything in range still stirs: fast echo change stirDb above that slice's own quiet floor within
 // the last stirSec. Two real move-back takes: stir mostly 14-37 dB at the new distance (gaps up to 7 s);
 // three walk-aways: under 12 dB once the person is out of range. Works for stirDb 12-22 and stirSec 8-15.
+// stirDb is 15, not 12: in app take 2026-11-16T18-51-13 a slice at the 80 cm range edge read 12-14 dB about once a
+// second while the person sat still in the watched zone and held their breath, which blocked a clear 13 dB drop
+// for 10 s. Replay of all takes at 15: 31/38 holds (12: 30/38), 16 false alarms (12: 15), walk-aways still alarm.
 // The alarm clears on movement, or when breathing is back: the level is within 3 dB of normal AND the
 // motion is sustained. Level alone is not enough: one shoulder twitch in a hold put as much power in the
 // 8 s spectrum as breathing does and cleared the alarm mid-hold (take 03-09-51, 115.9 s). Sustained motion
@@ -294,7 +297,7 @@ function apneaStep(st, disp, rate, nowMs) {
 // quarter (sustainQ) of the last 8 s, so it is high only if about 6 of the 8 s had motion. It must be within
 // sustainDb (3 dB, like the level) of its own normal. Chosen by replaying all takes, then checked on a take
 // recorded afterwards, simulated twitches and transplanted bursts (docs/diagnostics/sustained-recovery.md).
-const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120, stirDb: 12, stirSec: 10,
+const HOLD = { winSec: 8, dropDb: 6, confirmSec: 2, quietSec: 3, moveDb: 10, baseSec: 60, floorSec: 120, stirDb: 15, stirSec: 10,
   stepSec: 1, smoothSec: 0.5, sustainQ: 0.25, sustainDb: 3 };
 function makeHold() { return { alerting: false, holdStart: null, below: 0, quiet: 0, last: null, B: [], S: [], M: [], moving: [] }; }
 // IQ = list of channels (each with .I/.Q history) in the zone; fast = channels for movement.
