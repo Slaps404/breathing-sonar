@@ -45,7 +45,7 @@
 
   // Quiet mode: the alarm only shows on screen (no beep, no voice), so a demo room is not disturbed.
   const QUIET_KEY = 'breathing-sonar.quiet';
-  let quiet = store.get(QUIET_KEY) === '1' || params.has('quiet');   // app/?quiet opens with sound off
+  let quiet = Boolean(TEST) || store.get(QUIET_KEY) === '1' || params.has('quiet');   // app/?quiet opens with sound off; a friend test is always silent so the alarm doesn't startle anyone
   function setQuiet(on) { quiet = on; store.set(QUIET_KEY, on ? '1' : '0'); paintSound(); emit('quiet', on); }
   // Settings > "Alarm sound": the same switch as the dev dashboard's sound toggle.
   function paintSound() { $('alarmSound').value = quiet ? 'off' : 'on'; $('alarmSoundNote').hidden = !quiet; }

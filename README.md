@@ -108,7 +108,7 @@ app on GitHub Pages --POST /call + passcode--> Vultr machine: Caddy (https) --> 
 - `tools/rate/`: breathing-rate and lock-on experiments, and the two charts above (`charts.js`).
 - `tools/pacer.html`, `tools/cue.html`: on-screen pacer and cues for paced and scripted recordings.
 
-**Friend test link.** `https://breathbuddy.us/app/?test=<UPLOAD_CODE>&band=19` opens the normal app in test mode: a consent box on the "how to sit" screen, then the usual breathe-with-the-cloud start, then 3 breath holds the person marks with a button (or Space), 45 s after the chest is found and 30 s apart. Nobody is called; the alarm only shows. Done sends the take to the call server (`PUT /upload`, saved in `data/` there), or offers Share / Save so they can text the file. `band` is optional (19 = 19-21 kHz; default 20-22).
+**Friend test link.** `https://breathbuddy.us/app/?test=<UPLOAD_CODE>&band=19` opens the normal app in test mode: a consent box on the "how to sit" screen, then the usual breathe-with-the-cloud start, then 3 breath holds the person marks with a button (or Space), 45 s after the chest is found and 30 s apart. Nobody is called, and the alarm is silent (screen only) so it does not startle anyone. Done sends the take to the call server (`PUT /upload`, saved in `data/` there), or offers Share / Save so they can text the file. `band` is optional (19 = 19-21 kHz; default 20-22).
 - Count them: copy the takes into `data/`, then `node tools/friend-tally.js` (per person and device: holds marked, caught or missed, false alarms, and a sentence with the totals). `--at <commit>` freezes the detector version.
 
 **Collect labelled recordings.** Raw mic audio plus label timestamps, saved to `data/` (not committed).
