@@ -78,7 +78,7 @@
   <p>BreathBuddy is a student project that listens for breathing using your device's speaker and microphone, like a bat uses sound. It plays a very high sound, which most people can't hear, and listens for its echo off your chest.</p>
   <div class="card">
     <b>What you'll do (about 5 minutes):</b>
-    <p>Sit still and breathe normally, and hold your breath 3 times, for about 20 seconds each. The screen tells you what to do at every step.</p>
+    <p>Sit close to your device. First take slow, deep breaths with a circle on the screen. Then breathe normally, and hold your breath 3 times, for about 20 seconds each. The screen tells you what to do at every step.</p>
     <p class="dim">Only hold your breath as long as it feels fine. Skip this test if holding your breath isn't safe for you (for example, heart or lung problems, or you're pregnant).</p>
   </div>
   <p><label for="nick">Your first name or a nickname (optional)</label></p>
@@ -93,8 +93,8 @@
   <h2>Get set up</h2>
   <ol class="steps">
     <li><b>Find a quiet room.</b><span>Turn off music, TV and fans if you can. Be the only person or pet near the device.</span></li>
-    <li class="laptop-only"><b>Sit at a table with the laptop in front of you.</b><span>Sit up, facing the screen, about one forearm away (elbow to fingertips, 30-40 cm). Keep the laptop open on the table, not on your lap.</span></li>
-    <li class="phone-only"><b>Stand the phone up on a table, screen facing you.</b><span>Lean it against something (a book, a cup). Sit facing it, about one forearm away (elbow to fingertips, 30-40 cm), with the phone at chest height if you can. Don't hold it.</span></li>
+    <li class="laptop-only"><b>Sit close, with the laptop on a table right in front of you.</b><span>Closer is better: about one forearm away (elbow to fingertips, 30-40 cm) or nearer if you can. Face the screen. Keep the laptop on the table, not on your lap.</span></li>
+    <li class="phone-only"><b>Stand the phone up on a table and sit close to it.</b><span>Lean it against something (a book, a cup), screen facing you. Closer is better: about one forearm away (elbow to fingertips, 30-40 cm) or nearer if you can, with the phone at chest height. Don't hold it.</span></li>
     <li><b>Turn the volume up to about 3/4.</b><span>No headphones, earbuds or Bluetooth speakers: the sound must come from the device itself. Turn off silent mode.</span></li>
     <li class="mac-only"><b>Mac only: set Mic Mode to Standard.</b><span>Click Control Center (top right, two switches icon) &gt; Mic Mode &gt; Standard. (If you don't see Mic Mode, skip this.)</span></li>
     <li><b>Keep this page open the whole time.</b><span>Don't switch apps or lock the screen until it says "Done".</span></li>
@@ -363,11 +363,11 @@ function draw() {
   let text = '', sub = '', num = '', big = null, dot = false;
   const next = PLAN[run.i + 1];
   if (st.k === 'deep') {
-    text = 'Breathe slowly with the circle'; sub = 'In as it grows, out as it shrinks. Sit still and face the screen.';
+    text = 'Breathe slowly and deeply with the circle'; sub = 'Big breaths: in as it grows, out as it shrinks. Stay close and face the screen.';
     num = Math.max(0, Math.ceil(st.sec - el)); dot = true;
   } else if (st.k === 'normal') {
     text = 'Breathe normally'; num = Math.max(0, Math.ceil(st.sec - el));
-    sub = next?.k === 'hold' ? `Sit still. Next: breath hold ${next.n} of 3.` : next ? 'Sit still and relax.' : 'Almost done. Sit still.';
+    sub = next?.k === 'hold' ? `Sit still, close to the screen. Next: breath hold ${next.n} of 3.` : next ? 'Sit still, close to the screen, and relax.' : 'Almost done. Sit still.';
   } else if (run.phase === 'ready') {
     text = `Breath hold ${st.n} of 3`; sub = 'Get ready...'; num = Math.max(1, Math.ceil(GET_READY - el));
   } else if (run.phase === 'wait') {
