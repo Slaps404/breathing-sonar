@@ -398,3 +398,11 @@ body.alarming .sbar { color: #f3f8f8; }
 @media not ((min-width: 860px) and (min-height: 560px)) {
   .dev { position: fixed; inset: 8vh 0 0 0; z-index: 25; border-radius: 22px 22px 0 0; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4); animation: sheetUp 0.4s var(--ease) both; }
 }
+
+/* Friend test (app/?test=...): test-only parts show, the call parts hide. */
+body:not(.testing) .testonly, body.testing .notest { display: none !important; }
+.testbox { width: 100%; text-align: left; }
+.consent { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.4; color: var(--soft); margin: 2px 0 12px; cursor: pointer; }
+.consent input { width: 24px; height: 24px; margin: 0; padding: 0; flex: none; appearance: auto; accent-color: var(--echo); }
+#testTip { margin-bottom: 4px; text-align: center; }
+body.testing.alarming .lead { color: #f3f8f8; }

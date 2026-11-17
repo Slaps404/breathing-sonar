@@ -226,8 +226,9 @@
   <!-- 4. Where to sit, then start. A returning person lands here. -->
   <form id="s-sit" class="screen" novalidate hidden>
     <div class="top">
-      <button type="button" class="back" id="sitBack" data-go="you" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <div class="steps" id="sitSteps" aria-label="Step 3 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      <button type="button" class="back notest" id="sitBack" data-go="you" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <span class="topspace testonly"></span>
+      <div class="steps notest" id="sitSteps" aria-label="Step 3 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></div>
       <button type="button" class="iconbtn" data-sheet="sh-settings" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button>
     </div>
     <div class="mid center">
@@ -255,15 +256,21 @@
         <li>Chest facing me</li>
         <li class="only-laptop">Hands off the keyboard</li>
         <li class="only-phone">Hands off the phone</li>
-        <li>Sound on, no headphones, so I can hear</li>
+        <li class="notest">Sound on, no headphones, so I can hear</li>
+        <li class="testonly">Volume up, no headphones</li>
       </ul>
       <p class="err" id="sitErr" role="alert" hidden></p>
     </div>
     <div class="bot">
-      <button type="button" class="chipbtn" data-go="who">Calls <b class="fname"></b> &middot; Change</button>
+      <button type="button" class="chipbtn notest" data-go="who">Calls <b class="fname"></b> &middot; Change</button>
+      <!-- Friend test (app/?test=<upload code>): consent, then Start records the run and sends it to Zeke. Nobody is called. -->
+      <div class="testonly testbox">
+        <input id="testName" type="text" autocomplete="off" autocapitalize="words" maxlength="30" placeholder="Your first name (optional)" aria-label="Your first name, optional">
+        <label class="consent"><input id="testConsent" type="checkbox"><span>I agree that this records sound from my mic while it runs (about 4 minutes) and sends it, with basic info about my <span class="devword">phone</span>, to Zeke to test BreathBuddy. Nobody gets called.</span></label>
+      </div>
       <button type="submit" class="pill" id="start">Start watching</button>
       <p class="tiny">A prototype, not a medical device. It can miss things, and it only works while you stay in front of this <span class="devword">phone</span>.</p>
-      <button type="button" class="textbtn installbtn" data-sheet="sh-install" hidden>Keep it on your home screen</button>
+      <button type="button" class="textbtn installbtn notest" data-sheet="sh-install" hidden>Keep it on your home screen</button>
     </div>
   </form>
 
@@ -293,8 +300,10 @@
       <p class="soft" id="watchSub">Breathe in as I grow, out as I shrink. Keep your body still.</p>
     </div>
     <div class="bot">
+      <p class="lead testonly" id="testTip"></p>
+      <button type="button" class="pill testonly" id="holdBtn" disabled></button>
       <button type="button" class="pill ghost" id="stop">Stop</button>
-      <p class="tiny">Keep me facing you. I'll stay as long as you need.</p>
+      <p class="tiny notest">Keep me facing you. I'll stay as long as you need.</p>
     </div>
   </main>
 
@@ -308,9 +317,10 @@
         <b id="count">6</b>
       </div>
       <h1 class="huge">Are you okay?</h1>
-      <p class="lead">Calling <span class="fname"></span> when this reaches zero.</p>
+      <p class="lead notest">Calling <span class="fname"></span> when this reaches zero.</p>
+      <p class="lead testonly">It noticed! This is a test, so nobody gets called.</p>
     </div>
-    <div class="bot"><p class="lead strong">Tap anywhere if you are.</p></div>
+    <div class="bot"><p class="lead strong notest">Tap anywhere if you are.</p><p class="lead strong testonly">Tap anywhere when you're breathing again.</p></div>
   </main>
 
   <!-- 7. The call was made, or failed -->
@@ -326,6 +336,20 @@
       <button type="button" class="pill" id="callYourself" hidden></button>
       <button type="button" class="pill" id="resume">I'm okay, keep watching</button>
       <button type="button" class="pill ghost" id="stop2">Stop</button>
+    </div>
+  </main>
+
+  <!-- Friend test only: the run's recording goes to Zeke (call server upload), or is saved for them to text him -->
+  <main id="s-sent" class="screen" hidden>
+    <div class="top"></div>
+    <div class="mid center">
+      <h1 id="sentTitle">Sending to Zeke...</h1>
+      <p class="lead" id="sentSub"></p>
+    </div>
+    <div class="bot">
+      <button type="button" class="pill" id="sentShare" hidden>Send the file to Zeke</button>
+      <button type="button" class="pill" id="sentSave" hidden>Save the recording file</button>
+      <button type="button" class="pill ghost" id="sentRetry" hidden>Try sending again</button>
     </div>
   </main>
 

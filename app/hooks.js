@@ -28,7 +28,9 @@ window.SonarHooks = {
   // stop() then downloads take-<time>.wav + .json in the collectors' format, so `node tools/replay-take.js <path>`
   // replays it. Without record nothing is kept (an hour of mic frames would be ~350 MB of memory).
   // fake (dev only): no mic, no sound. A made-up chest line; label('hold') flattens it and fires the alarm after 7 s.
-  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug, onWarmup, onMark, record = false, fake = false }) {
+  // keep (friend test, app/?test=...): stop() returns { blob, name } of the take instead of downloading it, and
+  // takeMeta (nickname, deviceId...) is added to the take's json, so app.js can send it to Zeke (uploadTake).
+  async startMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onDebug, onWarmup, onMark, record = false, fake = false, keep = false, takeMeta = null }) {
     if (fake) return window.SonarHooks.fakeMonitoring({ onStatus, onBreathingStopped, onBreathingResumed, onWave, onWarmup, onMark });
     const LOST_MS = 3000, DEAF_DB = 20;
     // Probe loudness sets itself, like screen brightness: start quiet and step up only until the mic hears the
@@ -105,6 +107,7 @@ window.SonarHooks = {
         node.disconnect();
         stream.getTracks().forEach(t => t.stop());
         ctx.close();
+        if (take && keep) return take.blob(takeMeta);
         if (take) take.download();
       },
     };
@@ -158,19 +161,15 @@ window.SonarHooks = {
       mark(event) { events.push({ event, sample: samples(), t: +(samples() / SR).toFixed(3) }); },
       // Ground truth for tools/replay-take.js, which scores each 'hold' stretch (until the next label).
       label(label) { labels.push({ label, sample: samples(), t: +(samples() / SR).toFixed(3) }); },
-      download() {
+      // The finished take as one .wav with its labels in a 'json' chunk. extra: more fields for the json.
+      blob(extra = {}) {
         const n = samples(), wav = new DataView(new ArrayBuffer(44));
         const str = (o, t) => { for (let i = 0; i < t.length; i++) wav.setUint8(o + i, t.charCodeAt(i)); };
         wav.setUint32(16, 16, true); wav.setUint16(20, 1, true); wav.setUint16(22, 1, true);
         wav.setUint32(24, SR, true); wav.setUint32(28, 2 * SR, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true);
         str(36, 'data'); wav.setUint32(40, 2 * n, true);
         const meta = { id, source: 'app', started: started.toISOString(), sampleRate: SR, P, f0: p.f0, f1: p.f1, amp,
-          samples: n, seconds: +(n / SR).toFixed(2), labels, events, peak: +peak.toFixed(4), mic, userAgent: navigator.userAgent };
-        const save = (blob, name) => {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob); a.download = name; a.click();
-          setTimeout(() => URL.revokeObjectURL(a.href), 60000);
-        };
+          samples: n, seconds: +(n / SR).toFixed(2), labels, events, peak: +peak.toFixed(4), mic, userAgent: navigator.userAgent, ...extra };
         // One file: the labels ride inside the .wav as a 'json' chunk after the audio, because Chrome
         // blocks a second automatic download. Players skip unknown chunks; tools/replay-take.js reads it.
         let js = new TextEncoder().encode(JSON.stringify(meta));
@@ -178,8 +177,9 @@ window.SonarHooks = {
         const jh = new DataView(new ArrayBuffer(8));
         'json'.split('').forEach((c, i) => jh.setUint8(i, c.charCodeAt(0))); jh.setUint32(4, js.length, true);
         str(0, 'RIFF'); wav.setUint32(4, 36 + 2 * n + 8 + js.length, true); str(8, 'WAVEfmt ');
-        save(new Blob([wav, ...frames, jh, js], { type: 'audio/wav' }), id + '.wav');
+        return { blob: new Blob([wav, ...frames, jh, js], { type: 'audio/wav' }), name: (extra.id || id) + '.wav' };
       },
+      download() { const t = this.blob(); window.SonarHooks.saveFile(t.blob, t.name); },
     };
   },
 
@@ -222,6 +222,28 @@ window.SonarHooks = {
   // .../app/?key=<passcode> and it is kept in this browser (see below), so it is never in the public code.
   // call/server.py on the Vultr machine, behind Caddy for https. Empty string: the hosted app shows the number to dial.
   HOSTED_CALL_URL: 'https://207-246-99-169.sslip.io/call',
+
+  // Friend test: send a take to call/server.py (PUT /upload/<name>, saved in its data/ folder). code is the
+  // upload code from the test link (?test=<code>), the server's UPLOAD_CODE. Uploads never place a call.
+  // onProgress(0..1). Resolves when saved (409 = already saved, also fine); rejects otherwise.
+  uploadTake(blob, name, code, onProgress) {
+    const local = ['localhost', '127.0.0.1'].includes(location.hostname);
+    const url = (local ? 'http://127.0.0.1:8788' : this.HOSTED_CALL_URL.replace(/\/call$/, '')) + '/upload/' + name;
+    return new Promise((resolve, reject) => {
+      const x = new XMLHttpRequest();   // not fetch: XHR reports upload progress (a take is ~20 MB)
+      x.open('PUT', url);
+      x.setRequestHeader('X-Passcode', code);
+      x.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+      x.onload = () => (x.status === 200 || x.status === 409 ? resolve() : reject(new Error(x.status + ' ' + x.responseText)));
+      x.onerror = () => reject(new Error('network'));
+      x.send(blob);
+    });
+  },
+  saveFile(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+  },
   async callFriend(contact) {
     const local = ['localhost', '127.0.0.1'].includes(location.hostname);
     const url = local ? 'http://127.0.0.1:8788/call' : this.HOSTED_CALL_URL;

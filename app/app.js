@@ -21,6 +21,13 @@
   const DEBUG = store.get(DEBUG_KEY) === '1';
   document.body.classList.toggle('debug', DEBUG);
 
+  // Friend test: app/?test=<upload code> (add &band=19 to try another probe band, read by hooks.js).
+  // The sit screen gets a consent box, the watch screen a "holding my breath" button, nobody is ever called,
+  // and Done sends the recording to Zeke (call server upload, code = this value). Stays in the address bar,
+  // so a reload stays in test mode; without it the app is unchanged.
+  const TEST = params.get('test') || '';
+  document.body.classList.toggle('testing', Boolean(TEST));
+
   // Dev options (set from the dashboard). Off the dashboard, nothing is recorded and the call is real.
   const dev = { fake: false, record: true, realCall: true };
 
@@ -143,7 +150,7 @@
     const n = $('friendName').value.trim();
     for (const el of document.querySelectorAll('.fname')) el.textContent = n || 'your friend';
     const u = $('userName').value.trim();
-    $('welcomeBack').textContent = loadSavedComplete() && u ? `Welcome back, ${u}` : 'Last step';
+    $('welcomeBack').textContent = TEST ? 'Help test BreathBuddy' : loadSavedComplete() && u ? `Welcome back, ${u}` : 'Last step';
   }
 
   function onWho(e) {
@@ -280,15 +287,20 @@
     if (e) e.preventDefault();
     if (session) return;
     contact = readContact();
-    if (!contact.friendName || !contact.friendPhone) { show('who'); return; }
-    if (!contact.userName) { show('you'); return; }
-    save(contact);
-    setFriendName();
-    // Ask for GPS now, while the person is here to allow it; the call says where that is (and the text, when on, gets a map link).
-    // Not saved with the contact, so it is fresh each session. Fails quietly: the call then goes out without a location.
-    if (navigator.geolocation && !(DEBUG && dev.fake)) navigator.geolocation.getCurrentPosition(
-      pos => { contact.lat = pos.coords.latitude; contact.lng = pos.coords.longitude; },
-      () => {}, { enableHighAccuracy: true, timeout: 15000 });
+    if (TEST) {
+      if (!$('testConsent').checked) return;
+      contact.friendName = 'a friend';            // test runs never call anyone (placeCall is skipped)
+    } else {
+      if (!contact.friendName || !contact.friendPhone) { show('who'); return; }
+      if (!contact.userName) { show('you'); return; }
+      save(contact);
+      setFriendName();
+      // Ask for GPS now, while the person is here to allow it; the call says where that is (and the text, when on, gets a map link).
+      // Not saved with the contact, so it is fresh each session. Fails quietly: the call then goes out without a location.
+      if (navigator.geolocation && !(DEBUG && dev.fake)) navigator.geolocation.getCurrentPosition(
+        pos => { contact.lat = pos.coords.latitude; contact.lng = pos.coords.longitude; },
+        () => {}, { enableHighAccuracy: true, timeout: 15000 });
+    }
     $('start').disabled = true;
     $('sitErr').hidden = true;
     try {
@@ -300,8 +312,10 @@
         onWarmup: setWarmup,
         onDebug: DEBUG ? JudgeView.update : null,      // the sonar view lives in the dev dashboard
         onMark: ev => emit('mark', ev),
-        record: DEBUG && dev.record,                     // keep the raw audio only for dev runs (visitors should not get a file download on Stop)
+        record: TEST ? true : DEBUG && dev.record,       // keep the raw audio only for dev runs and friend tests
         fake: DEBUG && dev.fake,
+        keep: Boolean(TEST),                             // friend test: Stop hands the take back to send, no download
+        takeMeta: TEST ? testMeta() : null,
       });
     } catch (err) {
       $('sitErr').textContent = 'Could not start: ' + (err && err.message ? err.message : 'microphone not available') +
@@ -319,6 +333,7 @@
     $('orb').style.removeProperty('--s');
     keepAwake();
     emit('session', true);
+    if (TEST) startTest();
     show('watch');
   }
 
@@ -349,7 +364,7 @@
 
   const STATUS = {
     searching: ['Take slow, deep breaths with me.', 'Breathe in as I grow, out as I shrink. Keep your body still.', ''],
-    watching: ['Breathing with you.', () => `I'm right here. ${contact.friendName} gets a call only if your breathing stops.`, 'on'],
+    watching: ['Breathing with you.', () => TEST ? "I can see you breathing. It's a test, so nobody gets called." : `I'm right here. ${contact.friendName} gets a call only if your breathing stops.`, 'on'],
     lost: ['Where did you go?', 'Sit back in front of the screen, chest facing it, so I can see you.', 'lost'],
     deaf: ["Can't hear my own sound.", 'Not watching. Unmute the speaker and turn it up. No headphones. Mic Mode: Standard.', 'lost'],
   };
@@ -406,11 +421,12 @@
   function stopAll() {
     stopAlarmNoise();
     setHolding(false);
-    if (session) session.stop();              // dev runs with "Record take" on download the .wav here
+    const take = session ? session.stop() : null;   // dev runs with "Record take" on download the .wav here; test runs return it
     session = null;
     guide(false);
     if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
     emit('session', false);
+    if (TEST) { clearInterval(test.timer); if (take) { sendTake(take); return; } }
     show('sit');
   }
 
@@ -429,7 +445,7 @@
     countTimer = setInterval(() => {
       left -= 1;
       $('count').textContent = Math.max(left, 0);
-      if (left <= 0) placeCall();
+      if (left <= 0 && !TEST) placeCall();     // friend test: the alarm stays on screen until they tap, nobody is called
     }, 1000);
   }
 
@@ -445,7 +461,7 @@
   function cancelAlarm(e) {
     if (!countTimer) return;
     if (session) session.mark(e ? "user: I'm okay" : 'alarm cleared');
-    if (e) setHolding(false);                 // answering the alarm means breathing again
+    if (e) { if (TEST && holding) endHold(); else setHolding(false); }   // answering the alarm means breathing again
     stopAlarmNoise();
     show('watch');
   }
@@ -510,6 +526,113 @@
   }
   const dial = number => { location.href = 'tel:' + number; };
 
+  // ---------- Friend test (app/?test=...) ----------
+  // Fixed timing, the same for everyone, so the count cannot be tuned per person: after the sonar finds the
+  // chest ("Breathing with you"), FIRST_WAIT_S of normal breathing (the hold detector needs ~45 s of normal
+  // breathing to compare against, HOLD.baseN in dsp.js), then HOLDS breath holds with REST_S of normal
+  // breathing between them. The person marks each hold's start and end (button, or Space on a laptop).
+  const HOLDS = 3, FIRST_WAIT_S = 45, REST_S = 30, HOLD_AIM_S = 20, HOLD_MAX_S = 60;
+  const test = { timer: null, lockAt: null, holds: 0, readyAt: Infinity, holdAt: 0 };
+  const nowS = () => performance.now() / 1000;
+
+  function testMeta() {
+    let deviceId = store.get('breathing-sonar.testDevice');
+    if (!deviceId) { deviceId = Math.random().toString(36).slice(2, 10); store.set('breathing-sonar.testDevice', deviceId); }
+    const nickname = $('testName').value.trim().slice(0, 30);
+    const safe = nickname.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 20) || 'anon';
+    return {
+      id: 'take-' + new Date().toISOString().replace(/[:.]/g, '-') + '-test-' + safe,
+      source: 'app-test', nickname, deviceId, consent: true, device: DEVICE,
+      rules: { firstWaitS: FIRST_WAIT_S, restS: REST_S, holdAimS: HOLD_AIM_S, holdMaxS: HOLD_MAX_S, holds: HOLDS },
+      screenSize: `${window.screen.width}x${window.screen.height}@${devicePixelRatio}`,
+    };
+  }
+
+  function startTest() {
+    Object.assign(test, { lockAt: null, holds: 0, readyAt: Infinity, holdAt: 0 });
+    clearInterval(test.timer);
+    test.timer = setInterval(paintTest, 250);
+    paintTest();
+  }
+
+  function paintTest() {
+    if (!TEST || !session) return;
+    const t = nowS(), key = DEVICE === 'laptop' ? ' (or press Space)' : '';
+    if (test.lockAt === null && status === 'watching') { test.lockAt = t; test.readyAt = t + FIRST_WAIT_S; }
+    let tip, btn, can = false;
+    if (holding) {
+      const h = t - test.holdAt;
+      if (h >= HOLD_MAX_S) { session.mark(`hold: ended by itself after ${HOLD_MAX_S} s`); endHold(); return; }
+      tip = h < HOLD_AIM_S ? `Holding... aim for about ${HOLD_AIM_S} seconds. Stop any time you need to.` : 'Great. Tap as soon as you breathe again.';
+      btn = `I'm breathing again (${Math.floor(h)} s)`; can = true;
+    } else if (test.holds >= HOLDS) {
+      tip = 'All done, thank you! Tap Done to send it to Zeke.';
+    } else if (test.lockAt === null) {
+      tip = 'First, take slow, deep breaths with the cloud until it says "Breathing with you."';
+      btn = 'Breath hold (after the cloud finds you)';
+    } else if (t < test.readyAt) {
+      tip = test.holds ? 'Nice. Now breathe normally for a bit.' : 'Now just breathe normally, staying close and still.';
+      btn = `Hold ${test.holds + 1} of ${HOLDS} in ${Math.ceil(test.readyAt - t)} s`;
+    } else {
+      tip = `Hold ${test.holds + 1} of ${HOLDS}: tap the button${key}, then hold your breath for about ${HOLD_AIM_S} seconds.`;
+      btn = "I'm holding my breath"; can = true;
+    }
+    $('testTip').textContent = tip;
+    $('holdBtn').hidden = test.holds >= HOLDS && !holding;
+    if (btn) $('holdBtn').textContent = btn;
+    $('holdBtn').disabled = !can;
+    const done = test.holds >= HOLDS && !holding;
+    $('stop').textContent = done ? 'Done: send it to Zeke' : 'Stop early and send';
+    $('stop').classList.toggle('ghost', !done);
+  }
+
+  function endHold() {
+    setHolding(false);
+    test.holds++;
+    test.readyAt = nowS() + REST_S;
+    paintTest();
+  }
+  function toggleHold() {
+    if (!TEST || !session || $('holdBtn').disabled) return;
+    if (holding) endHold();
+    else { test.holdAt = nowS(); setHolding(true); paintTest(); }
+  }
+
+  let sent = null;   // { blob, name } of the last test take, kept for Retry / Save / Share
+  async function sendTake(take) {
+    sent = take;
+    show('sent');
+    for (const id of ['sentShare', 'sentSave', 'sentRetry']) $(id).hidden = true;
+    $('sentTitle').textContent = 'Sending to Zeke...';
+    $('sentSub').textContent = '';
+    try {
+      await SonarHooks.uploadTake(take.blob, take.name, TEST, f => { $('sentSub').textContent = Math.round(100 * f) + '%'; });
+      $('sentTitle').textContent = 'Sent. Thank you!';
+      $('sentSub').textContent = 'Zeke has your recording. You can close this page.';
+    } catch (err) {
+      emit('mark', 'upload failed: ' + (err && err.message));
+      $('sentTitle').textContent = "Couldn't send it by itself.";
+      $('sentSub').textContent = `Please save the file and text or email it to Zeke (about ${Math.round(take.blob.size / 1e6)} MB). Don't rename it.`;
+      const file = new File([take.blob], take.name, { type: 'audio/wav' });
+      $('sentShare').hidden = !(navigator.canShare && navigator.canShare({ files: [file] }));
+      $('sentSave').hidden = false;
+      $('sentRetry').hidden = false;
+    }
+  }
+  $('sentShare').addEventListener('click', async () => {
+    try { await navigator.share({ files: [new File([sent.blob], sent.name, { type: 'audio/wav' })], title: 'BreathBuddy test' }); } catch (e) { /* closed the menu */ }
+  });
+  $('sentSave').addEventListener('click', () => SonarHooks.saveFile(sent.blob, sent.name));
+  $('sentRetry').addEventListener('click', () => sendTake(sent));
+  $('holdBtn').addEventListener('click', () => { toggleHold(); $('holdBtn').blur(); });
+  if (TEST) {
+    const consent = () => { $('start').disabled = !$('testConsent').checked; };
+    $('testConsent').addEventListener('change', consent);
+    consent();
+    $('start').textContent = 'Start the test';
+    window.addEventListener('beforeunload', e => { if (session) { e.preventDefault(); e.returnValue = ''; } });
+  }
+
   // ---------- Wiring ----------
 
   $('s-who').addEventListener('submit', onWho);
@@ -530,6 +653,7 @@
   // During the countdown any key means "I'm okay". Escape closes a sheet.
   document.addEventListener('keydown', e => {
     if (countTimer) { e.preventDefault(); cancelAlarm(e); return; }
+    if (TEST && screen === 'watch' && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); toggleHold(); return; }
     if (e.key === 'Escape') closeSheet();
   });
   document.addEventListener('click', e => {
@@ -553,13 +677,13 @@
     $('sitBack').dataset.go = 'ready';
   }
   setFriendName();
-  show(fromLink ? ($('userName').value.trim() ? 'ready' : 'you') : known ? 'sit' : 'hello');
+  show(TEST ? 'sit' : fromLink ? ($('userName').value.trim() ? 'ready' : 'you') : known ? 'sit' : 'hello');
 
   // ---------- For the dev dashboard (dev.js) ----------
   window.BreathingApp = {
     DEBUG, dev, COUNTDOWN_S,
     on: f => listeners.push(f),
-    screens: ['hello', 'how', 'invite', 'share', 'ready', 'who', 'you', 'sit', 'watch', 'alarm', 'called'],
+    screens: ['hello', 'how', 'invite', 'share', 'ready', 'who', 'you', 'sit', 'watch', 'alarm', 'called', 'sent'],
     show(name) { if (!contact) contact = readContact(); if (!contact.friendName) contact.friendName = 'your friend'; show(name); },
     start: () => onStart(),
     stop: stopAll,

@@ -1,10 +1,11 @@
-// Tally the takes friends recorded with the friend link (friend/index.html): per person and device, how many
-// breath holds they marked and whether the detector caught each one.
+// Tally the takes friends recorded with the friend test link (app/?test=<code>, source 'app-test'; older takes from the
+// retired friend/ page have source 'friend-link'): per person and device, how many breath holds they marked and
+// whether the detector caught each one.
 // Usage: node tools/friend-tally.js                 (detector = dsp.js as it is now, the live app's code once pushed)
 //        node tools/friend-tally.js --at <commit>   (detector = dsp.js at that commit, to freeze it for a fair count)
 //        node tools/friend-tally.js --dir <folder>  (takes in another folder; default data/)
 // Rules, fixed here so the count cannot be tuned per take:
-//   - A take counts if it came from the friend link (source 'friend-link'). Every such take is listed.
+//   - A take counts if it came from a friend test (source 'app-test' or 'friend-link'). Every such take is listed.
 //   - Probe heard = median probe SNR over the recording, recomputed from the audio, >= 20 dB (the app's own line;
 //     below it the app shows "can't hear" and never alarms). Takes not heard are listed as device failures and
 //     their holds are not scored: the app would not have been watching.
@@ -45,7 +46,7 @@ const pct = x => (100 * x).toFixed(0) + '%';
 const rows = [];
 for (const id of T.ids()) {
   const got = T.meta(id);
-  if (!got || got.m.source !== 'friend-link') continue;
+  if (!got || !['app-test', 'friend-link'].includes(got.m.source)) continue;
   const fr = T.load(id), m = fr.m;
   const snr = [...fr.snr].sort((a, b) => a - b)[fr.n >> 1];
   const person = m.nickname || `(no name, device ${m.deviceId || '?'})`;
@@ -61,8 +62,8 @@ for (const id of T.ids()) {
   rows.push(row);
 }
 
-console.log(`Friend-link takes in ${T.DATA}. Detector: ${detector}.\n`);
-if (!rows.length) { console.log('No friend-link takes yet.'); process.exit(); }
+console.log(`Friend test takes in ${T.DATA}. Detector: ${detector}.\n`);
+if (!rows.length) { console.log('No friend test takes yet.'); process.exit(); }
 for (const r of rows) {
   const holds = r.heard
     ? r.per.map(h => `${(h.b - h.a).toFixed(0)}s hold ${h.latency === null ? 'MISSED' : 'caught ' + h.latency + 's in'}`).join('; ') || 'no holds marked'
@@ -98,7 +99,7 @@ if (H) {
   const [lo, hi] = wilson(C, H);
   console.log(`  Caught ${C} of ${H} (${pct(C / H)}, 95% range ${pct(lo)}-${pct(hi)}). Median time to alarm ${lat[lat.length >> 1] ?? '-'} s.`);
   console.log(`  False alarms: ${FA} in ${QM.toFixed(1)} min of normal breathing.`);
-  console.log(`\nQuote: "In recordings by ${people.size} people on ${devices.size} of their own devices, the probe was heard on ${okDevices.size}.` +
+  console.log(`\nQuote: "In recordings by ${people.size} ${people.size === 1 ? "person" : "people"} on ${devices.size} of their own devices, the probe was heard on ${okDevices.size}.` +
     ` On those, BreathBuddy's detector caught ${C} of ${H} marked breath holds, with ${FA} false alarm${FA === 1 ? '' : 's'} in ${QM.toFixed(0)} minutes of normal breathing` +
     ` (holds marked by the person; detector replayed on the recordings afterward, not live)."`);
 }
