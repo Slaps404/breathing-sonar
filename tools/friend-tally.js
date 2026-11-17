@@ -11,7 +11,9 @@
 //     their holds are not scored: the app would not have been watching.
 //   - A hold is the stretch between the person's two presses (or the 45 s cap). It is caught if an alarm starts
 //     inside it or up to 2 s after it (same rule as tools/replay-take.js and tools/final-test.js).
-//   - A false alarm is an alarm start anywhere else, counted against minutes of non-hold recording.
+//   - A false alarm is an alarm start anywhere else after the hold button unlocked (chest found + the rules'
+//     firstWaitS), counted against minutes of non-hold recording in that same stretch. Alarms before the button
+//     unlocked are listed but not counted: the person may have held their breath early, with no way to mark it.
 const { execSync } = require('child_process'), fs = require('fs'), os = require('os'), path = require('path');
 const arg = (name) => { const i = process.argv.indexOf('--' + name); return i > 0 ? process.argv[i + 1] : null; };
 const repo = path.join(__dirname, '..');
@@ -51,13 +53,17 @@ for (const id of T.ids()) {
   const snr = [...fr.snr].sort((a, b) => a - b)[fr.n >> 1];
   const person = m.nickname || `(no name, device ${m.deviceId || '?'})`;
   const holds = m.segs.filter(s => s.label === 'hold');
+  const lockT = (m.events || []).find(e => e.event === 'status: watching')?.t ?? null;
+  const unlockT = lockT === null ? null : lockT + ((m.rules && m.rules.firstWaitS) ?? 45);
   const auto = m.labels.filter((l, i) => i > 0 && m.labels[i - 1].label === 'hold' && l.by && l.by !== 'key' && l.by !== 'tap' && l.by !== 'click').length;
   const row = { id, person, deviceId: m.deviceId || id, device: device(m), band: `${m.f0 / 1000}-${m.f1 / 1000} kHz`, snr, heard: snr >= HEARD_DB,
-    secs: fr.n / fr.rate, holds, auto, short: holds.filter(h => h.b - h.a < SHORT_HOLD).length, stoppedEarly: !!m.stoppedEarly };
+    secs: fr.n / fr.rate, holds, auto, short: holds.filter(h => h.b - h.a < SHORT_HOLD).length, stoppedEarly: !!m.stoppedEarly, lockT, unlockT };
   if (row.heard) {
     const sc = T.score(T.detect(fr).events, m.segs);
-    row.per = sc.holds; row.caught = sc.caught; row.fa = sc.false.length;
-    row.quietMin = m.segs.filter(s => s.label !== 'hold').reduce((a, s) => a + s.b - s.a, 0) / 60;
+    const from = unlockT ?? Infinity;
+    row.per = sc.holds; row.caught = sc.caught;
+    row.fa = sc.false.filter(f => f.t >= from).length; row.early = sc.false.length - row.fa;
+    row.quietMin = m.segs.filter(s => s.label !== 'hold').reduce((a, s) => a + Math.max(0, s.b - Math.max(s.a, from)), 0) / 60;
   }
   rows.push(row);
 }
@@ -66,10 +72,12 @@ console.log(`Friend test takes in ${T.DATA}. Detector: ${detector}.\n`);
 if (!rows.length) { console.log('No friend test takes yet.'); process.exit(); }
 for (const r of rows) {
   const holds = r.heard
-    ? r.per.map(h => `${(h.b - h.a).toFixed(0)}s hold ${h.latency === null ? 'MISSED' : 'caught ' + h.latency + 's in'}`).join('; ') || 'no holds marked'
+    ? r.per.map(h => `${(h.b - h.a).toFixed(0)}s hold at ${h.a.toFixed(0)}s ${h.latency === null ? 'MISSED' : 'caught ' + h.latency + 's in'}`).join('; ') || 'never pressed the hold button'
     : `${r.holds.length} holds marked, not scored`;
+  const when = r.lockT === null ? 'chest never found' : `chest found at ${r.lockT.toFixed(0)}s, hold button unlocked at ${r.unlockT.toFixed(0)}s`;
   console.log(`${r.person.padEnd(16)} ${r.device.padEnd(16)} ${r.band}  probe ${r.snr.toFixed(0).padStart(3)} dB ${r.heard ? 'heard    ' : 'NOT HEARD'}  ${(r.secs / 60).toFixed(1)} min`);
-  console.log(`   ${holds}${r.heard ? ` | false alarms ${r.fa}` : ''}${r.auto ? ` | ${r.auto} hold(s) ended without a press` : ''}${r.short ? ` | ${r.short} hold(s) under ${SHORT_HOLD}s` : ''}${r.stoppedEarly ? ' | stopped early' : ''}`);
+  console.log(`   ${when}, stopped at ${r.secs.toFixed(0)}s`);
+  console.log(`   ${holds}${r.heard ? ` | false alarms ${r.fa}` : ''}${r.early ? ` | ${r.early} alarm(s) before the button unlocked, not counted` : ''}${r.auto ? ` | ${r.auto} hold(s) ended without a press` : ''}${r.short ? ` | ${r.short} hold(s) under ${SHORT_HOLD}s` : ''}${r.stoppedEarly ? ' | stopped early' : ''}`);
 }
 
 // Per person and device: one line each.

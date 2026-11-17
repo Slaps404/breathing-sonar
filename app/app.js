@@ -558,13 +558,13 @@
 
   function paintTest() {
     if (!TEST || !session) return;
-    const t = nowS(), key = DEVICE === 'laptop' ? ' (or press Space)' : '';
+    const t = nowS();
     if (test.lockAt === null && status === 'watching') { test.lockAt = t; test.readyAt = t + FIRST_WAIT_S; }
     let tip, btn, can = false;
     if (holding) {
       const h = t - test.holdAt;
       if (h >= HOLD_MAX_S) { session.mark(`hold: ended by itself after ${HOLD_MAX_S} s`); endHold(); return; }
-      tip = h < HOLD_AIM_S ? `Holding... aim for about ${HOLD_AIM_S} seconds. Stop any time you need to.` : 'Great. Tap as soon as you breathe again.';
+      tip = h < HOLD_AIM_S ? `Holding... aim for about ${HOLD_AIM_S} seconds. Stop any time you need to.` : `Great. ${DEVICE === 'laptop' ? 'Press Space' : 'Tap'} as soon as you breathe again.`;
       btn = `I'm breathing again (${Math.floor(h)} s)`; can = true;
     } else if (test.holds >= HOLDS) {
       tip = 'All done, thank you! Tap Done to send it to Zeke.';
@@ -572,12 +572,16 @@
       tip = 'First, take slow, deep breaths with the cloud until it says "Breathing with you."';
       btn = 'Breath hold (after the cloud finds you)';
     } else if (t < test.readyAt) {
-      tip = test.holds ? 'Nice. Now breathe normally for a bit.' : 'Now just breathe normally, staying close and still.';
+      tip = (test.holds ? 'Nice. ' : '') + "Breathe normally. Don't hold your breath yet.";
       btn = `Hold ${test.holds + 1} of ${HOLDS} in ${Math.ceil(test.readyAt - t)} s`;
     } else {
-      tip = `Hold ${test.holds + 1} of ${HOLDS}: tap the button${key}, then hold your breath for about ${HOLD_AIM_S} seconds.`;
+      tip = DEVICE === 'laptop'
+        ? `Now hold ${test.holds + 1} of ${HOLDS}: press Space (or click), then hold your breath for about ${HOLD_AIM_S} seconds.`
+        : `Now hold ${test.holds + 1} of ${HOLDS}: tap once, take your hand away, then hold your breath for about ${HOLD_AIM_S} seconds.`;
       btn = "I'm holding my breath"; can = true;
     }
+    if (status === 'lost' && test.lockAt !== null && !holding && test.holds < HOLDS)
+      tip = DEVICE === 'laptop' ? 'I lost you. Sit still, chest facing the screen.' : "I lost you. Put the phone down propped up, chest facing it, and don't hold it.";
     $('testTip').textContent = tip;
     $('holdBtn').hidden = test.holds >= HOLDS && !holding;
     if (btn) $('holdBtn').textContent = btn;
