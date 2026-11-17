@@ -108,6 +108,9 @@ app on GitHub Pages --POST /call + passcode--> Vultr machine: Caddy (https) --> 
 - `tools/rate/`: breathing-rate and lock-on experiments, and the two charts above (`charts.js`).
 - `tools/pacer.html`, `tools/cue.html`: on-screen pacer and cues for paced and scripted recordings.
 
+**Friend test link.** `https://breathbuddy.us/friend/?k=<UPLOAD_CODE>` walks someone through set-up, a sound check, about 4 minutes of breathing and 3 breath holds that they mark themselves (Space or a big button), then sends the take to the call server (`PUT /upload`, saved in `data/` there). If sending fails it offers Share / Save so they can text the file instead. Devices that cannot hear the probe still record and send: that is a result too.
+- Count them: copy the takes into `data/`, then `node tools/friend-tally.js` (per person and device: holds marked, caught or missed, false alarms, and a sentence with the totals). `--at <commit>` freezes the detector version.
+
 **Collect labelled recordings.** Raw mic audio plus label timestamps, saved to `data/` (not committed).
 - Mac menu bar: `.venv/bin/python collect/menubar.py` (setup once: `python3 -m venv .venv && .venv/bin/pip install rumps sounddevice numpy`). Start, then pick what you are doing (breathing, holding breath, moving, away). `Set intervals` takes a plan like `normal 30, hold 20, x5` for a hands-free guided take.
 - Phone page: `python3 collect/server.py`, then expose port 8787 over HTTPS.

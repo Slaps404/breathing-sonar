@@ -14,12 +14,17 @@ environment variables there instead of .env: the four keys, CALL_PASSCODE (any s
 so strangers cannot spend your Twilio credit), and SONAR_STATE (the text of your local call/state.json, so a
 restart reuses the same agent). Hosts set PORT themselves: when it is set the server listens publicly on it,
 and refuses to start without CALL_PASSCODE.
+
+Friend recordings: PUT /upload/take-<id>.wav saves a take from the friend page (friend/) into data/
+(or UPLOAD_DIR). Off unless UPLOAD_CODE is set; the page sends the code from its link (?k=<code>).
+UPLOAD_CODE is a different word from CALL_PASSCODE, so the friend link cannot place calls.
 """
 import base64
 import hmac
 import json
 import math
 import os
+import re
 import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -36,6 +41,10 @@ AT_HOME_MILES = 0.06   # about 100 m: a Wi-Fi fix taken at home can land this fa
 AT_PLACE_MILES = 0.025  # about 40 m: closer than this to a named shop or building counts as being at it
 GEOCODER = "https://nominatim.openstreetmap.org"   # OpenStreetMap: free, no key. /reverse: fix to address, /search: address to fix
 PORT = 8788
+UPLOADS = Path(os.environ.get("UPLOAD_DIR") or ROOT / "data")
+UPLOAD_NAME = re.compile(r"^take-[A-Za-z0-9_-]{1,100}\.wav$")
+UPLOAD_MAX = 80 * 1024 * 1024        # one take is about 20 MB (4 min of 48 kHz 16-bit mono)
+UPLOAD_TOTAL = 5 * 1024 ** 3         # stop accepting once the folder holds 5 GB, so the disk cannot fill
 
 FIRST = ("Hi {{friend_name}}. This is an automated safety alert for {{user_name}}. "
          "Their breathing appears to have stopped{{place_phrase}}, and they did not answer a check on their laptop. "
@@ -74,7 +83,7 @@ def env():
             k, v = line.split("=", 1)
             keys[k.strip()] = v.strip()
     needed = ("TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_NUMBER", "ELEVENLABS_API_KEY")
-    for k in needed + ("CALL_PASSCODE",):
+    for k in needed + ("CALL_PASSCODE", "UPLOAD_CODE"):
         if os.environ.get(k):
             keys[k] = os.environ[k].strip()
     missing = [k for k in needed if not keys.get(k)]
@@ -251,6 +260,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.send_header("Access-Control-Allow-Origin", "*")   # the app page may be opened as a file
         self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Passcode")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")
         self.end_headers()
         self.wfile.write(json.dumps(body).encode())
 
@@ -259,6 +269,39 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):   # hosting services load this to see that the server is up
         self.reply(200, {"ok": True})
+
+    def do_PUT(self):
+        """Save one friend take. Writes to a temp name first, so a cut-off upload never looks like a take."""
+        name = self.path.removeprefix("/upload/")
+        code = self.keys.get("UPLOAD_CODE")
+        if not self.path.startswith("/upload/") or not UPLOAD_NAME.match(name):
+            return self.reply(404, {"error": "PUT /upload/take-<id>.wav"})
+        if not code:
+            return self.reply(403, {"error": "uploads are off (no UPLOAD_CODE)"})
+        if not hmac.compare_digest(self.headers.get("X-Passcode", "").encode(), code.encode()):
+            return self.reply(401, {"error": "wrong or missing code"})
+        size = int(self.headers.get("Content-Length") or 0)
+        UPLOADS.mkdir(parents=True, exist_ok=True)
+        used = sum(f.stat().st_size for f in UPLOADS.glob("take-*"))
+        if size <= 44 or size > UPLOAD_MAX or used + size > UPLOAD_TOTAL:
+            return self.reply(413, {"error": "bad size or storage full"})
+        dest, part = UPLOADS / name, UPLOADS / (name + ".part")
+        if dest.exists():
+            return self.reply(409, {"error": "already saved"})
+        left = size
+        with open(part, "wb") as f:
+            while left > 0:
+                chunk = self.rfile.read(min(left, 1 << 20))
+                if not chunk:
+                    break
+                f.write(chunk)
+                left -= len(chunk)
+        if left:
+            part.unlink(missing_ok=True)
+            return self.reply(400, {"error": "upload cut short"})
+        part.rename(dest)
+        print(f"upload: saved {dest} ({size / 1e6:.1f} MB)", flush=True)
+        self.reply(200, {"saved": name})
 
     def do_POST(self):
         if self.path != "/call":

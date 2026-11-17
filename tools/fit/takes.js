@@ -3,7 +3,7 @@
 // measuring and replaying is fast. Cache: data/.cir/<id>.bin (data/ is not committed).
 const fs = require('fs'), path = require('path');
 const D = require(process.env.DSP || '../../dsp.js');   // DSP=<path> runs another version of the detector
-const ROOT = path.join(__dirname, '..', '..'), DATA = path.join(ROOT, 'data'), CACHE = path.join(DATA, '.cir');
+const ROOT = path.join(__dirname, '..', '..'), DATA = process.env.TAKES_DIR || path.join(ROOT, 'data'), CACHE = path.join(DATA, '.cir');   // TAKES_DIR: read takes from another folder
 
 function meta(id) {
   const base = path.join(DATA, id), wav = fs.readFileSync(base + '.wav'), bytes = wav.readUInt32LE(40), at = 44 + bytes + (bytes % 2);
