@@ -564,7 +564,7 @@
     if (holding) {
       const h = t - test.holdAt;
       if (h >= HOLD_MAX_S) { session.mark(`hold: ended by itself after ${HOLD_MAX_S} s`); endHold(); return; }
-      tip = h < HOLD_AIM_S ? `Holding... aim for about ${HOLD_AIM_S} seconds. Stop any time you need to.` : `Great. ${DEVICE === 'laptop' ? 'Press Space' : 'Tap'} as soon as you breathe again.`;
+      tip = h < HOLD_AIM_S ? `Holding... aim for about ${HOLD_AIM_S} seconds.${DEVICE === 'laptop' ? '' : ' Keep your finger resting on the button and stay still.'} Stop any time you need to.` : `Great. ${DEVICE === 'laptop' ? 'Press Space' : 'Tap'} as soon as you breathe again.`;
       btn = `I'm breathing again (${Math.floor(h)} s)`; can = true;
     } else if (test.holds >= HOLDS) {
       tip = 'All done, thank you! Tap Done to send it to Zeke.';
@@ -577,7 +577,7 @@
     } else {
       tip = DEVICE === 'laptop'
         ? `Now hold ${test.holds + 1} of ${HOLDS}: press Space (or click), then hold your breath for about ${HOLD_AIM_S} seconds.`
-        : `Now hold ${test.holds + 1} of ${HOLDS}: tap once, take your hand away, then hold your breath for about ${HOLD_AIM_S} seconds.`;
+        : `Now hold ${test.holds + 1} of ${HOLDS}: rest a finger on the button so you don't have to reach, tap it, then hold your breath for about ${HOLD_AIM_S} seconds.`;
       btn = "I'm holding my breath"; can = true;
     }
     if (status === 'lost' && test.lockAt !== null && !holding && test.holds < HOLDS)
