@@ -406,3 +406,4 @@ body:not(.testing) .testonly, body.testing .notest { display: none !important; }
 .consent input { width: 24px; height: 24px; margin: 0; padding: 0; flex: none; appearance: auto; accent-color: var(--echo); }
 #testTip { margin-bottom: 4px; text-align: center; }
 body.testing.alarming .lead { color: #f3f8f8; }
+.checks li[hidden] { display: none; }

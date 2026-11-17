@@ -27,6 +27,7 @@
   // so a reload stays in test mode; without it the app is unchanged.
   const TEST = params.get('test') || '';
   document.body.classList.toggle('testing', Boolean(TEST));
+  if (TEST && +params.get('band') > 0 && +params.get('band') < 20) document.getElementById('bandNote').hidden = false;   // a lower band can be heard by some people
 
   // Dev options (set from the dashboard). Off the dashboard, nothing is recorded and the call is real.
   const dev = { fake: false, record: true, realCall: true };
