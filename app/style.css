@@ -230,8 +230,9 @@ body.is-phone .only-laptop, body.is-laptop .only-phone { display: none; }
 @keyframes cheeks { 0%, 100% { opacity: 0.4; } 40% { opacity: 0.95; } }
 .buddy.guiding .g-in { animation: g-in 10s linear infinite; }
 .buddy.guiding .g-out { animation: g-out 10s linear infinite; }
-@keyframes g-in { 0%, 37% { opacity: 1; } 41%, 96% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes g-out { 0%, 37% { opacity: 0; } 41%, 96% { opacity: 1; } 100% { opacity: 0; } }
+/* One word at a time: each fades all the way out before the next fades in, so they never sit on top of each other. */
+@keyframes g-in { 0%, 36% { opacity: 1; } 39%, 97% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes g-out { 0%, 39% { opacity: 0; } 42%, 94% { opacity: 1; } 97%, 100% { opacity: 0; } }
 .ground { width: 150px; height: 14px; margin-top: 4px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--ink) 35%, transparent), transparent); animation: ground 6s ease-in-out infinite; }
 @keyframes ground { 0%, 100% { scale: 1; opacity: 0.9; } 50% { scale: 0.86; opacity: 0.6; } }
 .cloud.live { scale: var(--s, 1); }
@@ -241,8 +242,10 @@ body.is-phone .only-laptop, body.is-laptop .only-phone { display: none; }
 .cloud.lost .eyes { animation: look 3.2s ease-in-out infinite; }
 .cloud.lost .smile { opacity: 0; } .cloud.lost .oh { opacity: 1; } .cloud.lost .cheek { opacity: 0.2; }
 @keyframes look { 0%, 100% { translate: 0 0; } 25% { translate: -6px 0; } 65% { translate: 6px 0; } }
-.guidetxt { display: grid; opacity: 0; min-height: 1.5em; margin: 8px 0 0; color: var(--text); font-weight: 700; font-size: 30px; letter-spacing: -0.01em; margin-top: 14px; transition: opacity 0.6s; }
+/* nowrap + a size that shrinks on narrow phones: both words stay on one line, so they fill the same spot. */
+.guidetxt { display: grid; opacity: 0; min-height: 1.5em; margin: 14px 0 0; color: var(--text); font-weight: 700; font-size: clamp(22px, 7.4vw, 30px); letter-spacing: -0.01em; white-space: nowrap; transition: opacity 0.6s; }
 .guidetxt span { grid-area: 1 / 1; }
+.guidetxt .g-out { opacity: 0; } /* without the timeline (before it starts), only "in" shows */
 .buddy.guiding .guidetxt { opacity: 1; }
 #s-watch h1 { margin-bottom: 4px; font-size: 19px; font-weight: 600; }
 
@@ -307,7 +310,14 @@ body.alarming .sbar { color: #f3f8f8; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
-  .cloud.live { scale: 1; }
+  /* The breathing cloud is what the app is for, so it keeps its slow grow and shrink (and the words that go with it)
+     when a phone asks for less motion. Only the extras stop: floating, blinking, ripples, screens sliding in. */
+  .buddy.guiding .cloud, .hello-cloud, .cardart .cloud { animation: guide 10s ease-in-out infinite !important; }
+  .buddy.guiding .cheek { animation: cheeks 10s ease-in-out infinite !important; }
+  .buddy.guiding .g-in { animation: g-in 10s linear infinite !important; }
+  .buddy.guiding .g-out { animation: g-out 10s linear infinite !important; }
+  .cloud.live { transition-duration: 0.35s !important; }
+  .guidetxt { transition-duration: 0.6s !important; }
 }
 
 /* ---------- Dev dashboard (?debug) ---------- */

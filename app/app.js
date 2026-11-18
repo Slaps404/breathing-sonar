@@ -388,6 +388,12 @@
   // While it looks for the chest, the cloud paces breathing: in for 4 s, out for 6 s. The cloud's size
   // and the "in" / "out" words share one CSS timeline (.guiding in style.css), so they cannot drift apart.
   function guide(on) {
+    const words = $('warm').querySelectorAll('.guidetxt span');
+    // Leaving: keep whichever word is showing as it fades out. Without this, both words jump back to full
+    // strength for that fade and sit on top of each other.
+    if (!on && $('warm').classList.contains('guiding'))
+      for (const el of words) el.style.opacity = getComputedStyle(el).opacity;
+    if (on) for (const el of words) el.style.removeProperty('opacity');
     $('warm').classList.toggle('guiding', on);
   }
 
