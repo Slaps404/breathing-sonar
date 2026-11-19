@@ -54,7 +54,11 @@ window.SonarHooks = {
     const band = +new URLSearchParams(location.search).get('band');
     // The chest search looks out to 1.2 m. The guided breathing at the start locks onto the person's own chest,
     // so the farther reach (vs the detector's 80 cm default) lets people sit back without picking up a pet nearby.
-    const opts = { maxR: 1.2 }; if (band) opts.probe = { f0: band * 1000, f1: band * 1000 + 2000 };
+    // app/?range=0.8 (metres) or ?range=80 (cm) changes it; kept between 0.4 and 3 m.
+    let range = +new URLSearchParams(location.search).get('range') || 1.2;
+    if (range > 5) range /= 100;
+    range = Math.min(3, Math.max(0.4, range));
+    const opts = { maxR: range }; if (band) opts.probe = { f0: band * 1000, f1: band * 1000 + 2000 };
     const sonar = new DSP.RangeSonar(opts);
     const node = new AudioWorkletNode(ctx, 'probe', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
       processorOptions: { signal: sonar.p.sig, amp: VOLUME } });
@@ -66,6 +70,7 @@ window.SonarHooks = {
 
     let status = null, movingSince = null, level = 0, levelAt = performance.now(), tuned = false, deaf = false, alarmUp = false;
     const setStatus = s => { if (s !== status) { status = s; mark('status: ' + s); onStatus(s); } };
+    if (range !== 1.2) mark(`range: ${range} m`);
     setStatus('searching');
     const timer = setInterval(() => {
       const now = performance.now();
